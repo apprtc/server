@@ -1,0 +1,5 @@
+package signalsvc
+
+func httpHandle() {
+
+}
