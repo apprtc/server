@@ -17,14 +17,14 @@ define([
 
 	'directives/bfi',
 	'directives/title',
-	'directives/welcome',
 	'directives/menu',
 	'directives/ui'], function (_, onEnter, onEscape, buddyList,
 		settings, chat, audioVideo, usability,
 		audioLevel,
 		fileInfo,
 		contactRequest,
-		bfi, title, welcome, menu, ui) {
+		bfi, title, 
+		menu, ui) {
 
 		var directives = {
 			onEnter: onEnter,
@@ -39,7 +39,6 @@ define([
 			contactRequest: contactRequest,
 			bfi: bfi,
 			title: title,
-			welcome: welcome,
 			menu: menu,
 			ui: ui
 		};

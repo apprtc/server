@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!partials/contactrequest.html', 'text!partials/picturehover.html'], function($, _, moment, templateFileInfo, templateContactRequest, templatePictureHover) {
+define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!partials/contactrequest.html'], function($, _, moment, templateFileInfo, templateContactRequest) {
 
 	// ChatroomController
 	return ["$scope", "$element", "$window", "safeMessage", "safeDisplayName", "$compile", "$filter", "translation", "mediaStream", function($scope, $element, $window, safeMessage, safeDisplayName, $compile, $filter, translation, mediaStream) {
@@ -29,7 +29,6 @@ define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!p
 		var displayName = safeDisplayName;
 		var fileInfo = $compile(templateFileInfo);
 		var contactRequest = $compile(templateContactRequest);
-		var pictureHover = $compile(templatePictureHover);
 
 		var knowMessage = {
 			r: {},
@@ -81,33 +80,11 @@ define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!p
 			}
 		};
 
-		var addPictureHover = function(from, msg, is_self) {
-			if (msg.picture && !is_self) {
-				var subscope = $scope.$new();
-				subscope.startChat = function() {
-					$scope.$emit("startchat", from, {
-						autofocus: true,
-						restore: true
-					});
-				};
-				subscope.doCall = function() {
-					mediaStream.webrtc.doCall(from);
-				};
-				pictureHover(subscope, function(clonedElement, scope) {
-					msg.picture.append(clonedElement);
-				});
-			} else {
-				return;
-			}
-			msg.extra_css += "with_hoverimage ";
-		};
-
 		var showTitleAndPicture = function(from, msg, is_self) {
 			if ($scope.isgroupchat) {
 				msg.title = $("<strong>");
 				msg.title.html(displayName(from, true));
 				msg.extra_css += "with_name ";
-				addPictureHover(from, msg, is_self);
 			}
 		};
 

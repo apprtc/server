@@ -39,8 +39,8 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function ($, _, 
 		var controller = ['$scope', 'mediaSources', 'safeApply', 'availableLanguages', 'translation', 'localStorage', 'userSettingsData', 'constraints', 'appData', '$timeout', function ($scope, mediaSources, safeApply, availableLanguages, translation, localStorage, userSettingsData, constraints, appData, $timeout) {
 
 			$scope.layout.settings = false;
-			$scope.showAdvancedSettings = true;
-			$scope.autoshowSettings = true;
+			$scope.showAdvancedSettings = false;
+			$scope.autoshowSettings = false;
 			$scope.rememberSettings = true;
 			$scope.mediaSources = mediaSources;
 			$scope.availableLanguages = [{

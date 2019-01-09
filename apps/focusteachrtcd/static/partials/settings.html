@@ -14,15 +14,6 @@
     <div ng-form="settingsform" class="form-horizontal" on-enter="saveSettings(user)" on-escape="cancelSettings()"
       <fieldset>
 
-      <settings-account ng-controller="UsersettingsController as usersettings">
-        <legend>{{_('Profile')}}</legend>
-        <div class="form-group profile-yourname">
-          <label class="col-xs-4 control-label">{{_('Your name')}}</label>
-          <div class="col-xs-8">
-            <input type="text" class="form-control" ng-model="user.displayName" placeholder="{{_('Name')}}" />
-          </div>
-        </div>
-      </settings-account>
       <settings-media ng-show="mediaSources.supported || supported.constraints.audioVideo">
         <legend>{{_('Media')}}</legend>
         <div ng-show="mediaSources.supported">
