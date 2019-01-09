@@ -11,13 +11,12 @@ define([
 	'mediastream/peercall',
 	'mediastream/peerconference',
 	'mediastream/peerxfer',
-	'mediastream/peerscreenshare',
 	'mediastream/usermedia',
 	'mediastream/utils',
 	'mediastream/tokens',
 	'webrtc.adapter'],
 
-function($, _, PeerCall, PeerConference, PeerXfer, PeerScreenshare, UserMedia, utils, tokens) {
+function($, _, PeerCall, PeerConference, PeerXfer, UserMedia, utils, tokens) {
 
 	if (webrtcDetectedAndroid) {
 		console.log("This seems to be Android");
@@ -103,15 +102,6 @@ function($, _, PeerCall, PeerConference, PeerXfer, PeerScreenshare, UserMedia, u
 				mandatory: {},
 				optional: []
 			},
-			screensharing: {
-				mediaConstraints: {
-					audio: false,
-					video: {
-						optional: [],
-						mandatory: {}
-					}
-				}
-			},
 			// sdpParams values need to be strings.
 			sdpParams: {
 				//audioSendBitrate: ,
@@ -132,10 +122,6 @@ function($, _, PeerCall, PeerConference, PeerXfer, PeerScreenshare, UserMedia, u
 				offerToReceiveVideo: true
 			},
 			renegotiation: true
-		};
-
-		this.screensharingSettings = {
-
 		};
 
 		this.api.e.bind("received.offer received.candidate received.answer received.bye received.conference", _.bind(this.processReceived, this));
@@ -665,76 +651,6 @@ function($, _, PeerCall, PeerConference, PeerXfer, PeerScreenshare, UserMedia, u
 
 	};
 
-	WebRTC.prototype.doScreenshare = function(options) {
-
-		var usermedia = new UserMedia({
-			noAudio: true
-		});
-		var ok = usermedia.doGetUserMedia(null, PeerScreenshare.getCaptureMediaConstraints(this, options));
-		if (ok) {
-			this.e.one("done", function() {
-				usermedia.stop();
-			});
-			return usermedia;
-		} else {
-			return null;
-		}
-
-	};
-
-	WebRTC.prototype.doSubscribeScreenshare = function(id, token, options) {
-
-		var registeredToken = tokens.get(token);
-		if (!registeredToken) {
-			console.warn("Cannot subscribe screen share for unknown token", token);
-			return;
-		}
-
-		var peerscreenshare = new PeerScreenshare(this, null, token, id);
-		var opts = $.extend({
-			created: function() {},
-			connected: function() {},
-			error: function() {},
-			closed: function() {}
-		}, options);
-
-		this.e.one("done", function() {
-			peerscreenshare.close();
-		});
-
-		// Store as handler on the token object.
-		registeredToken.addHandler(peerscreenshare, id);
-
-		// Bind ICE connection state events.
-		peerscreenshare.e.on("connectionStateChange", _.bind(function(event, iceConnectionState, currentscreenshare) {
-			console.log("Screen share state changed", iceConnectionState);
-			switch (iceConnectionState) {
-				case "completed":
-				case "connected":
-					opts.connected(currentscreenshare);
-					break;
-				case "disconnected":
-					opts.error(currentscreenshare);
-					break;
-				case "closed":
-					opts.closed(currentscreenshare);
-					break;
-			}
-		}, this));
-
-		// Trigger initial event.
-		opts.created(peerscreenshare);
-
-		// Connect.
-		peerscreenshare.setInitiate(true); //XXX(longsleep): This creates a data channel which is not needed.
-		peerscreenshare.createPeerConnection(_.bind(function(pc) {
-			peerscreenshare.e.on("negotiationNeeded", _.bind(function(event, currentscreenshare) {
-				this.sendOfferWhenNegotiationNeeded(currentscreenshare, id);
-			}, this));
-			_.defer(pc.negotiationNeeded);
-		}, this));
-
-	};
 
 	WebRTC.prototype.stop = function() {
 

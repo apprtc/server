@@ -219,9 +219,9 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 
 						// Changes the way the video encoding adapts to the available bandwidth.
 						// https://code.google.com/p/webrtc/issues/detail?id=3351
-						c.add(["video", "screensharing"], "googLeakyBucket", settings.experimental.videoLeakyBucket && true); // defaults to false in Chrome
+						c.add(["video"], "googLeakyBucket", settings.experimental.videoLeakyBucket && true); // defaults to false in Chrome
 						// Removes the noise in the captured video stream at the expense of CPU.
-						c.add(["video", "screensharing"], "googNoiseReduction", settings.experimental.videoNoiseReduction && true); // defaults to false in Chrome
+						c.add(["video"], "googNoiseReduction", settings.experimental.videoNoiseReduction && true); // defaults to false in Chrome
 
 					}
 

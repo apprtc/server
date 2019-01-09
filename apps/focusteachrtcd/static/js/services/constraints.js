@@ -15,7 +15,6 @@
 			this.audio = [];
 			this.video = [];
 			this.videoMandatory = {};
-			this.screensharing =[];
 			this.disabled = {};
 			// Add a single promise for ourselves.
 			this.promises = [];
@@ -100,7 +99,6 @@
 					mandatory: constraints.videoMandatory
 				};
 			}
-			webrtc.settings.screensharing.mediaConstraints.video.optional = constraints.screensharing;
 		};
 
 		// Create as WebRTC data structure.
