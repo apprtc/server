@@ -22,54 +22,6 @@
             <input type="text" class="form-control" ng-model="user.displayName" placeholder="{{_('Name')}}" />
           </div>
         </div>
-        <div class="form-group profile-statusmessage">
-          <label class="col-xs-4 control-label">{{_('Status message')}}</label>
-          <div class="col-xs-8">
-            <input type="text" class="form-control" ng-model="user.message" placeholder="{{_('What\'s on your mind?')}}" />
-          </div>
-        </div>
-        <div class="form-group profile-publicnotice">
-          <label class="col-xs-4 control-label"></label>
-          <div class="col-xs-8">
-            <p class="help-block">{{_('Your picture, name and status message identify yourself in calls, chats and
-              rooms.')}}</p>
-          </div>
-        </div>
-        <div ng-if="(withUsers && withUsersRegistration) || userid">
-          <div class="form-group profile-yourid">
-            <label class="col-xs-4 control-label">{{_('Your ID')}}</label>
-            <div ng-switch="withUsersMode">
-              <div ng-switch-when="certificate" class="col-xs-8">
-                <div ng-if="userid">
-                  <p class="form-control-static well well-sm">{{userid|displayUserid}}</p>
-                  <p class-"help-block">{{_('Authenticated by certificate. To log out you have to remove your
-                    certificate from the browser.')}}</p>
-                </div>
-              </div>
-              <div ng-switch-default class="col-xs-8">
-                <div ng-if="!userid && withUsersRegistration">
-                  <label ng-if="usersettings.loginUserid">
-                    <button class="btn btn-small btn-primary btn-sign-in" ng-click="usersettings.loginUserid()">{{_('Sign
-                      in')}}</button>
-                  </label>
-                  <label ng-if="usersettings.registerUserid">
-                    <button class="btn btn-small btn-info btn-create-account" ng-click="usersettings.registerUserid($event)">{{_('Create
-                      an account')}}</button>
-                  </label>
-                </div>
-                <p class="form-control-static well well-sm" ng-if="userid">{{userid|displayUserid}}</p>
-                <label ng-if="userid && withUsersForget && usersettings.forgetUserid">
-                  <button class="btn btn-small btn-default btn-sign-out" ng-click="usersettings.forgetUserid()">{{_('Sign
-                    out')}}</button>
-                </label>
-                <label ng-if="userid && usersettings.accountUserid">
-                  <button class="btn btn-small btn-info btn-manage-account" ng-click="usersettings.accountUserid()">{{_('Manage
-                    account')}}</button>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
       </settings-account>
       <settings-media ng-show="mediaSources.supported || supported.constraints.audioVideo">
         <legend>{{_('Media')}}</legend>

@@ -6,7 +6,6 @@ define([
 
 	'directives/onenter',
 	'directives/onescape',
-	'directives/statusmessage',
 	'directives/buddylist',
 	'directives/settings',
 	'directives/chat',
@@ -20,7 +19,7 @@ define([
 	'directives/title',
 	'directives/welcome',
 	'directives/menu',
-	'directives/ui'], function (_, onEnter, onEscape, statusMessage, buddyList,
+	'directives/ui'], function (_, onEnter, onEscape, buddyList,
 		settings, chat, audioVideo, usability,
 		audioLevel,
 		fileInfo,
@@ -30,7 +29,6 @@ define([
 		var directives = {
 			onEnter: onEnter,
 			onEscape: onEscape,
-			statusMessage: statusMessage,
 			buddyList: buddyList,
 			settings: settings,
 			chat: chat,
