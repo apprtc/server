@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"github.com/apprtc/server/cmd/signalsvc"
-	"github.com/apprtc/server/cmd/stunsvc"
 	"github.com/go-apps/pkg/core"
 )
 
@@ -28,8 +27,8 @@ func Main() {
 	signalServer := signalsvc.NewSignalServer(signalIp, signalPort)
 	core.CoreApplication().AddTask(signalServer)
 
-	stunServer := stunsvc.NewStunServer(stunIp, stunPort)
-	core.CoreApplication().AddTask(stunServer)
+	// stunServer := stunsvc.NewStunServer(stunIp, stunPort)
+	// core.CoreApplication().AddTask(stunServer)
 }
 
 func main() {
