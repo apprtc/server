@@ -5,7 +5,6 @@ define([ // Helper module to put non dependency base libraries together.
 	'modernizr',
 	'moment',
 	'Howler',
-	'desktop-notify',
 	'bigscreen',
 	'visibly',
 	'avltree',

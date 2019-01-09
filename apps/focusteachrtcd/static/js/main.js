@@ -14,7 +14,6 @@ require.config({
 		'ui-bootstrap': 'libs/angular/ui-bootstrap-tpls.min',
 		'ua-parser': 'libs/ua-parser',
 		'Howler': 'libs/howler.min',
-		'desktop-notify': 'libs/desktop-notify',
 		'bigscreen': 'libs/bigscreen.min',
 		'moment': 'libs/moment.min',
 		'angular-sanitize': 'libs/angular/angular-sanitize.min',
@@ -52,9 +51,6 @@ require.config({
 		},
 		'ui-bootstrap': {
 			deps: ['angular']
-		},
-		'desktop-notify': {
-			exports: 'notify'
 		},
 		'bigscreen': {
 			exports: 'BigScreen'
