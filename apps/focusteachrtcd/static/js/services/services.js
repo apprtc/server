@@ -36,7 +36,6 @@ define([
 	'services/animationframe',
 	'services/dialogs',
 	'services/continueconnector',
-	'services/chromeextension',
 	'services/usersettingsdata',
 	'services/localstatus',
 	'services/rooms',
@@ -81,7 +80,6 @@ define([
 		animationFrame,
 		dialogs,
 		continueConnector,
-		chromeExtension,
 		userSettingsData,
 		localStatus,
 		rooms,
@@ -95,7 +93,6 @@ define([
 		playPromise) {
 
 		var services = {
-
 			playSound: playSound,
 			safeApply: safeApply,
 			connector: connector,
@@ -129,7 +126,6 @@ define([
 			animationFrame: animationFrame,
 			dialogs: dialogs,
 			continueConnector: continueConnector,
-			chromeExtension: chromeExtension,
 			userSettingsData: userSettingsData,
 			localStatus: localStatus,
 			rooms: rooms,
