@@ -21,7 +21,6 @@ define([
 	'directives/page',
 	'directives/contactrequest',
 	'directives/defaultdialog',
-	// 'directives/presentation',
 
 	'directives/bfi',
 	'directives/title',
@@ -31,7 +30,6 @@ define([
 		// screenshare, 
 		roomBar, 
 		page, contactRequest, defaultDialog, 
-		// pdfcanvas, odfcanvas, presentation, youtubevideo,
 		bfi, title, welcome, menu, ui) {
 
 	var directives = {
