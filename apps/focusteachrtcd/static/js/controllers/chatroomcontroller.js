@@ -27,7 +27,6 @@ define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!p
 		}, 100));
 
 		var displayName = safeDisplayName;
-		var buddyImageSrc = $filter("buddyImageSrc");
 		var fileInfo = $compile(templateFileInfo);
 		var contactRequest = $compile(templateContactRequest);
 		var pictureHover = $compile(templatePictureHover);
@@ -108,11 +107,6 @@ define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!p
 				msg.title = $("<strong>");
 				msg.title.html(displayName(from, true));
 				msg.extra_css += "with_name ";
-				var imgSrc = buddyImageSrc(from);
-				msg.picture = $('<div class="buddyPicture"><i class="fa fa-user fa-3x"/><img/></div>');
-				if (imgSrc) {
-					msg.picture.find("img").attr("src", imgSrc);
-				}
 				addPictureHover(from, msg, is_self);
 			}
 		};

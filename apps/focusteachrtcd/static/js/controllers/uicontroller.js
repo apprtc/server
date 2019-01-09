@@ -171,7 +171,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			// This is the user status.
 			var status = {
 				displayName: $scope.master.displayName || null,
-				buddyPicture: $scope.master.buddyPicture || null,
 				message: $scope.master.message || null
 			}
 			if (clear) {

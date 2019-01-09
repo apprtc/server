@@ -1,18 +1,18 @@
 
 
 "use strict";
-define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partials/buddy.html', 'text!partials/buddyactions.html', 'text!partials/buddyactionsforaudiomixer.html'], function($, angular, _, Modernizr, AvlTree, templateBuddy, templateBuddyActions, templateBuddyActionsForAudioMixer) {
+define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partials/buddy.html', 'text!partials/buddyactions.html', 'text!partials/buddyactionsforaudiomixer.html'], function ($, angular, _, Modernizr, AvlTree, templateBuddy, templateBuddyActions, templateBuddyActionsForAudioMixer) {
 
-	var BuddyTree = function() {
+	var BuddyTree = function () {
 
 		this.data = {};
-		this.tree = new AvlTree(function(a, b) {
+		this.tree = new AvlTree(function (a, b) {
 			return a.sort.localeCompare(b.sort);
 		});
 
 	};
 
-	BuddyTree.prototype.create = function(id, scope) {
+	BuddyTree.prototype.create = function (id, scope) {
 
 		var display = scope.display || {};
 		var sort = display.displayName ? display.displayName : "session " + scope.buddyIndexSortable + " " + id;
@@ -24,7 +24,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 	};
 
-	BuddyTree.prototype.add = function(id, scope) {
+	BuddyTree.prototype.add = function (id, scope) {
 
 		var data = this.create(id, scope);
 		this._add(id, data);
@@ -32,7 +32,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 	};
 
-	BuddyTree.prototype._add = function(id, data) {
+	BuddyTree.prototype._add = function (id, data) {
 
 		if (this.tree.add(data)) {
 			this.data[id] = data;
@@ -41,7 +41,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 	};
 
 
-	BuddyTree.prototype.remove = function(id) {
+	BuddyTree.prototype.remove = function (id) {
 
 		if (this.data.hasOwnProperty(id)) {
 			this.tree.remove(this.data[id]);
@@ -50,7 +50,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 	};
 
-	BuddyTree.prototype.check = function(id) {
+	BuddyTree.prototype.check = function (id) {
 
 		return this.data.hasOwnProperty(id);
 
@@ -59,7 +59,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 	/**
 	 * Returns undefined when no change required. Position result otherwise.
 	 */
-	BuddyTree.prototype.update = function(id, scope) {
+	BuddyTree.prototype.update = function (id, scope) {
 
 		var current = this.data[id];
 		if (!current) {
@@ -79,10 +79,10 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 	/**
 	 * Returns null when end position. Id of element to insert before otherwise.
 	 */
-	BuddyTree.prototype.position = function(id) {
+	BuddyTree.prototype.position = function (id) {
 
 		var result = null;
-		this.tree.inOrderTraverse(function(c) {
+		this.tree.inOrderTraverse(function (c) {
 			if (c.id !== id) {
 				result = c.id;
 				return true;
@@ -92,19 +92,19 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 	};
 
-	BuddyTree.prototype.traverse = function(cb) {
+	BuddyTree.prototype.traverse = function (cb) {
 
 		return this.tree.inOrderTraverse(cb);
 
 	};
 
-	BuddyTree.prototype.keys = function() {
+	BuddyTree.prototype.keys = function () {
 
 		return _.keys(this.data);
 
 	};
 
-	BuddyTree.prototype.clear = function() {
+	BuddyTree.prototype.clear = function () {
 
 		this.tree.clear();
 		this.data = {};
@@ -112,7 +112,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 	};
 
 	// buddyList
-	return ["$window", "$compile", "playSound", "buddyData", "buddySession", "buddyPicture", "fastScroll", "mediaStream", "animationFrame", "$q", function($window, $compile, playSound, buddyData, buddySession, buddyPicture, fastScroll, mediaStream, animationFrame, $q) {
+	return ["$window", "$compile", "playSound", "buddyData", "buddySession", "fastScroll", "mediaStream", "animationFrame", "$q", function ($window, $compile, playSound, buddyData, buddySession, fastScroll, mediaStream, animationFrame, $q) {
 
 		var buddyTemplate = $compile(templateBuddy);
 		var buddyActions = $compile(templateBuddyActions);
@@ -122,7 +122,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 		var doc = $window.document;
 		var buddyCount = 0;
 
-		var Buddylist = function($element, $scope, opts) {
+		var Buddylist = function ($element, $scope, opts) {
 
 			this.$scope = $scope;
 			this.$element = $element.find(".buddycontainer > div");
@@ -135,17 +135,17 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			this.playSoundLeft = false;
 			this.playSoundJoined = false;
 			fastScroll.apply($element, this.$element);
-			$element.on("mouseenter mouseleave", ".buddy", _.bind(function(event) {
+			$element.on("mouseenter mouseleave", ".buddy", _.bind(function (event) {
 				// Hover handler for on Buddy actions.
 				var buddyElement = $(event.currentTarget);
 				this.hover(buddyElement, event.type === "mouseenter" ? true : false);
 			}, this));
-			$element.on("click", ".buddy", _.bind(function(event) {
+			$element.on("click", ".buddy", _.bind(function (event) {
 				var buddyElement = $(event.currentTarget);
 				this.click(buddyElement, event.target);
 			}, this));
 			$element.attr("data-xthreshold", "10");
-			$element.on("swipeleft", ".buddy", _.bind(function(event) {
+			$element.on("swipeleft", ".buddy", _.bind(function (event) {
 				event.preventDefault();
 				var buddyElement = $(event.currentTarget);
 				this.hover(buddyElement, !buddyElement.hasClass("hovered"));
@@ -159,12 +159,12 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.addBuddyElementToScope = function(scope, before, container) {
+		Buddylist.prototype.addBuddyElementToScope = function (scope, before, container) {
 
 			if (!container) {
 				container = this.$element[0];
 			}
-			buddyTemplate(scope, function($clonedElement, $scope) {
+			buddyTemplate(scope, function ($clonedElement, $scope) {
 				//console.log("create", $scope.displayName, before)
 				if (before) {
 					// Insert directly before another node.
@@ -184,14 +184,14 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.onBuddyScopeCreated = function(scope, data) {
+		Buddylist.prototype.onBuddyScopeCreated = function (scope, data) {
 
 			// Init scope with our stuff.
 			scope.element = null;
 			scope.contact = null;
 			scope.display = {};
 			scope.session = buddySession.create(data);
-			scope.$on("$destroy", function() {
+			scope.$on("$destroy", function () {
 				//console.log("destroyed");
 				scope.element = null;
 				scope.killed = true;
@@ -199,7 +199,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.onBuddySessionUserid = function(scope, sourceSession) {
+		Buddylist.prototype.onBuddySessionUserid = function (scope, sourceSession) {
 
 			//console.log("session with userid", sourceSession);
 
@@ -241,7 +241,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.soundLoop = function() {
+		Buddylist.prototype.soundLoop = function () {
 
 			if (this.playSoundLeft) {
 				playSound.play("left");
@@ -254,7 +254,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.refreshBuddies = function() {
+		Buddylist.prototype.refreshBuddies = function () {
 
 			//console.log("processing", this.queue.length);
 			var processed = 0;
@@ -268,7 +268,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			// Cleanup lefts.
 			var lefts = this.lefts;
 			if (!_.isEmpty(lefts)) {
-				_.each(lefts, function(element, k) {
+				_.each(lefts, function (element, k) {
 					if (element) {
 						element.remove();
 					}
@@ -310,7 +310,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 					if (not_exists) {
 						this.addBuddyElementToScope(scope, before, container);
 					} else {
-						if (typeof(before) === "undefined") {
+						if (typeof (before) === "undefined") {
 							// No action when undefined.
 						} else if (before) {
 							// Move directly before another node.
@@ -361,7 +361,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.setDisplay = function(id, scope, data, queueName) {
+		Buddylist.prototype.setDisplay = function (id, scope, data, queueName) {
 
 			var status = data.Status;
 			if (!status) {
@@ -371,8 +371,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			var display = scope.display;
 			// Set display.name.
 			display.displayName = status.displayName;
-			// Set display.picture.
-			buddyPicture.update(display, status.buddyPicture);
 			// Set display subline.
 			this.updateSubline(display, status.message);
 			// Add to render queue when no element exists.
@@ -384,7 +382,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.updateDisplay = function(id, scope, data, queueName) {
+		Buddylist.prototype.updateDisplay = function (id, scope, data, queueName) {
 
 			//console.log("updateDisplay", data, scope);
 			var status = data.Status;
@@ -412,16 +410,9 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			if (status.message) {
 				this.updateSubline(display, status.message);
 			}
-			// Update display picture.
-			if (contact) {
-				buddyPicture.update(display, contact.buddyPicture || status.buddyPicture || null);
-			} else if (status.buddyPicture) {
-				buddyPicture.update(display, status.buddyPicture || null);
-			}
-
 		};
 
-		Buddylist.prototype.updateSubline = function(display, s) {
+		Buddylist.prototype.updateSubline = function (display, s) {
 
 			if (!s || s === "__e") {
 				display.subline = "";
@@ -435,7 +426,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.onContactUpdated = function(data) {
+		Buddylist.prototype.onContactUpdated = function (data) {
 			var scope = buddyData.get(data.Userid);
 			if (scope && scope.contact) {
 				scope.contact.Status = angular.extend(scope.contact.Status, data.Status);
@@ -444,15 +435,15 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			//console.log("onContactUpdated", 'data', data, 'scope', scope);
 		};
 
-		Buddylist.prototype.onStatus = function(data) {
+		Buddylist.prototype.onStatus = function (data) {
 
 			//console.log("onStatus", data);
 			var id = data.Id;
-			var scope = buddyData.get(id, this.$scope, _.bind(function(scope) {
+			var scope = buddyData.get(id, this.$scope, _.bind(function (scope) {
 				this.onBuddyScopeCreated(scope, data);
 			}, this), data.Userid);
 			// Update session.
-			var sessionData = scope.session.update(id, data, _.bind(function(session) {
+			var sessionData = scope.session.update(id, data, _.bind(function (session) {
 				//console.log("Session is now authenticated", session);
 				var newscope = this.onBuddySessionUserid(scope, session);
 				if (newscope) {
@@ -468,16 +459,16 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.onJoined = function(data, noApply) {
+		Buddylist.prototype.onJoined = function (data, noApply) {
 
 			//console.log("Joined", data);
 			var id = data.Id;
-			var scope = buddyData.get(id, this.$scope, _.bind(function(scope) {
+			var scope = buddyData.get(id, this.$scope, _.bind(function (scope) {
 				this.onBuddyScopeCreated(scope, data);
 			}, this), data.Userid);
 			// Update session.
 			buddyCount++;
-			var sessionData = scope.session.update(id, data, _.bind(function(session) {
+			var sessionData = scope.session.update(id, data, _.bind(function (session) {
 				//console.log("Session is now authenticated", session);
 				var newscope = this.onBuddySessionUserid(scope, session);
 				if (newscope) {
@@ -494,7 +485,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 		};
 
 
-		Buddylist.prototype.onLeft = function(data, force, noApply) {
+		Buddylist.prototype.onLeft = function (data, force, noApply) {
 
 			//console.log("Left", data);
 			var id = data.Id;
@@ -549,7 +540,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.onClosed = function() {
+		Buddylist.prototype.onClosed = function () {
 
 			//console.log("Closed");
 
@@ -569,7 +560,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.onContactAdded = function(contact) {
+		Buddylist.prototype.onContactAdded = function (contact) {
 
 			//console.log("onContactAdded", contact);
 			var userid = contact.Userid;
@@ -584,15 +575,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 						var status = contact.Status = _.extend({}, sessionData.Status);
 						// Remove status message.
 						delete status.message;
-						// Convert buddy image.
-						if (status.buddyPicture) {
-							var img = buddyPicture.toString(scope.element.find(".buddyPicture img")[0]);
-							if (img) {
-								status.buddyPicture = img;
-							} else {
-								delete status.buddyPicture;
-							}
-						}
 						console.log("Injected status into contact", contact);
 					}
 					this.updateDisplay(sessionData.Id, scope, contact, "status");
@@ -610,7 +592,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.onContactRemoved = function(contact) {
+		Buddylist.prototype.onContactRemoved = function (contact) {
 
 			//console.log("onContactRemoved", contact);
 			var userid = contact.Userid;
@@ -622,13 +604,13 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 				var sessionData = scope.session.get();
 				if (!sessionData) {
 					// Force left.
-					this.onLeft({Id: userid}, true);
+					this.onLeft({ Id: userid }, true);
 				}
 			}
 
 		};
 
-		Buddylist.prototype.click = function(buddyElement, target) {
+		Buddylist.prototype.click = function (buddyElement, target) {
 
 			var be = buddyElement[0];
 			// Traverse up to find click action.
@@ -647,13 +629,13 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			var session = scope.session;
 			var contact = scope.contact;
 
-			var promise = (function() {
+			var promise = (function () {
 				var deferred = $q.defer();
 				var sessionData = session.get()
 				if (!sessionData) {
 					// Find session with help of contact.
 					if (contact && contact.Token) {
-						mediaStream.api.sendSessions(contact.Token, "contact", function(event, type, data) {
+						mediaStream.api.sendSessions(contact.Token, "contact", function (event, type, data) {
 							var tmpSessionData = null;
 							if (data.Users && data.Users.length > 0) {
 								tmpSessionData = data.Users[0];
@@ -678,30 +660,30 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			})();
 
 			switch (action) {
-			case "call":
-				promise.then(function(id) {
-					scope.doCall(id);
-				});
-				break;
-			case "chat":
-				promise.then(function(id) {
-					scope.doChat(id);
-				});
-				break;
-			case "contact":
-				if (contact) {
-					scope.doContactRemove(contact.Userid);
-				} else {
-					promise.then(function(id) {
-						scope.doContactRequest(id);
+				case "call":
+					promise.then(function (id) {
+						scope.doCall(id);
 					});
-				}
-				break;
+					break;
+				case "chat":
+					promise.then(function (id) {
+						scope.doChat(id);
+					});
+					break;
+				case "contact":
+					if (contact) {
+						scope.doContactRemove(contact.Userid);
+					} else {
+						promise.then(function (id) {
+							scope.doContactRequest(id);
+						});
+					}
+					break;
 			}
 
 		};
 
-		Buddylist.prototype.hover = function(buddyElement, hover) {
+		Buddylist.prototype.hover = function (buddyElement, hover) {
 
 			//console.log("hover handler", buddyElement, hover);
 			var scope = buddyElement.scope();
@@ -711,7 +693,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			var elem;
 			if (!hover) {
 				buddy.removeClass("hovered");
-				setTimeout(_.bind(function() {
+				setTimeout(_.bind(function () {
 					if (!buddy.hasClass("hovered")) {
 						elem = actionElements[id];
 						if (elem) {
@@ -731,10 +713,10 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 					//	template = buddyActionsForAudioMixer;
 					//}
 					//console.log("scope", scope, id);
-					template(scope, _.bind(function(clonedElement, $scope) {
+					template(scope, _.bind(function (clonedElement, $scope) {
 						actionElements[id] = clonedElement;
 						buddy.append(clonedElement);
-						_.defer(function() {
+						_.defer(function () {
 							buddy.addClass("hovered");
 						});
 					}, this));
@@ -745,7 +727,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 		};
 
 		return {
-			buddylist: function($element, $scope, opts) {
+			buddylist: function ($element, $scope, opts) {
 				return new Buddylist($element, $scope, opts);
 			}
 		}

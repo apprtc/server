@@ -18,7 +18,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 		$scope.roomsHistory = [];
 		$scope.defaults = {
 			displayName: null,
-			buddyPicture: null,
 			message: null,
 			settings: {
 				videoQuality: "high",
