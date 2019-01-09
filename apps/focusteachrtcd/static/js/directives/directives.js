@@ -20,7 +20,6 @@ define([
 	'directives/roombar',
 	'directives/page',
 	'directives/contactrequest',
-	'directives/defaultdialog',
 
 	'directives/bfi',
 	'directives/title',
@@ -29,7 +28,7 @@ define([
 	'directives/ui'], function(_, onEnter, onEscape, statusMessage, buddyList, buddyPictureCapture, buddyPictureUpload, settings, chat, audioVideo, usability, audioLevel, fileInfo, 
 		// screenshare, 
 		roomBar, 
-		page, contactRequest, defaultDialog, 
+		page, contactRequest,
 		bfi, title, welcome, menu, ui) {
 
 	var directives = {
@@ -49,7 +48,6 @@ define([
 		roomBar: roomBar,
 		page: page,
 		contactRequest: contactRequest,
-		defaultDialog: defaultDialog,
 		bfi: bfi,
 		title: title,
 		welcome: welcome,
