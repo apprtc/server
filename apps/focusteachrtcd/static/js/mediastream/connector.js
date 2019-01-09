@@ -164,7 +164,7 @@ define(['jquery', 'underscore'], function($, _) {
 		this.connecting = null;
 		this.connecting_timeout = timeout;
 
-		//console.log("onclose", event);
+		console.log("onclose", event);
 		console.info("Connector on connection close.", event, this.error);
 		this.close();
 		if (!this.error) {
@@ -175,7 +175,7 @@ define(['jquery', 'underscore'], function($, _) {
 
 	Connector.prototype.onmessage = function(event) {
 
-		console.log("onmessage", event);
+		console.log("onmessage", event.data);
 		var msg = JSON.parse(event.data);
 		this.e.triggerHandler("received", [msg]);
 

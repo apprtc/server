@@ -271,7 +271,7 @@ function($, _, PeerCall, PeerConference, PeerXfer, UserMedia, utils, tokens) {
 			return;
 		}
 
-		var autoaccept = false;
+		var autoaccept = true;
 		if (data._conference) {
 			if (this.conference.id !== data._conference) {
 				console.warn("Received Offer for unknown conference -> busy.", from);
