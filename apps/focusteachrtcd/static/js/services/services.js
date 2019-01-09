@@ -3,8 +3,6 @@
 "use strict";
 define([
 	'underscore',
-
-	'services/desktopnotify',
 	'services/playsound',
 	'services/safeapply',
 	'services/connector',
@@ -50,7 +48,6 @@ define([
 	'services/dummystream',
 	'services/usermedia',
 	'services/playpromise'], function (_,
-		desktopNotify,
 		playSound,
 		safeApply,
 		connector,
@@ -98,7 +95,7 @@ define([
 		playPromise) {
 
 		var services = {
-			desktopNotify: desktopNotify,
+
 			playSound: playSound,
 			safeApply: safeApply,
 			connector: connector,

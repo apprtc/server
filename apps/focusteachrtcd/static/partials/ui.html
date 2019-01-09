@@ -17,13 +17,19 @@
 		<div class="audio-level" title="{{_('Your audio level')}}"></div>
 	</div>
 	<div id="audiovideo" class="ng-cloak" ng-show="peer || isConferenceRoom()">
-		<audio-video/>
+		<audio-video />
 	</div>
 	<div class="ng-cloak" id="rightslide">
 		<div class="rightslidepane">
-			<div id="buddylist"><buddy-list/></div>
-			<div id="chat"><chat/></div>
+			<div id="buddylist">
+				<buddy-list />
+			</div>
+			<div id="chat">
+				<chat />
+			</div>
 		</div>
 	</div>
-	<div class="ng-cloak" id="settings" ng-class="{show: layout.settings}"><settings/></div>
-</chat>
+	<div class="ng-cloak" id="settings" ng-class="{show: layout.settings}">
+		<settings />
+	</div>
+	</chat>

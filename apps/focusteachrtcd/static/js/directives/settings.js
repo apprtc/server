@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, template) {
+define(['jquery', 'underscore', 'text!partials/settings.html'], function ($, _, template) {
 
 	var videoQualityMap = {
 		tiny: {
@@ -34,15 +34,14 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 		}
 	};
 
-	return ["$compile", "mediaStream", function($compile, mediaStream) {
+	return ["$compile", "mediaStream", function ($compile, mediaStream) {
 
-		var controller = ['$scope', 'desktopNotify', 'mediaSources', 'safeApply', 'availableLanguages', 'translation', 'localStorage', 'userSettingsData', 'constraints', 'appData', '$timeout', function($scope, desktopNotify, mediaSources, safeApply, availableLanguages, translation, localStorage, userSettingsData, constraints, appData, $timeout) {
+		var controller = ['$scope', 'mediaSources', 'safeApply', 'availableLanguages', 'translation', 'localStorage', 'userSettingsData', 'constraints', 'appData', '$timeout', function ($scope, mediaSources, safeApply, availableLanguages, translation, localStorage, userSettingsData, constraints, appData, $timeout) {
 
 			$scope.layout.settings = false;
 			$scope.showAdvancedSettings = true;
 			$scope.autoshowSettings = true;
 			$scope.rememberSettings = true;
-			$scope.desktopNotify = desktopNotify;
 			$scope.mediaSources = mediaSources;
 			$scope.availableLanguages = [{
 				code: "",
@@ -52,7 +51,7 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 			$scope.withUsersRegistration = mediaStream.config.UsersAllowRegistration;
 			$scope.withUsersMode = mediaStream.config.UsersMode;
 
-			_.each(availableLanguages, function(name, code) {
+			_.each(availableLanguages, function (name, code) {
 				$scope.availableLanguages.push({
 					code: code,
 					name: name
@@ -60,13 +59,13 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 			});
 
 			// Make sure to save settings when they are open and the page is reloaded.
-			$(window).on("unload", function() {
+			$(window).on("unload", function () {
 				if ($scope.layout.settings) {
 					$scope.saveSettings();
 				}
 			});
 
-			$scope.saveSettings = function() {
+			$scope.saveSettings = function () {
 				var form = $scope.settingsform;
 				if (form.$valid && form.$dirty) {
 					var user = $scope.user;
@@ -84,7 +83,7 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 				$scope.layout.settings = false;
 			};
 
-			$scope.cancelSettings = function() {
+			$scope.cancelSettings = function () {
 				var form = $scope.settingsform;
 				$scope.reset();
 				if (form.$dirty) {
@@ -93,13 +92,8 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 				$scope.layout.settings = false;
 			};
 
-			$scope.requestDesktopNotifyPermission = function() {
-				$scope.desktopNotify.requestPermission(function() {
-					safeApply($scope);
-				});
-			};
 
-			$scope.checkDefaultMediaSources = function() {
+			$scope.checkDefaultMediaSources = function () {
 				// Check if the stuff exists.
 				if ($scope.master.settings.microphoneId && !$scope.mediaSources.hasAudioId($scope.master.settings.microphoneId)) {
 					$scope.master.settings.microphoneId = null;
@@ -109,11 +103,10 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 				}
 			};
 
-			$scope.$watch("layout.settings", function(showSettings, oldValue) {
+			$scope.$watch("layout.settings", function (showSettings, oldValue) {
 				if (showSettings) {
-					$scope.desktopNotify.refresh();
-					$scope.mediaSources.refresh(function(audio, video) {
-						safeApply($scope, function(scope) {
+					$scope.mediaSources.refresh(function (audio, video) {
+						safeApply($scope, function (scope) {
 							if ($scope.user.settings.microphoneId && !$scope.mediaSources.hasAudioId($scope.user.settings.microphoneId)) {
 								$scope.user.settings.microphoneId = null;
 							}
@@ -134,7 +127,7 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 				}
 			});
 
-			$scope.maybeShowSettings = function() {
+			$scope.maybeShowSettings = function () {
 				if ($scope.autoshowSettings && mediaStream.connector.connected && !appData.authorizing()) {
 					$scope.autoshowSettings = false;
 					if (!$scope.loadedUser) {
@@ -143,23 +136,23 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 				}
 			};
 
-			$scope.$on("room.joined", function() {
+			$scope.$on("room.joined", function () {
 				$timeout($scope.maybeShowSettings);
 			});
 
-			appData.e.on("authenticationChanged", function() {
+			appData.e.on("authenticationChanged", function () {
 				$scope.autoshowSettings = true;
 				$timeout($scope.maybeShowSettings);
 			});
 
-			constraints.e.on("refresh", function(event, c) {
+			constraints.e.on("refresh", function (event, c) {
 
 				var settings = $scope.master.settings;
 
 				// Assert that selected devices are there.
-				(function() {
+				(function () {
 					var deferred = c.defer();
-					mediaSources.refresh(function() {
+					mediaSources.refresh(function () {
 						$scope.checkDefaultMediaSources();
 						// Select microphone device by id.
 						if (settings.microphoneId) {
@@ -233,13 +226,13 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function($, _, t
 					var videoQuality = videoQualityMap[settings.videoQuality];
 					if (videoQuality) {
 						var mandatory = videoQuality.mandatory;
-						_.forEach(videoQuality, function(v, k) {
+						_.forEach(videoQuality, function (v, k) {
 							if (k !== "mandatory") {
 								c.add("video", k, v, mandatory ? false : true);
 							}
 						});
 						if (mandatory) {
-							_.forEach(mandatory, function(v, k) {
+							_.forEach(mandatory, function (v, k) {
 								c.add("video", k, v, true);
 							});
 						}

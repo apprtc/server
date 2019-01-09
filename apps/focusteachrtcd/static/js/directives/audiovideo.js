@@ -1,13 +1,13 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/audiovideopeer.html', 'bigscreen', 'webrtc.adapter'], function($, _, template, templatePeer, BigScreen) {
+define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/audiovideopeer.html', 'bigscreen', 'webrtc.adapter'], function ($, _, template, templatePeer, BigScreen) {
 
-	return ["$window", "$compile", "$filter", "mediaStream", "safeApply", "desktopNotify", "buddyData", "videoWaiter", "videoLayout", "animationFrame", "$timeout", "dummyStream", function($window, $compile, $filter, mediaStream, safeApply, desktopNotify, buddyData, videoWaiter, videoLayout, animationFrame, $timeout, DummyStream) {
+	return ["$window", "$compile", "$filter", "mediaStream", "safeApply", "buddyData", "videoWaiter", "videoLayout", "animationFrame", "$timeout", "dummyStream", function ($window, $compile, $filter, mediaStream, safeApply, buddyData, videoWaiter, videoLayout, animationFrame, $timeout, DummyStream) {
 
 		var peerTemplate = $compile(templatePeer);
 
-		var controller = ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
 
 			var streams = this.streams = {};
 			var calls = {};
@@ -31,7 +31,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			//console.log("audiovideo", localVideo, miniVideo);
 
-			$scope.addRemoteStream = function(stream, currentcall) {
+			$scope.addRemoteStream = function (stream, currentcall) {
 
 				var id = currentcall.getStreamId(stream);
 				console.log("New stream", id);
@@ -57,7 +57,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 							subscope.dummy = null;
 							delete streams[dummyId];
 							streams[id] = subscope;
-							safeApply(subscope, function(scope) {
+							safeApply(subscope, function (scope) {
 								console.log("Replacing dummy with stream", id);
 								scope.attachStream(stream);
 							});
@@ -84,10 +84,10 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				subscope.withvideo = false;
 				subscope.onlyaudio = false;
 				subscope.destroyed = false;
-				subscope.$on("active", function() {
+				subscope.$on("active", function () {
 					console.log("Stream scope is now active", id, peerid);
 				});
-				subscope.$on("$destroy", function() {
+				subscope.$on("$destroy", function () {
 					if (subscope.destroyed) {
 						return;
 					}
@@ -111,14 +111,14 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				streams[id] = subscope;
 
 				// Render template.
-				peerTemplate(subscope, function(clonedElement, scope) {
+				peerTemplate(subscope, function (clonedElement, scope) {
 					clonedElement.data("peerid", scope.peerid);
 					scope.element = clonedElement;
-					scope.attachStream = function(stream) {
+					scope.attachStream = function (stream) {
 						if (DummyStream.is(stream)) {
 							scope.withvideo = false;
 							scope.onlyaudio = true;
-							$timeout(function() {
+							$timeout(function () {
 								scope.$emit("active", currentcall);
 								$scope.redraw();
 							});
@@ -127,26 +127,26 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 							var video = clonedElement.find("video")[0];
 							$window.attachMediaStream(video, stream);
 							// Waiter callbacks also count as connected, as browser support (FireFox 25) is not setting state changes properly.
-							videoWaiter.wait(video, stream, function(withvideo) {
+							videoWaiter.wait(video, stream, function (withvideo) {
 								if (scope.destroyed) {
 									console.log("Abort wait for video on destroyed scope.");
 									return;
 								}
 								if (withvideo) {
-									scope.$apply(function($scope) {
+									scope.$apply(function ($scope) {
 										$scope.withvideo = true;
 										$scope.onlyaudio = false;
 									});
 								} else {
 									console.info("Incoming stream has no video tracks.");
-									scope.$apply(function($scope) {
+									scope.$apply(function ($scope) {
 										$scope.withvideo = false;
 										$scope.onlyaudio = true;
 									});
 								}
 								scope.$emit("active", currentcall);
 								$scope.redraw();
-							}, function() {
+							}, function () {
 								if (scope.destroyed) {
 									console.log("No longer wait for video on destroyed scope.");
 									return;
@@ -159,7 +159,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 						}
 						scope.unattached = false;
 					};
-					scope.doChat = function() {
+					scope.doChat = function () {
 						$scope.$emit("startchat", currentcall.id, {
 							autofocus: true,
 							restore: true
@@ -171,7 +171,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			};
 
-			$scope.removeRemoteStream = function(stream, currentcall) {
+			$scope.removeRemoteStream = function (stream, currentcall) {
 
 				var id = currentcall.getStreamId(stream);
 				console.log("Stream removed", id);
@@ -190,13 +190,13 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 			};
 
 			// Talking updates receiver.
-			mediaStream.api.e.on("received.talking", function(event, id, from, talking) {
-				$scope.$apply(function(scope) {
+			mediaStream.api.e.on("received.talking", function (event, id, from, talking) {
+				$scope.$apply(function (scope) {
 					scope.peersTalking[from] = !!talking;
 				});
 			});
 
-			$scope.$on("active", function(currentcall) {
+			$scope.$on("active", function (currentcall) {
 
 				//console.log("active 2");
 				if (!$scope.isActive) {
@@ -204,12 +204,12 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					$scope.remoteVideos.style.opacity = 1;
 					$element.addClass("active");
 					//console.log("active 3");
-					_.delay(function() {
+					_.delay(function () {
 						$scope.localVideos.style.opacity = 0;
 						$scope.localVideo.style.opacity = 0;
 						$scope.localVideo.src = "";
 					}, 500);
-					_.delay(function() {
+					_.delay(function () {
 						//console.log("active 4", $scope.mini);
 						$($scope.mini).addClass("visible");
 					}, 1000);
@@ -217,20 +217,20 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			});
 
-			$scope.toggleFullscreen = function() {
+			$scope.toggleFullscreen = function () {
 				//console.log("Toggle full screen", BigScreen.enabled, $scope.isActive, $scope.hasUsermedia);
 				if (BigScreen.enabled && ($scope.isActive || $scope.hasUsermedia)) {
-					BigScreen.toggle($scope.layoutparent[0], function() {
+					BigScreen.toggle($scope.layoutparent[0], function () {
 						// onEnter
 						$scope.layoutparent.addClass("fullscreen");
-					}, function() {
+					}, function () {
 						// onExit
 						$scope.layoutparent.removeClass("fullscreen");
 					});
 				}
 			};
 
-			mediaStream.webrtc.e.on("usermedia", function(event, usermedia) {
+			mediaStream.webrtc.e.on("usermedia", function (event, usermedia) {
 
 				if (!usermedia || !usermedia.started) {
 					return;
@@ -247,7 +247,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					$scope.hasUsermedia = true;
 					usermedia.attachMediaStream($scope.localVideo);
 					var count = 0;
-					var waitForLocalVideo = function() {
+					var waitForLocalVideo = function () {
 						if (!$scope.hasUsermedia || $scope.isActive) {
 							return;
 						}
@@ -270,9 +270,9 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			});
 
-			mediaStream.webrtc.e.on("done stop", function(event) {
+			mediaStream.webrtc.e.on("done stop", function (event) {
 
-				safeApply($scope, function(scope) {
+				safeApply($scope, function (scope) {
 					if (!scope.isActive) {
 						return;
 					}
@@ -282,7 +282,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					if (BigScreen.enabled) {
 						BigScreen.exit();
 					}
-					var removeVideos = function() {
+					var removeVideos = function () {
 						if (scope.isActive) {
 							return;
 						}
@@ -300,7 +300,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					scope.localVideo.style.opacity = 0;
 					scope.remoteVideos.style.opacity = 0;
 					$element.removeClass('active');
-					_.each(streams, function(streamscope, k) {
+					_.each(streams, function (streamscope, k) {
 						streamscope.$destroy();
 						delete streams[k];
 					});
@@ -310,7 +310,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			});
 
-			mediaStream.webrtc.e.on("streamadded", function(event, stream, currentcall) {
+			mediaStream.webrtc.e.on("streamadded", function (event, stream, currentcall) {
 
 				console.log("Remote stream added.", stream, currentcall);
 				if (!$scope.haveStreams) {
@@ -326,43 +326,43 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			});
 
-			mediaStream.webrtc.e.on("streamremoved", function(event, stream, currentcall) {
+			mediaStream.webrtc.e.on("streamremoved", function (event, stream, currentcall) {
 
 				console.log("Remote stream removed.", stream, currentcall);
 				$scope.removeRemoteStream(stream, currentcall);
 
 			});
 
-			mediaStream.webrtc.e.on("statechange", function(event, iceConnectionState, currentcall) {
+			mediaStream.webrtc.e.on("statechange", function (event, iceConnectionState, currentcall) {
 
 				if (!$scope.haveStreams || currentcall.closed) {
 					return;
 				}
 
 				switch (iceConnectionState) {
-				case "new":
-				case "checking":
-				case "connected":
-				case "completed":
-				case "failed":
-					$scope.addRemoteStream(new DummyStream(), currentcall);
-					break;
+					case "new":
+					case "checking":
+					case "connected":
+					case "completed":
+					case "failed":
+						$scope.addRemoteStream(new DummyStream(), currentcall);
+						break;
 				}
 
 			});
 
 		}];
 
-		var compile = function(tElement, tAttr) {
+		var compile = function (tElement, tAttr) {
 
-			return function(scope, iElement, iAttrs, controller) {
+			return function (scope, iElement, iAttrs, controller) {
 
 				//console.log("compile", arguments)
 
 				iElement.on("doubletap dblclick", _.debounce(scope.toggleFullscreen, 100, true));
 
 				var rendererName = null;
-				var getRendererName = function() {
+				var getRendererName = function () {
 					// Return name of current renderer.
 					if (rendererName !== null) {
 						return rendererName;
@@ -370,7 +370,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 						return scope.rendererName;
 					}
 				};
-				var forceRendererName = function(name) {
+				var forceRendererName = function (name) {
 					// Allow change between some renderes when forced.
 					if (name === "classroom") {
 						rendererName = "classroom";
@@ -379,7 +379,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					}
 				};
 
-				scope.setRenderer = function(name) {
+				scope.setRenderer = function (name) {
 					scope.rendererName = name;
 					if (rendererName && rendererName !== name) {
 						forceRendererName(name);
@@ -387,11 +387,11 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				};
 
 				var needsRedraw = false;
-				scope.redraw = function() {
+				scope.redraw = function () {
 					needsRedraw = true;
 				};
 
-				var redraw = function() {
+				var redraw = function () {
 					var size = {
 						width: scope.layoutparent.width(),
 						height: scope.layoutparent.height()
@@ -412,7 +412,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 				// Make sure we draw on resize.
 				$($window).on("resize", scope.redraw);
-				scope.$on("mainresize", function(event, main) {
+				scope.$on("mainresize", function (event, main) {
 					if (main) {
 						// Force smally renderer or pin classroom when we have a main view.
 						forceRendererName(scope.rendererName);
@@ -424,12 +424,12 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				scope.redraw();
 
 				// Make sure we draw when the renderer was changed.
-				scope.$watch("rendererName", function() {
+				scope.$watch("rendererName", function () {
 					_.defer(scope.redraw);
 				});
 
 				// Update function run in rendering thread.
-				var update = function() {
+				var update = function () {
 					if (needsRedraw) {
 						needsRedraw = false;
 						redraw();
