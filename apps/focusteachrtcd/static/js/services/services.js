@@ -48,7 +48,6 @@ define([
 	'services/constraints',
 	'services/modules',
 	'services/mediadevices',
-	'services/sandbox',
 	'services/dummystream',
 	'services/usermedia',
 	'services/playpromise'], function(_,
@@ -96,7 +95,6 @@ roompin,
 constraints,
 modules,
 mediaDevices,
-sandbox,
 dummyStream,
 userMedia,
 playPromise) {
@@ -146,7 +144,6 @@ playPromise) {
 		constraints: constraints,
 		modules: modules,
 		mediaDevices: mediaDevices,
-		sandbox: sandbox,
 		dummyStream: dummyStream,
 		userMedia: userMedia,
 		playPromise: playPromise
