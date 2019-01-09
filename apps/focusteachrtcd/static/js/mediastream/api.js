@@ -179,15 +179,6 @@ define(['jquery', 'underscore', 'ua-parser'], function($, _, uaparser) {
 			case "Talking":
 				this.e.triggerHandler("received.talking", [d.To, d.From, data.Talking]);
 				break;
-			case "Screenshare":
-				this.e.triggerHandler("received.screenshare", [d.To, d.From, data.Screenshare, d.p2p]);
-				break;
-			case "Presentation":
-				this.e.triggerHandler("received.presentation", [d.To, d.From, data.Presentation, d.p2p]);
-				break;
-			case "YouTubeVideo":
-				this.e.triggerHandler("received.youtubevideo", [d.To, d.From, data.YouTubeVideo, d.p2p]);
-				break;
 			case "Alive":
 				// Do nothing.
 				//console.log("Alive response received.");
@@ -375,53 +366,6 @@ define(['jquery', 'underscore', 'ua-parser'], function($, _, uaparser) {
 
 	};
 
-	Api.prototype.sendScreenshare = function(id, screen_id) {
-
-		var data = {
-			Id: id,
-			Type: "Screenshare",
-			Screenshare: {
-				id: screen_id
-			}
-		}
-
-		return this.send("Screenshare", data);
-
-	};
-
-	Api.prototype.sendPresentation = function(id, viewer_id, viewer_data) {
-
-		var data = {
-			Id: id,
-			Type: "Presentation",
-			Presentation: {
-				id: viewer_id
-			}
-		}
-		if (viewer_data) {
-			data.Presentation = _.extend(data.Presentation, viewer_data);
-		}
-
-		return this.send("Presentation", data);
-
-	};
-
-	Api.prototype.sendYouTubeVideo = function(id, video_id, video_data) {
-
-		var data = {
-			Id: id,
-			Type: "YouTubeVideo",
-			YouTubeVideo: {
-				id: video_id
-			}
-		}
-		if (video_data) {
-			data.YouTubeVideo = _.extend(data.YouTubeVideo, video_data);
-		}
-
-		return this.send("YouTubeVideo", data);
-
-	};
 
 	Api.prototype.sendAlive = function(timestamp) {
 

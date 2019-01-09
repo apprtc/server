@@ -21,10 +21,8 @@ define([
 	'directives/page',
 	'directives/contactrequest',
 	'directives/defaultdialog',
-	'directives/pdfcanvas',
-	'directives/odfcanvas',
-	'directives/presentation',
-	'directives/youtubevideo',
+	// 'directives/presentation',
+
 	'directives/bfi',
 	'directives/title',
 	'directives/welcome',
@@ -33,7 +31,7 @@ define([
 		// screenshare, 
 		roomBar, 
 		page, contactRequest, defaultDialog, 
-		pdfcanvas, odfcanvas, presentation, youtubevideo, 
+		// pdfcanvas, odfcanvas, presentation, youtubevideo,
 		bfi, title, welcome, menu, ui) {
 
 	var directives = {
@@ -54,10 +52,6 @@ define([
 		page: page,
 		contactRequest: contactRequest,
 		defaultDialog: defaultDialog,
-		pdfcanvas: pdfcanvas,
-		odfcanvas: odfcanvas,
-		presentation: presentation,
-		youtubevideo: youtubevideo,
 		bfi: bfi,
 		title: title,
 		welcome: welcome,
