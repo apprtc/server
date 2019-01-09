@@ -153,10 +153,6 @@ window.Modernizr = (function( window, document, undefined ) {
         }
     }
 
-
-    tests['geolocation'] = function() {
-        return 'geolocation' in navigator;
-    };
     tests['indexedDB'] = function() {
       return !!testPropsAll("indexedDB", window);
     };    tests['websockets'] = function() {

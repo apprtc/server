@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!partials/contactrequest.html', 'text!partials/geolocation.html', 'text!partials/picturehover.html'], function($, _, moment, templateFileInfo, templateContactRequest, templateGeolocation, templatePictureHover) {
+define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!partials/contactrequest.html', 'text!partials/picturehover.html'], function($, _, moment, templateFileInfo, templateContactRequest, templatePictureHover) {
 
 	// ChatroomController
 	return ["$scope", "$element", "$window", "safeMessage", "safeDisplayName", "$compile", "$filter", "translation", "mediaStream", function($scope, $element, $window, safeMessage, safeDisplayName, $compile, $filter, translation, mediaStream) {
@@ -30,7 +30,6 @@ define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!p
 		var buddyImageSrc = $filter("buddyImageSrc");
 		var fileInfo = $compile(templateFileInfo);
 		var contactRequest = $compile(templateContactRequest);
-		var geoLocation = $compile(templateGeolocation);
 		var pictureHover = $compile(templatePictureHover);
 
 		var knowMessage = {
@@ -463,18 +462,6 @@ define(['jquery', 'underscore', 'moment', 'text!partials/fileinfo.html', 'text!p
 							subscope.from = from;
 							fileInfo(subscope, function(clonedElement, scope) {
 								var text = fromself ? translation._("You share file:") : translation._("Incoming file:");
-								element = $scope.showmessage(from, timestamp, text, clonedElement);
-							});
-							noop = true;
-						}
-
-						// Geolocation sharing.
-						if (data.Status.Geolocation) {
-							subscope = $scope.$new();
-							subscope.info = data.Status.Geolocation;
-							subscope.from = from;
-							geoLocation(subscope, function(clonedElement, scope) {
-								var text = fromself ? translation._("You shared your location:") : translation._("Location received:");
 								element = $scope.showmessage(from, timestamp, text, clonedElement);
 							});
 							noop = true;
