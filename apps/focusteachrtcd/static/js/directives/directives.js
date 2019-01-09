@@ -16,53 +16,48 @@ define([
 	'directives/usability',
 	'directives/audiolevel',
 	'directives/fileinfo',
-	// 'directives/screenshare',
-	'directives/roombar',
-	'directives/page',
 	'directives/contactrequest',
 
 	'directives/bfi',
 	'directives/title',
 	'directives/welcome',
 	'directives/menu',
-	'directives/ui'], function(_, onEnter, onEscape, statusMessage, buddyList, buddyPictureCapture, buddyPictureUpload, settings, chat, audioVideo, usability, audioLevel, fileInfo, 
-		// screenshare, 
-		roomBar, 
-		page, contactRequest,
+	'directives/ui'], function (_, onEnter, onEscape, statusMessage, buddyList, buddyPictureCapture, buddyPictureUpload,
+		settings, chat, audioVideo, usability,
+		audioLevel,
+		fileInfo,
+		contactRequest,
 		bfi, title, welcome, menu, ui) {
 
-	var directives = {
-		onEnter: onEnter,
-		onEscape: onEscape,
-		statusMessage: statusMessage,
-		buddyList: buddyList,
-		buddyPictureCapture: buddyPictureCapture,
-		buddyPictureUpload: buddyPictureUpload,
-		settings: settings,
-		chat: chat,
-		audioVideo: audioVideo,
-		usability: usability,
-		audioLevel: audioLevel,
-		fileInfo: fileInfo,
-		// screenshare: screenshare,
-		roomBar: roomBar,
-		page: page,
-		contactRequest: contactRequest,
-		bfi: bfi,
-		title: title,
-		welcome: welcome,
-		menu: menu,
-		ui: ui
-	};
+		var directives = {
+			onEnter: onEnter,
+			onEscape: onEscape,
+			statusMessage: statusMessage,
+			buddyList: buddyList,
+			buddyPictureCapture: buddyPictureCapture,
+			buddyPictureUpload: buddyPictureUpload,
+			settings: settings,
+			chat: chat,
+			audioVideo: audioVideo,
+			usability: usability,
+			audioLevel: audioLevel,
+			fileInfo: fileInfo,
+			contactRequest: contactRequest,
+			bfi: bfi,
+			title: title,
+			welcome: welcome,
+			menu: menu,
+			ui: ui
+		};
 
-	var initialize = function(angModule) {
-		_.each(directives, function(directive, name) {
-			angModule.directive(name, directive);
-		});
-	};
+		var initialize = function (angModule) {
+			_.each(directives, function (directive, name) {
+				angModule.directive(name, directive);
+			});
+		};
 
-	return {
-		initialize: initialize
-	};
+		return {
+			initialize: initialize
+		};
 
-});
+	});
