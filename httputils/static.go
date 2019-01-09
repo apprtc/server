@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"path"
 	"strings"
-	"time"
 )
 
 type fileStaticHandler struct {
@@ -40,9 +39,9 @@ func (f *fileStaticHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			// Filter version from upath
 			upath = fmt.Sprintf("%s/%s", strings.Join(parts[:2], "/"), strings.Join(parts[3:], "/"))
 			// Add far futore expire header
-			w.Header().Set("Expires", (time.Now().UTC().AddDate(1, 0, 0).Format(http.TimeFormat)))
-			w.Header().Set("Cache-Control", "public, max-age=31536000")
-			w.Header().Set("X-Content-Type-Options", "nosniff")
+			// w.Header().Set("Expires", (time.Now().UTC().AddDate(1, 0, 0).Format(http.TimeFormat)))
+			// w.Header().Set("Cache-Control", "public, max-age=31536000")
+			// w.Header().Set("X-Content-Type-Options", "nosniff")
 		}
 
 		ServeFile(w, r, f.root, upath)

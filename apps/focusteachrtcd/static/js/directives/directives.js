@@ -16,9 +16,8 @@ define([
 	'directives/usability',
 	'directives/audiolevel',
 	'directives/fileinfo',
-	'directives/screenshare',
+	// 'directives/screenshare',
 	'directives/roombar',
-	'directives/socialshare',
 	'directives/page',
 	'directives/contactrequest',
 	'directives/defaultdialog',
@@ -30,7 +29,12 @@ define([
 	'directives/title',
 	'directives/welcome',
 	'directives/menu',
-	'directives/ui'], function(_, onEnter, onEscape, statusMessage, buddyList, buddyPictureCapture, buddyPictureUpload, settings, chat, audioVideo, usability, audioLevel, fileInfo, screenshare, roomBar, socialShare, page, contactRequest, defaultDialog, pdfcanvas, odfcanvas, presentation, youtubevideo, bfi, title, welcome, menu, ui) {
+	'directives/ui'], function(_, onEnter, onEscape, statusMessage, buddyList, buddyPictureCapture, buddyPictureUpload, settings, chat, audioVideo, usability, audioLevel, fileInfo, 
+		// screenshare, 
+		roomBar, 
+		page, contactRequest, defaultDialog, 
+		pdfcanvas, odfcanvas, presentation, youtubevideo, 
+		bfi, title, welcome, menu, ui) {
 
 	var directives = {
 		onEnter: onEnter,
@@ -45,9 +49,8 @@ define([
 		usability: usability,
 		audioLevel: audioLevel,
 		fileInfo: fileInfo,
-		screenshare: screenshare,
+		// screenshare: screenshare,
 		roomBar: roomBar,
-		socialShare: socialShare,
 		page: page,
 		contactRequest: contactRequest,
 		defaultDialog: defaultDialog,
