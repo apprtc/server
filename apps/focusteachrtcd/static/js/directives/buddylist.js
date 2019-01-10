@@ -59,16 +59,6 @@ define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 				webrtc.doCall(id);
 			};
 
-			$scope.doChat = function(id) {
-
-				//console.log("doChat", id);
-				$scope.$emit("startchat", id, {
-					autofocus: true,
-					restore: true
-				});
-
-			};
-
 			$scope.doContactRequest = function(id) {
 
 				//console.log("doContact", id);

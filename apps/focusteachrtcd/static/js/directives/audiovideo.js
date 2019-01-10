@@ -159,12 +159,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 						}
 						scope.unattached = false;
 					};
-					scope.doChat = function () {
-						$scope.$emit("startchat", currentcall.id, {
-							autofocus: true,
-							restore: true
-						});
-					};
 					scope.attachStream(stream);
 					$($scope.remoteVideos).append(clonedElement);
 				});

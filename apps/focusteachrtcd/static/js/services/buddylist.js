@@ -622,7 +622,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 			// Make call the default action.
 			if (!action) {
-				action = "chat";
+				action = "call";
 			}
 
 			var scope = buddyElement.scope();
@@ -663,11 +663,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 				case "call":
 					promise.then(function (id) {
 						scope.doCall(id);
-					});
-					break;
-				case "chat":
-					promise.then(function (id) {
-						scope.doChat(id);
 					});
 					break;
 				case "contact":

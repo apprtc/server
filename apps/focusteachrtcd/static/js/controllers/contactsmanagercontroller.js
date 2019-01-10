@@ -44,13 +44,6 @@ define([], function() {
 			mediaStream.webrtc.doCall(getContactSessionId(contact.Userid));
 			$modalInstance.close();
 		};
-		$scope.startChat = function(contact) {
-			$scope.$emit("startchat", getContactSessionId(contact.Userid), {
-				autofocus: true,
-				restore: true
-			});
-			$modalInstance.close();
-		};
 	}];
 
 });

@@ -5,15 +5,13 @@ define([
 	'underscore',
 
 	'controllers/uicontroller',
-	'controllers/chatroomcontroller',
 	'controllers/usersettingscontroller',
 	'controllers/contactsmanagercontroller',
 	'controllers/contactsmanagereditcontroller',
-	'controllers/appcontroller'], function(_, UiController, ChatroomController, UsersettingsController, ContactsmanagerController, ContactsmanagereditController, AppController) {
+	'controllers/appcontroller'], function(_, UiController, UsersettingsController, ContactsmanagerController, ContactsmanagereditController, AppController) {
 
 	var controllers = {
 		UiController: UiController,
-		ChatroomController: ChatroomController,
 		UsersettingsController: UsersettingsController,
 		ContactsmanagerController: ContactsmanagerController,
 		ContactsmanagereditController: ContactsmanagereditController,
