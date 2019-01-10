@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, moment, sjcl, Modernizr) {
 
-	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "playSound", "alertify", "toastr", "translation", "fileDownload", "localStorage", "localStatus", "dialogs", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, playSound, alertify, toastr, translation, fileDownload, localStorage, localStatus, dialogs, rooms, constraints) {
+	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "playSound", "alertify", "toastr", "translation", "localStorage", "localStatus", "dialogs", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, playSound, alertify, toastr, translation, localStorage, localStatus, dialogs, rooms, constraints) {
 
 		alertify.dialog.registerCustom({
 			baseType: 'notify',
@@ -803,13 +803,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 				alertify.dialog.alert(message);
 			}
 			appData.e.triggerHandler("uiNotification", [type, details]);
-		});
-
-		$scope.$on("download", function (event, from, token) {
-
-			var scope = event.targetScope;
-			fileDownload.startDownload(scope, from, token);
-
 		});
 
 		var chatMessagesUnseen = {};

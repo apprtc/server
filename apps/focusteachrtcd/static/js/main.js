@@ -31,7 +31,6 @@ require.config({
 		'humanize': 'libs/humanize',
 		'sha': 'libs/sha',
 		'sjcl': 'libs/sjcl',
-		'bootstrap-file-input': 'libs/bootstrap.file-input',
 		'webfont': 'libs/webfont',
 
 		'partials': '../partials',
@@ -85,10 +84,6 @@ require.config({
 			exports: '$'
 		},
 		'mobile-events': {
-			deps: ['jquery'],
-			exports: '$'
-		},
-		'bootstrap-file-input': {
 			deps: ['jquery'],
 			exports: '$'
 		},

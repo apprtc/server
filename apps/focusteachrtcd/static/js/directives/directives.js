@@ -11,18 +11,14 @@ define([
 	'directives/audiovideo',
 	'directives/usability',
 	'directives/audiolevel',
-	'directives/fileinfo',
 	'directives/contactrequest',
-
-	'directives/bfi',
 	'directives/title',
 	'directives/menu',
 	'directives/ui'], function (_, onEnter, onEscape, buddyList,
 		settings, audioVideo, usability,
 		audioLevel,
-		fileInfo,
 		contactRequest,
-		bfi, title, 
+		title,
 		menu, ui) {
 
 		var directives = {
@@ -33,9 +29,7 @@ define([
 			audioVideo: audioVideo,
 			usability: usability,
 			audioLevel: audioLevel,
-			fileInfo: fileInfo,
 			contactRequest: contactRequest,
-			bfi: bfi,
 			title: title,
 			menu: menu,
 			ui: ui
