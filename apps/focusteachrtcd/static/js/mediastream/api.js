@@ -141,19 +141,19 @@ define(['jquery', 'underscore', 'ua-parser'], function($, _, uaparser) {
 				this.e.triggerHandler("received.self", [data]);
 				break;
 			case "Offer":
-				//console.log("Offer received", data.To, data.Offer);
+				console.log("Offer received", data.To, data.Offer);
 				this.e.triggerHandler("received.offer", [data.To, data.Offer, data.Type, d.To, d.From]);
 				break;
 			case "Candidate":
-				//console.log("Candidate received", data.To, data.Candidate);
+				console.log("Candidate received", data.To, data.Candidate);
 				this.e.triggerHandler("received.candidate", [data.To, data.Candidate, data.Type, d.To, d.From]);
 				break;
 			case "Answer":
-				//console.log("Answer received", data.To, data.Answer);
+				console.log("Answer received", data.To, data.Answer);
 				this.e.triggerHandler("received.answer", [data.To, data.Answer, data.Type, d.To, d.From]);
 				break;
 			case "Users":
-				//console.log("Connected users: " + data.Users.length);
+				console.log("Connected users: " + data.Users.length);
 				this.e.triggerHandler("received.users", [data.Users]);
 				break;
 			case "Bye":
@@ -162,19 +162,12 @@ define(['jquery', 'underscore', 'ua-parser'], function($, _, uaparser) {
 				break;
 			case "Joined":
 			case "Left":
-				//console.log("User action received", dataType, data);
+				console.log("User action received", dataType, data);
 				this.e.triggerHandler("received.userleftorjoined", [dataType, data]);
 				break;
 			case "Status":
-				//console.log("User status received", dataType, data);
+				console.log("User status received", dataType, data);
 				this.e.triggerHandler("received.status", [data]);
-				break;
-			case "Chat":
-				//console.log("chat received", dataType, data);
-				this.e.triggerHandler("received.chat", [data.To, d.From, data.Chat, d.p2p]);
-				break;
-			case "Conference":
-				this.e.triggerHandler("received.conference", [data.Id, data.Conference, data.Type, d.To, d.From]);
 				break;
 			case "Talking":
 				this.e.triggerHandler("received.talking", [d.To, d.From, data.Talking]);

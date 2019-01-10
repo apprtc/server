@@ -484,6 +484,7 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 				scope.incoming = from;
 			});
 			if ($scope.updateAutoAccept(null, from)) {
+				console.log("accept support.");
 				// Auto accept support.
 				mediaStream.webrtc.doAccept(from);
 				return;

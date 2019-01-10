@@ -285,12 +285,7 @@ func runner(runtime phoenix.Runtime) error {
 	r.HandleFunc("/", httputils.MakeGzipHandler(mainHandler))
 	r.Handle("/static/img/buddy/{flags}/{imageid}/{idx:.*}", http.StripPrefix(config.B, makeImageHandler(buddyImages, time.Duration(24)*time.Hour)))
 	r.Handle("/static/{path:.*}", http.StripPrefix(config.B, httputils.FileStaticServer(http.Dir(rootFolder))))
-	r.Handle("/robots.txt", http.StripPrefix(config.B, http.FileServer(http.Dir(path.Join(rootFolder, "static")))))
-	r.Handle("/favicon.ico", http.StripPrefix(config.B, http.FileServer(http.Dir(path.Join(rootFolder, "static", "img")))))
 	r.HandleFunc("/.well-known/spreed-configuration", wellKnownHandler)
-
-	// Sandbox handler.
-	r.HandleFunc("/sandbox/{origin_scheme}/{origin_host}/{sandbox}.html", httputils.MakeGzipHandler(sandboxHandler))
 
 	// Add RESTful API end points.
 	rest := sloth.NewAPI()

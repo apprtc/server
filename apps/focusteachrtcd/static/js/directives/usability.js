@@ -36,7 +36,7 @@ define(['jquery', 'underscore', 'text!partials/usability.html'], function($, _, 
 			};
 
 			$scope.testMediaAccess = function() {
-				//console.log("Test media access");
+				console.log("Test media access");
 				var passedBefore = localStorage.getItem("mediastream-mediacheck");
 				if (passedBefore !== MEDIA_CHECK && $scope.isChrome) {
 					// NOTE(longsleep): Checkin for media access makes only sense on
