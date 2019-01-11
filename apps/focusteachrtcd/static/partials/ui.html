@@ -9,16 +9,16 @@
 				</ul>
 			</div>
 		</div>
-		<div class="callbar middle">
-			<status-message></status-message>
-		</div>
 	</div>
+
 	<div id="audiolevel" class="ng-cloak">
 		<div class="audio-level" title="{{_('Your audio level')}}"></div>
 	</div>
+
 	<div id="audiovideo" class="ng-cloak" ng-show="peer || isConferenceRoom()">
 		<audio-video />
 	</div>
+
 	<div class="ng-cloak" id="rightslide">
 		<div class="rightslidepane">
 			<div id="buddylist">
@@ -26,6 +26,7 @@
 			</div>
 		</div>
 	</div>
+
 	<div class="ng-cloak" id="settings" ng-class="{show: layout.settings}">
 		<settings />
 	</div>
