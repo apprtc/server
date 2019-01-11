@@ -4,7 +4,7 @@
 define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 
 	// buddyList
-	return ["buddyList", "api", "webrtc", "contacts", function(buddyList, api, webrtc, contacts) {
+	return ["buddyList", "api", "webrtc", function(buddyList, api, webrtc) {
 
 		//console.log("buddyList directive");
 
@@ -14,9 +14,7 @@ define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 			var onJoined = _.bind(buddylist.onJoined, buddylist);
 			var onLeft = _.bind(buddylist.onLeft, buddylist);
 			var onStatus = _.bind(buddylist.onStatus, buddylist);
-			var onContactAdded = _.bind(buddylist.onContactAdded, buddylist);
-			var onContactRemoved = _.bind(buddylist.onContactRemoved, buddylist);
-			var onContactUpdated = _.bind(buddylist.onContactUpdated, buddylist);
+
 
 			var inRoom = false;
 
@@ -59,20 +57,6 @@ define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 				webrtc.doCall(id);
 			};
 
-			$scope.doContactRequest = function(id) {
-
-				//console.log("doContact", id);
-				$scope.$emit("requestcontact", id, {
-					restore: true
-				});
-
-			};
-
-			$scope.doContactRemove = function(userid) {
-
-				contacts.remove(userid);
-
-			};
 
 			api.e.on("received.userleftorjoined", function(event, dataType, data) {
 				if (dataType === "Left") {
@@ -93,18 +77,6 @@ define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 			api.e.on("received.status", function(event, data) {
 				onStatus(data);
 			});
-
-			// Contacts.
-			contacts.e.on("contactadded", function(event, data) {
-				onContactAdded(data);
-			});
-			contacts.e.on("contactremoved", function(event, data) {
-				onContactRemoved(data);
-			});
-			contacts.e.on("contactupdated", function(event, data) {
-				onContactUpdated(data);
-			});
-
 		}];
 
 		var link = function(scope, iElement, iAttrs, controller) {
@@ -121,9 +93,6 @@ define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 				}
 				scope.$apply();
 			});
-			if (contacts.enabled) {
-				iElement.addClass("with-contacts");
-			}
 
 		};
 

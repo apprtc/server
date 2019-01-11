@@ -137,7 +137,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			$element.on("mouseenter mouseleave", ".buddy", _.bind(function (event) {
 				// Hover handler for on Buddy actions.
 				var buddyElement = $(event.currentTarget);
-				this.hover(buddyElement, event.type === "mouseenter" ? true : false);
 			}, this));
 			$element.on("click", ".buddy", _.bind(function (event) {
 				var buddyElement = $(event.currentTarget);
@@ -147,7 +146,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			$element.on("swipeleft", ".buddy", _.bind(function (event) {
 				event.preventDefault();
 				var buddyElement = $(event.currentTarget);
-				this.hover(buddyElement, !buddyElement.hasClass("hovered"));
 			}, this));
 
 			$window.setInterval(_.bind(this.soundLoop, this), 500);
@@ -187,7 +185,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 			// Init scope with our stuff.
 			scope.element = null;
-			scope.contact = null;
 			scope.display = {};
 			scope.session = buddySession.create(data);
 			scope.$on("$destroy", function () {
@@ -390,12 +387,9 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			}
 
 			var display = scope.display;
-			var contact = scope.contact && scope.contact.Status;
 			// Update display name.
 			var displayName = display.displayName;
-			if (contact) {
-				display.displayName = contact.displayName;
-			} else if (status.displayName) {
+			 if (status.displayName) {
 				display.displayName = status.displayName;
 			} else {
 				display.displayName = null;
@@ -425,14 +419,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		};
 
-		Buddylist.prototype.onContactUpdated = function (data) {
-			var scope = buddyData.get(data.Userid);
-			if (scope && scope.contact) {
-				scope.contact.Status = angular.extend(scope.contact.Status, data.Status);
-			}
-			this.updateDisplay(data.Id, scope, data, "status");
-			//console.log("onContactUpdated", 'data', data, 'scope', scope);
-		};
+	
 
 		Buddylist.prototype.onStatus = function (data) {
 
@@ -663,15 +650,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 					promise.then(function (id) {
 						scope.doCall(id);
 					});
-					break;
-				case "contact":
-					if (contact) {
-						scope.doContactRemove(contact.Userid);
-					} else {
-						promise.then(function (id) {
-							scope.doContactRequest(id);
-						});
-					}
 					break;
 			}
 

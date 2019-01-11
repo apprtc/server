@@ -4,7 +4,7 @@
 define(['underscore'], function(_) {
 
 	// buddyData
-	return ["appData", "contactData", "mediaStream", "$rootScope", function(appData, contactData, mediaStream, $rootScope) {
+	return ["appData", "mediaStream", "$rootScope", function(appData, mediaStream, $rootScope) {
 
 		var scopes = {};
 		var brain = {};
@@ -75,11 +75,7 @@ define(['underscore'], function(_) {
 							scopes[userid] = scope;
 						}
 						scope.buddyIndex = ++count;
-						if (userid) {
-							scope.contact = contactData.get(userid);
-						} else {
-							scope.contact = null;
-						}
+
 						scope.buddyIndexSortable = ("0000000" + scope.buddyIndex).slice(-7);
 						if (pushed.hasOwnProperty(id)) {
 							// Refresh pushed scope reference.

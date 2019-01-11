@@ -8,13 +8,11 @@ define([
 	'directives/audiovideo',
 	'directives/usability',
 	'directives/audiolevel',
-	'directives/contactrequest',
 	'directives/title',
 	'directives/menu',
 	'directives/ui'], function (_, buddyList,
 		settings, audioVideo, usability,
 		audioLevel,
-		contactRequest,
 		title,
 		menu, ui) {
 
@@ -24,7 +22,6 @@ define([
 			audioVideo: audioVideo,
 			usability: usability,
 			audioLevel: audioLevel,
-			contactRequest: contactRequest,
 			title: title,
 			menu: menu,
 			ui: ui
