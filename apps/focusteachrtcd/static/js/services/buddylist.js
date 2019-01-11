@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partials/buddy.html', 'text!partials/buddyactions.html', 'text!partials/buddyactionsforaudiomixer.html'], function ($, angular, _, Modernizr, AvlTree, templateBuddy, templateBuddyActions, templateBuddyActionsForAudioMixer) {
+define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partials/buddy.html', 'text!partials/buddyactions.html'], function ($, angular, _, Modernizr, AvlTree, templateBuddy, templateBuddyActions) {
 
 	var BuddyTree = function () {
 
@@ -116,7 +116,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 
 		var buddyTemplate = $compile(templateBuddy);
 		var buddyActions = $compile(templateBuddyActions);
-		var buddyActionsForAudioMixer = $compile(templateBuddyActionsForAudioMixer);
 
 		//console.log("$buddylist $get");
 		var doc = $window.document;
@@ -674,49 +673,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 						});
 					}
 					break;
-			}
-
-		};
-
-		Buddylist.prototype.hover = function (buddyElement, hover) {
-
-			//console.log("hover handler", buddyElement, hover);
-			var scope = buddyElement.scope();
-			var id = scope.session.Id;
-			var buddy = $(buddyElement);
-			var actionElements = this.actionElements;
-			var elem;
-			if (!hover) {
-				buddy.removeClass("hovered");
-				setTimeout(_.bind(function () {
-					if (!buddy.hasClass("hovered")) {
-						elem = actionElements[id];
-						if (elem) {
-							delete actionElements[id];
-							elem.remove();
-							//console.log("cleaned up actions", id);
-						}
-					}
-				}, this), 1000);
-			} else {
-				elem = actionElements[id];
-				if (elem) {
-					buddy.addClass("hovered");
-				} else {
-					var template = buddyActions;
-					//if (scope.status.autoCalls && _.indexOf(scope.status.autoCalls, "conference") !== -1) {
-					//	template = buddyActionsForAudioMixer;
-					//}
-					//console.log("scope", scope, id);
-					template(scope, _.bind(function (clonedElement, $scope) {
-						actionElements[id] = clonedElement;
-						buddy.append(clonedElement);
-						_.defer(function () {
-							buddy.addClass("hovered");
-						});
-					}, this));
-					scope.$apply();
-				}
 			}
 
 		};
