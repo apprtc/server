@@ -5,17 +5,13 @@ define([
 	'underscore',
 
 	'filters/displayname',
-	'filters/displayconference',
 	'filters/displayuserid',
-	'filters/displaynameforsession',
-	'filters/formatbase1000'], function (_, displayName, displayConference, displayUserid, displayNameForSession, formatBase1000) {
+	'filters/displaynameforsession'], function (_, displayName, displayUserid, displayNameForSession) {
 
 		var filters = {
 			displayName: displayName,
-			displayConference: displayConference,
 			displayUserid: displayUserid,
-			displayNameForSession: displayNameForSession,
-			formatBase1000: formatBase1000
+			displayNameForSession: displayNameForSession
 		};
 
 		var initialize = function (angModule) {
