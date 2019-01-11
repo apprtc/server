@@ -3,9 +3,6 @@
 "use strict";
 define([
 	'underscore',
-
-	'directives/onenter',
-	'directives/onescape',
 	'directives/buddylist',
 	'directives/settings',
 	'directives/audiovideo',
@@ -14,7 +11,7 @@ define([
 	'directives/contactrequest',
 	'directives/title',
 	'directives/menu',
-	'directives/ui'], function (_, onEnter, onEscape, buddyList,
+	'directives/ui'], function (_, buddyList,
 		settings, audioVideo, usability,
 		audioLevel,
 		contactRequest,
@@ -22,8 +19,6 @@ define([
 		menu, ui) {
 
 		var directives = {
-			onEnter: onEnter,
-			onEscape: onEscape,
 			buddyList: buddyList,
 			settings: settings,
 			audioVideo: audioVideo,
