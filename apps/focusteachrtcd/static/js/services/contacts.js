@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['underscore', 'jquery', 'modernizr', 'sjcl', 'text!partials/contactsmanager.html', 'text!partials/contactsmanageredit.html'], function(_, $, Modernizr, sjcl, templateContactsManager, templateContactsManagerEdit) {
+define(['underscore', 'jquery', 'modernizr', 'sjcl', 'text!partials/contactsmanager.html'], function(_, $, Modernizr, sjcl, templateContactsManager) {
 
 	var Database = function(name) {
 		this.version = 3;
@@ -111,7 +111,6 @@ define(['underscore', 'jquery', 'modernizr', 'sjcl', 'text!partials/contactsmana
 		if (withContacts) {
 			// Inject our templates.
 			$templateCache.put('/contactsmanager/main.html', templateContactsManager);
-			$templateCache.put('/contactsmanager/edit.html', templateContactsManagerEdit);
 		}
 
 		var Contacts = function() {

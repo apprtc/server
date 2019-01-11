@@ -15,18 +15,6 @@ define([], function() {
 		};
 		$scope.header = data.header;
 		$scope.contacts = [];
-		$scope.openContactsManagerEdit = function(contact) {
-			return dialogs.create(
-				"/contactsmanager/edit.html",
-				"ContactsmanagereditController",
-				{
-					header: translation._("Edit Contact"),
-					contact: contact,
-				}, {
-					wc: "contactsmanager contactsmanageredit"
-				}
-			);
-		};
 		var updateContacts = function() {
 			$scope.contacts = contactData.getAll();
 		};
