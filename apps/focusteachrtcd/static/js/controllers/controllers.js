@@ -6,13 +6,11 @@ define([
 
 	'controllers/uicontroller',
 	'controllers/usersettingscontroller',
-	'controllers/contactsmanagercontroller',
-	'controllers/appcontroller'], function(_, UiController, UsersettingsController, ContactsmanagerController, AppController) {
+	'controllers/appcontroller'], function(_, UiController, UsersettingsController, AppController) {
 
 	var controllers = {
 		UiController: UiController,
 		UsersettingsController: UsersettingsController,
-		ContactsmanagerController: ContactsmanagerController,
 		AppController: AppController
 	};
 

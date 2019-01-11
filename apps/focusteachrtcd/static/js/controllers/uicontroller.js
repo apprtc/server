@@ -293,28 +293,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			}
 		}());
 
-		$scope.openContactsManager = (function () {
-			var oldDialog = null;
-			return function () {
-				if (oldDialog) {
-					oldDialog.dismiss("open");
-				}
-				oldDialog = dialogs.create(
-					"/contactsmanager/main.html",
-					"ContactsmanagerController",
-					{
-						header: translation._("Contacts Manager")
-					}, {
-						wc: "contactsmanager"
-					}
-				);
-				oldDialog.result.finally(function () {
-					oldDialog = null;
-				});
-				return oldDialog
-			}
-		}());
-
 		$scope.$watch("cameraMute", function (cameraMute) {
 			mediaStream.webrtc.setVideoMute(cameraMute);
 		});
