@@ -7,7 +7,7 @@ define([
 	'underscore'
 ], function (angular, $, _) {
 
-	return ["$window", "$location", "$timeout", "$q", "$route", "$rootScope", "$http", "globalContext", "safeApply", "connector", "api", "restURL", "roompin", "appData", "alertify", "translation", "mediaStream", function ($window, $location, $timeout, $q, $route, $rootScope, $http, globalContext, safeApply, connector, api, restURL, roompin, appData, alertify, translation, mediaStream) {
+	return ["$window", "$location", "$timeout", "$q", "$route", "$rootScope", "$http", "globalContext", "safeApply", "connector", "api", "restURL", "appData", "alertify", "translation", "mediaStream", function ($window, $location, $timeout, $q, $route, $rootScope, $http, globalContext, safeApply, connector, api, restURL, appData, alertify, translation, mediaStream) {
 
 		var body = $("body");
 
@@ -34,20 +34,6 @@ define([
 				case "default_room_disabled":
 					priorRoomName = null;
 					rooms.randomRoom();
-					break;
-				case "invalid_credentials":
-					roompin.clear(requestedRoomName);
-				/* falls through */
-				case "authorization_required":
-					roompin.requestInteractively(requestedRoomName).then(joinRequestedRoom,
-						function () {
-							console.log("Authentication cancelled, try a different room.");
-							rooms.joinPriorOrDefault(true);
-						});
-					break;
-				case "authorization_not_required":
-					roompin.clear(requestedRoomName);
-					joinRequestedRoom();
 					break;
 				case "room_join_requires_account":
 					console.log("Room join requires a logged in user.");
@@ -76,7 +62,7 @@ define([
 						}
 					});
 					console.log("Joining room", [requestedRoomName]);
-					api.sendHello(requestedRoomName, roompin.get(requestedRoomName), function (room) {
+					api.sendHello(requestedRoomName, "", function (room) {
 						setCurrentRoom(room);
 					}, function (error) {
 						joinFailed(error);
@@ -111,10 +97,6 @@ define([
 		};
 
 		applyRoomUpdate = function (room) {
-			if (room.Credentials) {
-				roompin.update(currentRoom.Name, room.Credentials.PIN);
-				delete room.Credentials;
-			}
 			currentRoom = room;
 			$rootScope.$broadcast("room.updated", currentRoom);
 			return room;
@@ -243,9 +225,6 @@ define([
 				});
 			}
 		};
-
-		// NOTE(lcooper): For debugging only, do not use this on production.
-		$window.setRoomPIN = rooms.setPIN;
 
 		return rooms;
 	}];
