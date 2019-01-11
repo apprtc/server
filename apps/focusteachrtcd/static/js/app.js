@@ -14,8 +14,6 @@ define([
 	'filters/filters',
 	'controllers/controllers',
 
-	'translation/languages',
-
 	'ui-bootstrap',
 	'angular-sanitize',
 	'angular-animate',
@@ -24,7 +22,7 @@ define([
 
 	'mobile-events'
 
-], function(require, $, _, angular, modernizr, moment, services, directives, filters, controllers, languages) {
+], function(require, $, _, angular, modernizr, moment, services, directives, filters, controllers) {
 
 	// Simple and fast split based URL query parser based on location.search. We require this before the
 	// angular App is bootstrap to control initialization parameters like translation based on URL parameters.
@@ -151,7 +149,6 @@ define([
 			}, 0);
 		}]);
 
-		app.constant("availableLanguages", languages);
 
 		app.provider("translationData", function translationDataProvider() {
 
@@ -223,26 +220,10 @@ define([
 				}
 			}
 
-			// Get from query.
-			var qsl = urlQuery.lang;
-			if (qsl) {
-				addLanguage(qsl);
-			}
-
-			// Get from server side configuration (As provided by browser).
-			_.each(globalContext.Languages, addLanguage);
-
-			// Loop through requested languages and use first one we have.
-			for (var i = 0; i < wanted.length; i++) {
-				if (languages.hasOwnProperty(wanted[i])) {
-					lang = wanted[i];
-					break;
-				}
-			}
 
 			// Storage at DOM.
 			var html = document.getElementsByTagName("html")[0];
-			html.setAttribute("lang", lang);
+			html.setAttribute("lang", "zh-CN");
 
 			return lang;
 

@@ -36,27 +36,19 @@ define(['jquery', 'underscore', 'text!partials/settings.html'], function ($, _, 
 
 	return ["$compile", "mediaStream", function ($compile, mediaStream) {
 
-		var controller = ['$scope', 'mediaSources', 'safeApply', 'availableLanguages', 'translation', 'localStorage', 'userSettingsData', 'constraints', 'appData', '$timeout', function ($scope, mediaSources, safeApply, availableLanguages, translation, localStorage, userSettingsData, constraints, appData, $timeout) {
+		var controller = ['$scope', 'mediaSources', 'safeApply', 'translation', 'localStorage', 'userSettingsData', 'constraints', 'appData', '$timeout', function ($scope, mediaSources, safeApply, translation, localStorage, userSettingsData, constraints, appData, $timeout) {
 
 			$scope.layout.settings = false;
 			$scope.showAdvancedSettings = false;
 			$scope.autoshowSettings = false;
 			$scope.rememberSettings = true;
 			$scope.mediaSources = mediaSources;
-			$scope.availableLanguages = [{
-				code: "",
-				name: translation._("Use browser language")
-			}];
+
 			$scope.withUsers = mediaStream.config.UsersEnabled;
 			$scope.withUsersRegistration = mediaStream.config.UsersAllowRegistration;
 			$scope.withUsersMode = mediaStream.config.UsersMode;
 
-			_.each(availableLanguages, function (name, code) {
-				$scope.availableLanguages.push({
-					code: code,
-					name: name
-				});
-			});
+
 
 			// Make sure to save settings when they are open and the page is reloaded.
 			$(window).on("unload", function () {
