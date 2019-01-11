@@ -285,7 +285,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 			return;
 		}
 		this.peerconnection.addIceCandidate(candidate, function() {
-			//console.log("Remote candidate added successfully.", candidate);
+			console.log("Remote candidate added successfully.", candidate);
 		}, function(error) {
 			console.warn("Failed to add remote candidate:", error, candidate);
 		});

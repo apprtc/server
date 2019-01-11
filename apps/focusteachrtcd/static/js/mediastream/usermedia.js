@@ -296,6 +296,7 @@ define(['jquery', 'underscore', 'audiocontext', 'mediastream/dummystream', 'webr
 			return true;
 		} catch (e) {
 			console.error('getUserMedia failed with exception: ' + e.message);
+			this.onUserMediaSuccess(new DummyStream());
 			return false;
 		}
 

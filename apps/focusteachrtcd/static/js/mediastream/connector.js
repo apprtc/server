@@ -175,7 +175,7 @@ define(['jquery', 'underscore'], function($, _) {
 
 	Connector.prototype.onmessage = function(event) {
 
-		console.log("onmessage", event.data);
+		// console.log("onmessage", event.data);
 		var msg = JSON.parse(event.data);
 		this.e.triggerHandler("received", [msg]);
 

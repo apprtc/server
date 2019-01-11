@@ -95,7 +95,7 @@ function($, _, PeerCall, PeerConference, PeerXfer, UserMedia, utils, tokens) {
 			},
 			pcConfig: {
 				iceServers: [{
-					url: 'stun:' + 'stun.l.google.com:19302'
+					// url: 'stun:' + 'stun.l.google.com:19302'
 				}]
 			},
 			pcConstraints: {
@@ -323,7 +323,7 @@ function($, _, PeerCall, PeerConference, PeerXfer, UserMedia, utils, tokens) {
 			candidate: data.candidate
 		});
 		call.addIceCandidate(candidate);
-		//console.log("Got candidate", data.sdpMid, data.sdpMLineIndex, data.candidate);
+		console.log("Got candidate [sdpMid=]", data.sdpMid, "[sdpMLineIndex=]", data.sdpMLineIndex, "[candidate=]", data.candidate);
 	};
 
 	WebRTC.prototype._processAnswer = function(to, data, type, to2, from) {
@@ -522,10 +522,10 @@ function($, _, PeerCall, PeerConference, PeerXfer, UserMedia, utils, tokens) {
 			return true;
 		}
 
-		this.e.triggerHandler("error", ["Failed to access camera/microphone.", "failed_getusermedia"]);
-		if (call.id) {
-			this.doHangup("usermedia", call.id);
-		}
+		// this.e.triggerHandler("error", ["Failed to access camera/microphone.", "failed_getusermedia"]);
+		// if (call.id) {
+		// 	this.doHangup("usermedia", call.id);
+		// }
 		return false;
 	};
 
