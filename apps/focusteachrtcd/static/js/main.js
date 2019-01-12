@@ -33,7 +33,6 @@ require.config({
 		'webfont': 'libs/webfont',
 
 		'partials': '../partials',
-		'sounds': '../sounds',
 		'translation': '../translation'
 	},
 	shim: {

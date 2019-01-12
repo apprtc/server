@@ -112,7 +112,7 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 	};
 
 	// buddyList
-	return ["$window", "$compile", "playSound", "buddyData", "buddySession", "fastScroll", "mediaStream", "animationFrame", "$q", function ($window, $compile, playSound, buddyData, buddySession, fastScroll, mediaStream, animationFrame, $q) {
+	return ["$window", "$compile", "buddyData", "buddySession", "fastScroll", "mediaStream", "animationFrame", "$q", function ($window, $compile, buddyData, buddySession, fastScroll, mediaStream, animationFrame, $q) {
 
 		var buddyTemplate = $compile(templateBuddy);
 		var buddyActions = $compile(templateBuddyActions);
@@ -131,8 +131,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			this.tree = new BuddyTree();
 			this.queue = [];
 			this.lefts = {};
-			this.playSoundLeft = false;
-			this.playSoundJoined = false;
 			fastScroll.apply($element, this.$element);
 			$element.on("mouseenter mouseleave", ".buddy", _.bind(function (event) {
 				// Hover handler for on Buddy actions.
@@ -148,7 +146,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 				var buddyElement = $(event.currentTarget);
 			}, this));
 
-			$window.setInterval(_.bind(this.soundLoop, this), 500);
 			var update = _.bind(function refreshBuddies() {
 				this.refreshBuddies();
 			}, this);
@@ -234,19 +231,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 				return targetScope;
 			}
 			return;
-
-		};
-
-		Buddylist.prototype.soundLoop = function () {
-
-			if (this.playSoundLeft) {
-				playSound.play("left");
-				this.playSoundLeft = false;
-			}
-			if (this.playSoundJoined) {
-				playSound.play("joined");
-				this.playSoundJoined = false;
-			}
 
 		};
 
@@ -373,7 +357,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 			if (!scope.element) {
 				var before = this.tree.add(id, scope);
 				this.queue.push([queueName, id, before]);
-				this.playSoundJoined = true;
 			}
 
 		};
@@ -489,7 +472,6 @@ define(['jquery', 'angular', 'underscore', 'modernizr', 'avltree', 'text!partial
 				// No session left. Cleanup.
 				if (scope.element) {
 					this.lefts[id] = scope.element;
-					this.playSoundLeft = true;
 				}
 				if (session.Userid) {
 					buddyData.del(session.Userid, true);

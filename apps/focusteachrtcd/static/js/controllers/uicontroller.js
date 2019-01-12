@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, moment, sjcl, Modernizr) {
 
-	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "playSound", "alertify", "toastr", "translation", "localStorage", "localStatus", "dialogs", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, playSound, alertify, toastr, translation, localStorage, localStatus, dialogs, rooms, constraints) {
+	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "alertify", "toastr", "translation", "localStorage", "localStatus", "dialogs", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, alertify, toastr, translation, localStorage, localStatus, dialogs, rooms, constraints) {
 
 		alertify.dialog.registerCustom({
 			baseType: 'notify',
@@ -78,46 +78,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			});
 
 		};
-
-		// Load default sounds.
-		playSound.initialize({
-			urls: ['sounds/sprite1.ogg', 'sounds/sprite1.mp3'],
-			sprite: {
-				"connect1": [
-					0,
-					5179],
-				"end1": [
-					12892,
-					6199],
-				"entry1": [
-					8387,
-					3000],
-				"leaving1": [
-					5228,
-					2126],
-				"message1": [
-					19140,
-					816],
-				"question1": [
-					20006,
-					3313],
-				"ringtone1": [
-					7403,
-					935],
-				"whistle1": [
-					11437,
-					1405]
-			}
-		}, null, {
-				"ring": "whistle1",
-				"joined": "entry1",
-				"left": "leaving1",
-				"end": "end1",
-				"dial": "ringtone1",
-				"connect": "connect1",
-				"prompt": "question1",
-				"chatmessage": "message1"
-			});
 
 		var displayName = safeDisplayName;
 
@@ -245,16 +205,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 		};
 		$scope.refreshWebrtcSettings(); // Call once for bootstrap.
 
-		$scope.refreshSoundSettings = function () {
-			var s = $scope.master.settings.sound;
-			playSound.disable("chatmessage", !s.incomingMessages);
-			playSound.disable("ring", !s.incomingCall);
-			var roomJoinLeave = $scope.peer ? false : s.roomJoinLeave; // Do not play these sounds when in call.
-			playSound.disable("joined", !roomJoinLeave);
-			playSound.disable("left", !roomJoinLeave);
-		};
-		$scope.refreshSoundSettings(); // Call once on bootstrap;
-
 		var pickupTimeout = null;
 		var autoAcceptTimeout = null;
 		var ringerTimeout = null;
@@ -301,19 +251,7 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			mediaStream.webrtc.setAudioMute(cameraMute);
 		});
 
-		$scope.$watch("peer", function (c, o) {
-			// Watch for peer and disable some sounds while there is a peer.
-			if (c && !o) {
-				// New call.
-				$scope.refreshSoundSettings();
-			} else if (!c && o) {
-				// No longer in call.
-				$scope.refreshSoundSettings();
-			}
-		});
 
-		var ringer = playSound.interval("ring", null, 4000);
-		var dialer = playSound.interval("dial", null, 4000);
 		var dialerEnabled = false;
 		var notification;
 		var ttlTimeout;
@@ -430,13 +368,7 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			// Kill timeout.
 			$timeout.cancel(pickupTimeout);
 			pickupTimeout = null;
-			// Kill ringer.
-			if (peercall && peercall.isOutgoing()) {
-				dialerEnabled = true;
-			} else {
-				dialerEnabled = false;
-			}
-			ringer.stop();
+
 			// Close notifications.
 			if (notification) {
 				notification.close();
@@ -467,8 +399,7 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 				mediaStream.webrtc.doAccept(from);
 				return;
 			}
-			// Start to ring.
-			ringer.start();
+
 			// Show incoming call notification.
 			$scope.$emit("status", "ringing");
 			// Start accept timeout.
@@ -740,18 +671,12 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 					});
 				}, 35000);
 			} else {
-				dialer.stop();
 				$timeout.cancel(ringerTimeout);
 				ringerTimeout = null;
 			}
 			safeApply($scope, function (scope) {
 				var old = $scope.status;
 				$scope.status = status;
-				if (old === "connected" && status === "waiting") {
-					_.delay(playSound.play, 100, "end");
-				} else if (old === "connecting" && status === "connected") {
-					playSound.play("connect");
-				}
 			});
 			appData.e.triggerHandler("mainStatus", [status]);
 		});
@@ -778,7 +703,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 					break;
 			}
 			if (message) {
-				playSound.play("question");
 				alertify.dialog.alert(message);
 			}
 			appData.e.triggerHandler("uiNotification", [type, details]);

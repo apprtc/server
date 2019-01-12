@@ -52,7 +52,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 				$scope.updateStatus();
 			}
 			$scope.refreshWebrtcSettings();
-			$scope.refreshSoundSettings();
 		};
 
 		$scope.reset = function() {
