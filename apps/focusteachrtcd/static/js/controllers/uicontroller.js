@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, moment, sjcl, Modernizr) {
 
-	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "alertify", "toastr", "translation", "localStorage", "localStatus", "dialogs", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, alertify, toastr, translation, localStorage, localStatus, dialogs, rooms, constraints) {
+	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "alertify", "toastr", "translation", "localStorage", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, alertify, toastr, translation, localStorage, localStatus, rooms, constraints) {
 
 		alertify.dialog.registerCustom({
 			baseType: 'notify',
