@@ -20,8 +20,6 @@ define([
 	'angular-humanize',
 	'angular-route',
 
-	'mobile-events'
-
 ], function(require, $, _, angular, modernizr, moment, services, directives, filters, controllers) {
 
 	// Simple and fast split based URL query parser based on location.search. We require this before the

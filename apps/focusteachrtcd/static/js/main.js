@@ -24,7 +24,6 @@ require.config({
 		'visibly': 'libs/visibly',
 		'avltree': 'libs/avltree',
 		'injectCSS': 'libs/jquery/jquery.injectCSS',
-		'mobile-events': 'libs/jquery/jquery.mobile-events',
 		'jed': 'libs/jed',
 		'audiocontext': 'libs/audiocontext',
 		'rAF': 'libs/rAF',
@@ -80,10 +79,6 @@ require.config({
 			exports: 'AvlTree'
 		},
 		'injectCSS': {
-			deps: ['jquery'],
-			exports: '$'
-		},
-		'mobile-events': {
 			deps: ['jquery'],
 			exports: '$'
 		},
