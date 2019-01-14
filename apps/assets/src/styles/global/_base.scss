@@ -1,0 +1,77 @@
+
+
+html,
+body {
+  background-clip: padding-box;
+  background-color: $background;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  padding: 0;
+
+  @include breakpt($breakpoint-medium, max-width) {
+    overflow-x: auto;
+  }
+
+  > .ui {
+    height: 100%;
+    min-width: $buddylist-width;
+    position: absolute;
+    width: 100%;
+  }
+}
+
+a {
+  cursor: pointer;
+}
+
+#background { // scss-lint:disable IdSelector
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 0;
+}
+
+.help-block {
+  color: $form-help-text;
+}
+
+.dialog-header-notify,
+.dialog-header-confirm {
+  background-color: $dialog-header-neutral;
+}
+
+:fullscreen {
+  background: #000;
+}
+
+.visibleRoomTypeRoom {
+  display: none;
+}
+
+.roomTypeRoom .visibleRoomTypeRoom {
+  display: block;
+}
+
+.roomTypeRoom .hiddenRoomTypeRoom {
+  display: none;
+}
+
+.visibleRoomTypeConference {
+  display: none;
+}
+
+.roomTypeConference .visibleRoomTypeConference {
+  display: block;
+}
+
+.roomTypeConference .hiddenRoomTypeConference {
+  display: none;
+}

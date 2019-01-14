@@ -1,0 +1,13 @@
+
+.dialog-header-error { background-color: #d2322d; }
+.dialog-header-wait { background-color: #428bca; }
+.dialog-header-notify { background-color: #eee; }
+.dialog-header-confirm { background-color: #eee; }
+.dialog-header-error span, .dialog-header-error h4,
+.dialog-header-wait span, .dialog-header-wait h4 { color: #fff; }
+.modal-content {
+	overflow:hidden;
+	.modal-body {
+		min-height: 160px;
+	}
+}

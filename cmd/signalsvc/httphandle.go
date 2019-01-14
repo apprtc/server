@@ -1,5 +1,0 @@
-package signalsvc
-
-func httpHandle() {
-
-}
