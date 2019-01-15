@@ -155,24 +155,8 @@ if (Object.create) {
 		'underscore',
 		'angular',
 		'require',
-		'webfont',
-		'base'], function($, _, angular, require, webfont) {
+		'base'], function($, _, angular, require) {
 
-		// Load web fonts.
-		webfont.load({
-			custom: {
-				families: ["FontAwesome"],
-				testStrings: {
-					"FontAwesome": '\uf004\uf005'
-				}
-			},
-			active: function() {
-				console.log("Web fonts loaded.");
-			},
-			inactive: function() {
-				console.warn("Web font not available.");
-			}
-		});
 
 		var launcherApp = angular.module('launcherApp', []);
 		launcherApp.run(["$q", "$window", "$http", function($q, $window, $http) {
