@@ -22,7 +22,6 @@ require.config({
 		'angular-humanize': 'modules/angular-humanize',
 		'toastr': 'libs/toastr',
 		'visibly': 'libs/visibly',
-		'avltree': 'libs/avltree',
 		'injectCSS': 'libs/jquery/jquery.injectCSS',
 		'jed': 'libs/jed',
 		'audiocontext': 'libs/audiocontext',
@@ -72,9 +71,6 @@ require.config({
 		},
 		'visibly': {
 			exports: 'visibly'
-		},
-		'avltree': {
-			exports: 'AvlTree'
 		},
 		'injectCSS': {
 			deps: ['jquery'],
