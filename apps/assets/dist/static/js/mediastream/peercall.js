@@ -219,6 +219,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 			// Allow external payload modifications.
 			this.e.triggerHandler("icecandidate", [payload, this]);
 			// Send it.
+			// TODO(longsleep): This id needs to be different for PeerXfers.
 			// XXX(longsleep): This seems to be breaking conferences when this.to and not this.id.
 			this.webrtc.api.sendCandidate(this.to, payload);
 			//console.log("Sent candidate", event.candidate.sdpMid, event.candidate.sdpMLineIndex, event.candidate.candidate);
