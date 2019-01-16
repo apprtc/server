@@ -66,6 +66,7 @@ define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 				}
 			});
 			api.e.on("received.users", function(event, data) {
+				console.log('received.users:', data);
 				var selfId = $scope.id;
 				_.each(data, function(p) {
 					if (p.Id !== selfId) {
