@@ -4,18 +4,16 @@
 define([
 	'underscore',
 	'directives/buddylist',
-	'directives/settings',
 	'directives/audiovideo',
 	'directives/usability',
 	'directives/audiolevel',
 	'directives/ui'], function (_, buddyList,
-		settings, audioVideo, usability,
+		audioVideo, usability,
 		audioLevel,
 		ui) {
 
 		var directives = {
 			buddyList: buddyList,
-			settings: settings,
 			audioVideo: audioVideo,
 			usability: usability,
 			audioLevel: audioLevel,
