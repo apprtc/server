@@ -58,7 +58,7 @@ define(['underscore'], function (_, template) {
 				$scope.$apply();
 			});
 			api.e.on("received.status", function (event, data) {
-				onStatus(data);
+				// onStatus(data);
 			});
 		}];
 
