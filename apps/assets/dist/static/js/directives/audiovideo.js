@@ -16,10 +16,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 			$scope.layoutparent = $element.parent();
 
 			$scope.remoteVideos = $element.find(".remoteVideos")[0];
-			$scope.localVideos = $element.find(".localVideos")[0];
-			$scope.localVideo = $element.find(".localVideo")[0];
-			$scope.miniVideo = $element.find(".miniVideo")[0];
-			$scope.mini = $element.find(".miniContainer")[0];
 
 			$scope.hasUsermedia = false;
 			$scope.isActive = false;
@@ -27,9 +23,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			$scope.peersTalking = {};
 
-			$scope.rendererName = $scope.defaultRendererName = "democrazy";
-
-			//console.log("audiovideo", localVideo, miniVideo);
+			$scope.rendererName = $scope.defaultRendererName = "onepeople";
 
 			$scope.addRemoteStream = function (stream, currentcall) {
 
@@ -197,16 +191,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					$scope.isActive = true;
 					$scope.remoteVideos.style.opacity = 1;
 					$element.addClass("active");
-					//console.log("active 3");
-					// _.delay(function () {
-					// 	$scope.localVideos.style.opacity = 0;
-					// 	$scope.localVideo.style.opacity = 0;
-					// 	$scope.localVideo.src = "";
-					// }, 500);
-					_.delay(function () {
-						//console.log("active 4", $scope.mini);
-						$($scope.mini).addClass("visible");
-					}, 1000);
 				}
 
 			});
@@ -229,39 +213,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				if (!usermedia || !usermedia.started) {
 					return;
 				}
-
-				//console.log("XXXX XXXXXXXXXXXXXXXXXXXXX usermedia event", usermedia);
-				// if ($scope.haveStreams) {
-
-				// 	usermedia.attachMediaStream($scope.miniVideo);
-				// 	$scope.redraw();
-
-				// } else {
-
-				// 	$scope.hasUsermedia = true;
-				// 	usermedia.attachMediaStream($scope.localVideo);
-				// 	var count = 0;
-				// 	var waitForLocalVideo = function () {
-				// 		if (!$scope.hasUsermedia || $scope.isActive) {
-				// 			return;
-				// 		}
-				// 		if ($scope.localVideo.videoWidth > 0) {
-				// 			console.log("Local video size: ", $scope.localVideo.videoWidth, $scope.localVideo.videoHeight);
-				// 			$scope.localVideo.style.opacity = 1;
-				// 			$scope.redraw();
-				// 		} else {
-				// 			count++;
-				// 			if (count < 100) {
-				// 				setTimeout(waitForLocalVideo, 100);
-				// 			} else {
-				// 				console.warn("Timeout while waiting for local video.")
-				// 			}
-				// 		}
-				// 	};
-				// 	waitForLocalVideo();
-
-				// }
-
 			});
 
 			mediaStream.webrtc.e.on("done stop", function (event) {
@@ -280,8 +231,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 						if (scope.isActive) {
 							return;
 						}
-						scope.localVideo.src = '';
-						scope.miniVideo.src = '';
 						$(scope.remoteVideos).children(".remoteVideo").remove();
 					};
 					if (event.type === "stop") {
@@ -289,9 +238,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					} else {
 						$timeout(removeVideos, 1500);
 					}
-					$(scope.mini).removeClass("visible");
-					scope.localVideos.style.opacity = 1;
-					scope.localVideo.style.opacity = 0;
 					scope.remoteVideos.style.opacity = 0;
 					$element.removeClass('active');
 					_.each(streams, function (streamscope, k) {
@@ -307,11 +253,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 			mediaStream.webrtc.e.on("streamadded", function (event, stream, currentcall) {
 
 				console.log("Remote stream added.", stream, currentcall);
-				// if (!$scope.haveStreams) {
-				// 	//console.log("First stream");
-				// 	$window.reattachMediaStream($scope.miniVideo, $scope.localVideo);
-				// 	$scope.haveStreams = true;
-				// }
 				if (stream === null) {
 					// Inject dummy stream.
 					stream = new DummyStream();
@@ -397,11 +338,11 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					} else {
 						name = getRendererName();
 					}
-					// var again = videoLayout.update(name, size, scope, controller);
-					// if (again) {
-					// 	// Layout needs a redraw.
-					// 	needsRedraw = true;
-					// }
+					var again = videoLayout.update(name, size, scope, controller);
+					if (again) {
+						// Layout needs a redraw.
+						needsRedraw = true;
+					}
 				};
 
 				// Make sure we draw on resize.
