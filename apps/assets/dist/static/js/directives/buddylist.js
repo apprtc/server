@@ -4,18 +4,11 @@
 define(['underscore'], function (_, template) {
 
 	// buddyList
-	return ["buddyList", "api", "webrtc", function (buddyList, api, webrtc) {
+	return ["api", "webrtc", function (api, webrtc) {
 
 		//console.log("buddyList directive");
 
 		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-
-			var buddylist = $scope.buddylist = buddyList.buddylist($element, $scope, {});
-			var onJoined = _.bind(buddylist.onJoined, buddylist);
-			var onLeft = _.bind(buddylist.onLeft, buddylist);
-			var onStatus = _.bind(buddylist.onStatus, buddylist);
-
-
 			var inRoom = false;
 
 			webrtc.e.on("done", function () {
@@ -33,7 +26,7 @@ define(['underscore'], function (_, template) {
 
 			$scope.$on("room.left", function (ev) {
 				inRoom = false;
-				buddylist.onClosed();
+				// buddylist.onClosed();
 			});
 
 			$scope.doCall = function (id) {
@@ -43,9 +36,9 @@ define(['underscore'], function (_, template) {
 
 			api.e.on("received.userleftorjoined", function (event, dataType, data) {
 				if (dataType === "Left") {
-					onLeft(data);
+					// onLeft(data);
 				} else {
-					onJoined(data);
+					// onJoined(data);
 				}
 			});
 			api.e.on("received.users", function (event, data) {

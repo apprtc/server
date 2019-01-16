@@ -231,17 +231,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 
 		};
 
-		$scope.toggleBuddylist = (function () {
-			var oldState = null;
-			return function (status, force) {
-				if (status || force) {
-					oldState = $scope.layout.buddylist;
-					$scope.layout.buddylist = !!status;
-				} else {
-					$scope.layout.buddylist = oldState;
-				}
-			}
-		}());
 
 		$scope.$watch("cameraMute", function (cameraMute) {
 			mediaStream.webrtc.setVideoMute(cameraMute);
@@ -489,13 +478,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 
 			console.info("Video state active (assuming connected)", currentcall.id);
 			$scope.setConnectedStatus();
-			$timeout(function () {
-				if ($scope.peer) {
-					$scope.layout.buddylist = false;
-					$scope.layout.buddylistAutoHide = true;
-				}
-			}, 1000);
-
 		});
 
 		$scope.$on("mainview", function (event, mainview, state) {
