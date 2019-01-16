@@ -148,38 +148,6 @@ define([
 			inDefaultRoom: function () {
 				return (currentRoom !== null ? currentRoom.Name : requestedRoomName) === "";
 			},
-			randomRoom: function () {
-				if (!canCreateRooms) {
-					$timeout(function () {
-						$rootScope.$broadcast('room.random', {});
-					});
-					return;
-				}
-				$http({
-					method: "POST",
-					url: url,
-					data: $.param({}),
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).
-					success(function (data, status) {
-						console.info("Retrieved random room data", data);
-						if (!data.name) {
-							data.name = "";
-						}
-						randomRoom = { name: data.name };
-						$rootScope.$broadcast('room.random', randomRoom);
-					}).
-					error(function () {
-						console.error("Failed to retrieve random room data.");
-						randomRoom = {};
-						$rootScope.$broadcast('room.random', randomRoom);
-					});
-			},
-			getRandomRoom: function () {
-				return randomRoom;
-			},
 			canCreateRooms: function () {
 				return canCreateRooms;
 			},
@@ -207,22 +175,6 @@ define([
 				} else {
 					rooms.joinByName(priorRoomName, replace);
 				}
-			},
-			link: function (room) {
-				var name = room ? room.Name : null;
-				if (!name) {
-					name = "";
-				}
-				return restURL.room(name);
-			},
-			setPIN: function (pin) {
-				pin = "" + pin;
-				var newRoom = angular.copy(currentRoom);
-				newRoom.Credentials = { PIN: pin };
-				return updateRoom(newRoom).then(null, function (error) {
-					console.log("Failed to set room PIN", error);
-					return $q.reject(error);
-				});
 			}
 		};
 

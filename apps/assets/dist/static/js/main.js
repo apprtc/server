@@ -30,7 +30,6 @@ require.config({
 		'humanize': 'libs/humanize',
 		'sha': 'libs/sha',
 		'sjcl': 'libs/sjcl',
-		'webfont': 'libs/webfont',
 
 		'partials': '../partials',
 		'translation': '../translation'
@@ -80,9 +79,6 @@ require.config({
 		'injectCSS': {
 			deps: ['jquery'],
 			exports: '$'
-		},
-		'webfont': {
-			exports: 'WebFont'
 		}
 	}
 });
