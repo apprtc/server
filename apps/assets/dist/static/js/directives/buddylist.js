@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['underscore', 'text!partials/buddylist.html'], function (_, template) {
+define(['underscore'], function (_, template) {
 
 	// buddyList
 	return ["buddyList", "api", "webrtc", function (buddyList, api, webrtc) {
@@ -18,39 +18,22 @@ define(['underscore', 'text!partials/buddylist.html'], function (_, template) {
 
 			var inRoom = false;
 
-			$scope.layout.buddylist = false;
-			$scope.layout.buddylistAutoHide = true;
-
-			var updateBuddyListVisibility = function () {
-				if (inRoom && !$scope.peer) {
-					$scope.layout.buddylist = true;
-					$scope.layout.buddylistAutoHide = false;
-				} else if (!$scope.layout.buddylistAutoHide) {
-					$scope.layout.buddylist = false;
-					$scope.layout.buddylistAutoHide = true;
-				}
-			};
-
 			webrtc.e.on("done", function () {
-				$scope.$apply(updateBuddyListVisibility);
 			});
 
 			$scope.$watch("peer", function () {
 				if ($scope.peer) {
 					// Also reset the buddylist if the peer is cleared after the "done" event.
-					updateBuddyListVisibility();
 				}
 			});
 
 			$scope.$on("room.joined", function (ev) {
 				inRoom = true;
-				updateBuddyListVisibility();
 			});
 
 			$scope.$on("room.left", function (ev) {
 				inRoom = false;
 				buddylist.onClosed();
-				updateBuddyListVisibility();
 			});
 
 			$scope.doCall = function (id) {
@@ -78,7 +61,7 @@ define(['underscore', 'text!partials/buddylist.html'], function (_, template) {
 						break;
 					}	
 				}
-				
+
 				$scope.$apply();
 			});
 			api.e.on("received.status", function (event, data) {
@@ -86,30 +69,11 @@ define(['underscore', 'text!partials/buddylist.html'], function (_, template) {
 			});
 		}];
 
-		var link = function (scope, iElement, iAttrs, controller) {
-
-			// Add events to buddy list parent container to show/hide.
-			var parent = iElement.parent();
-			parent.on("mouseenter mouseleave", function (event) {
-				if (event.type === "mouseenter") {
-					scope.layout.buddylist = true;
-				} else {
-					if (scope.layout.buddylistAutoHide) {
-						scope.layout.buddylist = false;
-					}
-				}
-				scope.$apply();
-			});
-
-		};
-
 		return {
 			restrict: 'E',
 			replace: true,
 			scope: true,
-			template: template,
-			controller: controller,
-			link: link
+			controller: controller
 		}
 
 	}];
