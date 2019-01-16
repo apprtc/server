@@ -10,13 +10,11 @@ define([
 	'underscore',
 	'mediastream/peercall',
 	'mediastream/peerconference',
-	'mediastream/peerxfer',
 	'mediastream/usermedia',
 	'mediastream/utils',
-	'mediastream/tokens',
 	'webrtc.adapter'],
 
-function($, _, PeerCall, PeerConference, PeerXfer, UserMedia, utils, tokens) {
+function($, _, PeerCall, PeerConference, UserMedia, utils) {
 
 	if (webrtcDetectedAndroid) {
 		console.log("This seems to be Android");
@@ -186,25 +184,6 @@ function($, _, PeerCall, PeerConference, PeerXfer, UserMedia, utils, tokens) {
 	WebRTC.prototype.processReceived = function(event, to, data, type, to2, from) {
 
 		//console.log(">>>>>>>>>>>>", type, from, data, to, to2);
-
-		if (data && data._token) {
-			// Internal token request.
-			var token = data._token;
-			var id = data._id;
-			delete data._token;
-			delete data._id;
-			// TODO(longsleep): Check if that really needs to be in another file.
-			tokens.processReceivedMessage(this, token, id, to, data, type, to2, from);
-			return;
-		}
-
-		if (this.leavingConference) {
-			// Defer evaluating of messages until the previous conference room
-			// has been left.
-			this.pendingMessages.push([to, data, type, to2, from]);
-			return;
-		}
-
 		this.processReceivedMessage(to, data, type, to2, from);
 	};
 
@@ -594,63 +573,6 @@ function($, _, PeerCall, PeerConference, PeerXfer, UserMedia, utils, tokens) {
 
 		return this._doCallUserMedia(call);
 	};
-
-	WebRTC.prototype.doXfer = function(id, token, options) {
-
-		var registeredToken = tokens.get(token);
-		if (!registeredToken) {
-			console.warn("Cannot start xfer for unknown token", token);
-			return;
-		}
-
-		// Create new xfer object.
-		var xfer = new PeerXfer(this, null, token, id);
-		var opts = $.extend({
-			created: function() {},
-			connected: function() {},
-			error: function() {},
-			closed: function() {}
-		}, options);
-
-		// Store as handler on the token object.
-		registeredToken.addHandler(xfer, id);
-
-		// Bind ICE connection state events.
-		xfer.e.on("connectionStateChange", _.bind(function(event, iceConnectionState, currentxfer) {
-			console.log("Xfer state changed", iceConnectionState);
-			switch (iceConnectionState) {
-				case "completed":
-				case "connected":
-					// Do nothing here, we wait for dataReady.
-					break;
-				case "disconnected":
-					opts.error(currentxfer);
-					break;
-				case "closed":
-					opts.closed(currentxfer);
-					break;
-			}
-		}, this));
-
-		// Bind data channel ready event.
-		xfer.e.on("dataReady", _.bind(function(event, currentxfer) {
-			opts.connected(currentxfer);
-		}, this));
-
-		// Trigger initial event.
-		opts.created(xfer);
-
-		// Connect.
-		xfer.setInitiate(true);
-		xfer.createPeerConnection(_.bind(function(pc) {
-			xfer.e.on("negotiationNeeded", _.bind(function(event, currentxfer) {
-				this.sendOfferWhenNegotiationNeeded(currentxfer, id);
-			}, this));
-			_.defer(pc.negotiationNeeded);
-		}, this));
-
-	};
-
 
 	WebRTC.prototype.stop = function() {
 

@@ -7,10 +7,9 @@ define([
 	'ua-parser',
 	'sjcl',
 	'modernizr',
-	'mediastream/tokens',
 	'webrtc.adapter'
 
-], function ($, _, uaparser, sjcl, Modernizr, tokens) {
+], function ($, _, uaparser, sjcl, Modernizr) {
 
 	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "visibility", "alertify", "$http", "safeApply", "$timeout", "$sce", "localStorage", "continueConnector", "restURL", function (context, connector, api, webrtc, appData, $route, $location, $window, visibility, alertify, $http, safeApply, $timeout, $sce, localStorage, continueConnector, restURL) {
 
@@ -40,7 +39,6 @@ define([
 			webrtc: webrtc,
 			connector: connector,
 			api: api,
-			tokens: tokens,
 			connect: function () {
 				var myMarker = {};
 				connectMarker = myMarker;
