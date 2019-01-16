@@ -1,14 +1,14 @@
 
 
 "use strict";
-define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
+define(['underscore', 'text!partials/buddylist.html'], function (_, template) {
 
 	// buddyList
-	return ["buddyList", "api", "webrtc", function(buddyList, api, webrtc) {
+	return ["buddyList", "api", "webrtc", function (buddyList, api, webrtc) {
 
 		//console.log("buddyList directive");
 
-		var controller = ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
 
 			var buddylist = $scope.buddylist = buddyList.buddylist($element, $scope, {});
 			var onJoined = _.bind(buddylist.onJoined, buddylist);
@@ -21,7 +21,7 @@ define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 			$scope.layout.buddylist = false;
 			$scope.layout.buddylistAutoHide = true;
 
-			var updateBuddyListVisibility = function() {
+			var updateBuddyListVisibility = function () {
 				if (inRoom && !$scope.peer) {
 					$scope.layout.buddylist = true;
 					$scope.layout.buddylistAutoHide = false;
@@ -31,60 +31,66 @@ define(['underscore', 'text!partials/buddylist.html'], function(_, template) {
 				}
 			};
 
-			webrtc.e.on("done", function() {
+			webrtc.e.on("done", function () {
 				$scope.$apply(updateBuddyListVisibility);
 			});
 
-			$scope.$watch("peer", function() {
+			$scope.$watch("peer", function () {
 				if ($scope.peer) {
 					// Also reset the buddylist if the peer is cleared after the "done" event.
 					updateBuddyListVisibility();
 				}
 			});
 
-			$scope.$on("room.joined", function(ev) {
+			$scope.$on("room.joined", function (ev) {
 				inRoom = true;
 				updateBuddyListVisibility();
 			});
 
-			$scope.$on("room.left", function(ev) {
+			$scope.$on("room.left", function (ev) {
 				inRoom = false;
 				buddylist.onClosed();
 				updateBuddyListVisibility();
 			});
 
-			$scope.doCall = function(id) {
+			$scope.doCall = function (id) {
 				webrtc.doCall(id);
 			};
 
 
-			api.e.on("received.userleftorjoined", function(event, dataType, data) {
+			api.e.on("received.userleftorjoined", function (event, dataType, data) {
 				if (dataType === "Left") {
 					onLeft(data);
 				} else {
 					onJoined(data);
 				}
 			});
-			api.e.on("received.users", function(event, data) {
+			api.e.on("received.users", function (event, data) {
 				console.log('received.users:', data);
 				var selfId = $scope.id;
-				_.each(data, function(p) {
+
+				for (let index = 0; index < data.length; index++) {
+					const p = data[index];
+
 					if (p.Id !== selfId) {
-						onJoined(p);
-					}
-				});
+						// onJoined(p);
+						webrtc.doCall(p.Id);
+						break;
+					}	
+				}
+				
 				$scope.$apply();
 			});
-			api.e.on("received.status", function(event, data) {
+			api.e.on("received.status", function (event, data) {
 				onStatus(data);
 			});
 		}];
 
-		var link = function(scope, iElement, iAttrs, controller) {
+		var link = function (scope, iElement, iAttrs, controller) {
 
 			// Add events to buddy list parent container to show/hide.
 			var parent = iElement.parent();
-			parent.on("mouseenter mouseleave", function(event) {
+			parent.on("mouseenter mouseleave", function (event) {
 				if (event.type === "mouseenter") {
 					scope.layout.buddylist = true;
 				} else {
