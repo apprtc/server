@@ -198,11 +198,11 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					$scope.remoteVideos.style.opacity = 1;
 					$element.addClass("active");
 					//console.log("active 3");
-					_.delay(function () {
-						$scope.localVideos.style.opacity = 0;
-						$scope.localVideo.style.opacity = 0;
-						$scope.localVideo.src = "";
-					}, 500);
+					// _.delay(function () {
+					// 	$scope.localVideos.style.opacity = 0;
+					// 	$scope.localVideo.style.opacity = 0;
+					// 	$scope.localVideo.src = "";
+					// }, 500);
 					_.delay(function () {
 						//console.log("active 4", $scope.mini);
 						$($scope.mini).addClass("visible");
@@ -231,36 +231,36 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				}
 
 				//console.log("XXXX XXXXXXXXXXXXXXXXXXXXX usermedia event", usermedia);
-				if ($scope.haveStreams) {
+				// if ($scope.haveStreams) {
 
-					usermedia.attachMediaStream($scope.miniVideo);
-					$scope.redraw();
+				// 	usermedia.attachMediaStream($scope.miniVideo);
+				// 	$scope.redraw();
 
-				} else {
+				// } else {
 
-					$scope.hasUsermedia = true;
-					usermedia.attachMediaStream($scope.localVideo);
-					var count = 0;
-					var waitForLocalVideo = function () {
-						if (!$scope.hasUsermedia || $scope.isActive) {
-							return;
-						}
-						if ($scope.localVideo.videoWidth > 0) {
-							console.log("Local video size: ", $scope.localVideo.videoWidth, $scope.localVideo.videoHeight);
-							$scope.localVideo.style.opacity = 1;
-							$scope.redraw();
-						} else {
-							count++;
-							if (count < 100) {
-								setTimeout(waitForLocalVideo, 100);
-							} else {
-								console.warn("Timeout while waiting for local video.")
-							}
-						}
-					};
-					waitForLocalVideo();
+				// 	$scope.hasUsermedia = true;
+				// 	usermedia.attachMediaStream($scope.localVideo);
+				// 	var count = 0;
+				// 	var waitForLocalVideo = function () {
+				// 		if (!$scope.hasUsermedia || $scope.isActive) {
+				// 			return;
+				// 		}
+				// 		if ($scope.localVideo.videoWidth > 0) {
+				// 			console.log("Local video size: ", $scope.localVideo.videoWidth, $scope.localVideo.videoHeight);
+				// 			$scope.localVideo.style.opacity = 1;
+				// 			$scope.redraw();
+				// 		} else {
+				// 			count++;
+				// 			if (count < 100) {
+				// 				setTimeout(waitForLocalVideo, 100);
+				// 			} else {
+				// 				console.warn("Timeout while waiting for local video.")
+				// 			}
+				// 		}
+				// 	};
+				// 	waitForLocalVideo();
 
-				}
+				// }
 
 			});
 
@@ -307,11 +307,11 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 			mediaStream.webrtc.e.on("streamadded", function (event, stream, currentcall) {
 
 				console.log("Remote stream added.", stream, currentcall);
-				if (!$scope.haveStreams) {
-					//console.log("First stream");
-					$window.reattachMediaStream($scope.miniVideo, $scope.localVideo);
-					$scope.haveStreams = true;
-				}
+				// if (!$scope.haveStreams) {
+				// 	//console.log("First stream");
+				// 	$window.reattachMediaStream($scope.miniVideo, $scope.localVideo);
+				// 	$scope.haveStreams = true;
+				// }
 				if (stream === null) {
 					// Inject dummy stream.
 					stream = new DummyStream();
@@ -397,11 +397,11 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					} else {
 						name = getRendererName();
 					}
-					var again = videoLayout.update(name, size, scope, controller);
-					if (again) {
-						// Layout needs a redraw.
-						needsRedraw = true;
-					}
+					// var again = videoLayout.update(name, size, scope, controller);
+					// if (again) {
+					// 	// Layout needs a redraw.
+					// 	needsRedraw = true;
+					// }
 				};
 
 				// Make sure we draw on resize.
