@@ -285,26 +285,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 				}
 			}
 
-			// Support authentication from localStorage.
-			if (!data.Userid && mediaStream.config.UsersEnabled) {
-				// Check if we can load a user.
-				var login = mediaStream.users.load();
-				if (login !== null) {
-					$scope.loadedUserlogin = true;
-					console.log("Trying to authorize with stored credentials ...");
-					mediaStream.users.authorize(login, function (data) {
-						console.info("Retrieved nonce - authenticating as user:", data.userid);
-						mediaStream.api.requestAuthentication(data.userid, data.nonce);
-						delete data.nonce;
-					}, function (data, status) {
-						console.error("Failed to authorize session", status, data);
-						mediaStream.users.forget();
-					});
-				} else {
-					$scope.loadedUserlogin = false;
-				}
-			}
-
 			// Support to upgrade stuff when ttl was reached.
 			if (data.Turn.ttl) {
 				ttlTimeout = $timeout(function () {
@@ -328,32 +308,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 
 			// Propagate authentication event.
 			appData.e.triggerHandler("selfReceived", [data]);
-
-			// Unmark authorization process.
-			if (data.Userid) {
-				appData.authorizing(false, data.Userid);
-			} else {
-				if (!appData.authorizing()) {
-					// Trigger user data load when not in authorizing phase.
-					$scope.loadUserSettings();
-				} else {
-					// Wait until authorizing is over and try it then.
-					var handler = (function () {
-						return function (event, authorizing, userid) {
-							if (!authorizing) {
-								// Turn of handler if we are no longer authorizing.
-								appData.e.off("authorizing", handler);
-								handler = null;
-								if (!userid) {
-									// Trigger user data load when without user after authorizing phase.
-									$scope.loadUserSettings();
-								}
-							}
-						}
-					})();
-					appData.e.on("authorizing", handler);
-				}
-			}
 
 			// Select room if settings have an alternative default room.
 			if (rooms.inDefaultRoom() && $scope.master.settings.defaultRoom) {
@@ -557,19 +511,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			}
 			if (changed) {
 				$scope.$broadcast("mainresize", layout.main);
-			}
-		});
-
-		$scope.$watch("userid", function (userid, olduserid) {
-			var suserid;
-			if (userid) {
-				suserid = $scope.suserid;
-				console.info("Session is now authenticated:", userid, suserid);
-			}
-			if (userid !== olduserid) {
-				appData.e.triggerHandler("authenticationChanged", [userid, suserid]);
-				// Load user settings after authentication changed.
-				$scope.loadUserSettings();
 			}
 		});
 

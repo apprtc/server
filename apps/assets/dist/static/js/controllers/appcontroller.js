@@ -4,7 +4,7 @@
 define(["jquery", "angular", "underscore"], function($, angular, _) {
 
 	// AppController
-	return ["$scope", "$window", "appData", "userSettingsData", "$timeout", function($scope, $window, appData, userSettingsData, $timeout) {
+	return ["$scope", "$window", "appData", "$timeout", function($scope, $window, appData, $timeout) {
 
 		// Disable drag and drop.
 		$($window).on("dragover dragenter drop", function(event) {
@@ -56,22 +56,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 
 		$scope.reset = function() {
 			$scope.user = angular.copy($scope.master);
-		};
-
-		$scope.loadUserSettings = function() {
-			$scope.master = angular.copy($scope.defaults);
-			var storedUser = userSettingsData.load();
-			if (storedUser) {
-				$scope.user = $.extend(true, {}, $scope.master, storedUser);
-				$scope.user.settings = $.extend(true, {}, $scope.user.settings, $scope.master.settings, $scope.user.settings);
-				$scope.update($scope.user);
-				$scope.loadedUser = storedUser.displayName && true;
-			} else {
-				$scope.loadedUser = false;
-			}
-			$scope.roomsHistory = [];
-			appData.e.triggerHandler("userSettingsLoaded", [$scope.loadedUser, $scope.user]);
-			$scope.reset();
 		};
 
 		$scope.manualReloadApp = function(url) {

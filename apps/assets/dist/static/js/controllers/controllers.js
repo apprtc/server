@@ -5,12 +5,10 @@ define([
 	'underscore',
 
 	'controllers/uicontroller',
-	'controllers/usersettingscontroller',
-	'controllers/appcontroller'], function(_, UiController, UsersettingsController, AppController) {
+	'controllers/appcontroller'], function(_, UiController, AppController) {
 
 	var controllers = {
 		UiController: UiController,
-		UsersettingsController: UsersettingsController,
 		AppController: AppController
 	};
 
