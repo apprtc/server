@@ -8,11 +8,10 @@ define([
 	'directives/audiovideo',
 	'directives/usability',
 	'directives/audiolevel',
-	'directives/menu',
 	'directives/ui'], function (_, buddyList,
 		settings, audioVideo, usability,
 		audioLevel,
-		menu, ui) {
+		ui) {
 
 		var directives = {
 			buddyList: buddyList,
@@ -20,7 +19,6 @@ define([
 			audioVideo: audioVideo,
 			usability: usability,
 			audioLevel: audioLevel,
-			menu: menu,
 			ui: ui
 		};
 
