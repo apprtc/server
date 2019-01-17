@@ -14,7 +14,6 @@ require.config({
 		'ui-bootstrap': 'libs/angular/ui-bootstrap-tpls.min',
 		'ua-parser': 'libs/ua-parser',
 		'bigscreen': 'libs/bigscreen.min',
-		'moment': 'libs/moment.min',
 		'angular-sanitize': 'libs/angular/angular-sanitize.min',
 		'angular-animate': 'libs/angular/angular-animate.min',
 		'angular-route': 'libs/angular/angular-route.min',
@@ -40,9 +39,6 @@ require.config({
 		},
 		'bigscreen': {
 			exports: 'BigScreen'
-		},
-		'moment': {
-			exports: 'moment'
 		},
 		'angular-sanitize': {
 			deps: ['angular'],

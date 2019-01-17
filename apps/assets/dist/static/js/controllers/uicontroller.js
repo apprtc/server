@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'bigscreen', 'moment', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, moment, Modernizr) {
+define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, Modernizr) {
 
 	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, localStatus, rooms, constraints) {
 
@@ -579,12 +579,12 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'modernizr', 'webrtc.adap
 					message = details.from + " does not pick up.";
 					break;
 				case "incomingbusy":
-					alert(moment().format("lll"), details.from + " tried to call you");
+					alert(details.from + " tried to call you");
 					break;
 				case "abortbeforepickup":
 				// Fall through
 				case "incomingpickuptimeout":
-					alert(moment().format("lll"), details.from + " called you");
+					alert(details.from + " called you");
 					break;
 			}
 			if (message) {

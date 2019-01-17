@@ -7,7 +7,6 @@ define([
 	'underscore',
 	'angular',
 	'modernizr',
-	'moment',
 
 	'services/services',
 	'directives/directives',
@@ -19,7 +18,7 @@ define([
 	'angular-animate',
 	'angular-route',
 
-], function (require, $, _, angular, modernizr, moment, services, directives, filters, controllers) {
+], function (require, $, _, angular, modernizr, services, directives, filters, controllers) {
 
 	// Simple and fast split based URL query parser based on location.search. We require this before the
 	// angular App is bootstrap to control initialization parameters like translation based on URL parameters.
@@ -110,8 +109,6 @@ define([
 
 		console.info("Selected language: " + lang);
 
-		// Set momemt language.
-		moment.lang(lang);
 	};
 
 	return {
