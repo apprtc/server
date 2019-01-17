@@ -13,7 +13,6 @@ require.config({
 		'angular': 'libs/angular/angular.min',
 		'ui-bootstrap': 'libs/angular/ui-bootstrap-tpls.min',
 		'ua-parser': 'libs/ua-parser',
-		'Howler': 'libs/howler.min',
 		'bigscreen': 'libs/bigscreen.min',
 		'moment': 'libs/moment.min',
 		'angular-sanitize': 'libs/angular/angular-sanitize.min',

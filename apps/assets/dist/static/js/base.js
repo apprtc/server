@@ -4,7 +4,6 @@
 define([ // Helper module to put non dependency base libraries together.
 	'modernizr',
 	'moment',
-	'Howler',
 	'bigscreen',
 	'visibly',
 	'audiocontext',
