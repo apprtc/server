@@ -16,15 +16,12 @@ define([
 		var priorRoomName = null;
 		var helloedRoomName = null;
 		var currentRoom = null;
-		var randomRoom = null;
-		var canJoinRooms = !mediaStream.config.AuthorizeRoomJoin;
-		var canCreateRooms = canJoinRooms ? !mediaStream.config.AuthorizeRoomCreation : false;
 
 		var rooms;
 		var joinFailed;
 		var joinRequestedRoom;
 		var setCurrentRoom;
-		var updateRoom;
+
 		var applyRoomUpdate;
 
 		joinFailed = function (error) {
@@ -47,8 +44,8 @@ define([
 		};
 
 		joinRequestedRoom = function () {
-			if (!connector.connected || appData.authorizing()) {
-				// Do nothing while not connected or authorizing.
+			if (!connector.connected) {
+				// Do nothing while not connected.
 				return;
 			}
 			if (!currentRoom || requestedRoomName !== currentRoom.Name) {
@@ -90,12 +87,6 @@ define([
 			}
 		};
 
-		updateRoom = function (room) {
-			var response = $q.defer();
-			api.requestRoomUpdate(room, response.resolve, response.reject);
-			return response.promise.then(applyRoomUpdate);
-		};
-
 		applyRoomUpdate = function (room) {
 			currentRoom = room;
 			$rootScope.$broadcast("room.updated", currentRoom);
@@ -110,21 +101,8 @@ define([
 			applyRoomUpdate(room);
 		});
 
-		appData.e.on("authorizing", function (event, value) {
-			if (!value) {
-				// NOTE(lcooper): This will have been skipped earlier, so try again.
-				_.defer(joinRequestedRoom);
-			}
-		});
-
 		appData.e.on("selfReceived", function (event, data) {
 			_.defer(joinRequestedRoom);
-			canJoinRooms = (!mediaStream.config.AuthorizeRoomJoin || $rootScope.myuserid) ? true : false
-			if (canJoinRooms) {
-				canCreateRooms = (!mediaStream.config.AuthorizeRoomCreation || $rootScope.myuserid) ? true : false;
-			} else {
-				canCreateRooms = false;
-			}
 		});
 
 		$rootScope.$on("$locationChangeSuccess", function (event) {
@@ -147,12 +125,6 @@ define([
 		rooms = {
 			inDefaultRoom: function () {
 				return (currentRoom !== null ? currentRoom.Name : requestedRoomName) === "";
-			},
-			canCreateRooms: function () {
-				return canCreateRooms;
-			},
-			canJoinRooms: function () {
-				return canJoinRooms;
 			},
 			joinByName: function (name, replace) {
 				var nn = restURL.encodeRoomURL(name, "", function (url) {

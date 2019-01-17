@@ -6,10 +6,6 @@ define(["jquery"], function($) {
 	// appData.e events:
 	// Subscribe these events with appData.e.on(eventname, function() {}).
 	//
-	// - authenticationChanged(event, userid, suserid)
-	//     userid (string)  : Public user id of the authenticated user.
-	//     suserid (string) : Private user id of the authenticated user.
-	//
 	// - selfReceived(event, self)
 	//     self (object) : Self document as received from API.
 	//
@@ -20,10 +16,6 @@ define(["jquery"], function($) {
 	//
 	// - mainStatus(event, status)
 	//     status (string)  : Status id (connected, waiting, ...)
-	//
-	// - authorizing(event, flag, userid)
-	//     flag (bool)      : True if authorizing phase, else false.
-	//     userid (string)  : User id if a user was authorized.
 	//
 	// - userSettingsLoaded(event, loaded, user_settings)
 	//     loaded (bool)    : True if something was loaded, else false.
@@ -43,7 +35,6 @@ define(["jquery"], function($) {
 		service.e = $({});
 		service.data = null;
 		service.flags = {
-			authorizing: false,
 			resurrect: null
 		};
 
@@ -56,17 +47,6 @@ define(["jquery"], function($) {
 		service.set = function(d) {
 			service.data = d;
 			return d;
-		};
-		service.authorizing = function(value, userid) {
-			// Boolean flag to indicate that an authentication is currently in progress.
-			if (typeof(value) !== "undefined") {
-				var v = !!value;
-				if (v !== service.flags.authorizing) {
-					service.flags.authorizing = v;
-					service.e.triggerHandler("authorizing", v, userid);
-				}
-			}
-			return service.flags.authorizing;
 		};
 
 		console.info("App runtime id: "+service.id);

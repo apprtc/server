@@ -264,20 +264,6 @@ define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
 
 	}
 
-	Api.prototype.requestRoomUpdate = function (room, success, fault) {
-		var onResponse = function (event, type, data) {
-			if (type === "Room") {
-				if (success) {
-					success(data);
-				}
-			} else {
-				if (fault) {
-					fault(data);
-				}
-			}
-		};
-		this.request("Room", room, onResponse, true);
-	};
 
 	Api.prototype.requestUsers = function () {
 
