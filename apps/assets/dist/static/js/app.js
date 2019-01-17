@@ -44,75 +44,7 @@ define([
 	// Base application config shared during initialization.
 	var appConfig = {};
 
-	// Implement translation store.
-	var TranslationData = function(default_language, launcher) {
-		// Create data structure.
-		this.data = {
-			locale_data: {}
-		};
-		this.lang = this.default_lang = default_language;
-		this.getHTTP = launcher.$http.get;
-	};
-	TranslationData.prototype.language = function() {
-		// Return language.
-		return this.lang;
-	};
-	TranslationData.prototype.default_language = function() {
-		return this.default_lang;
-	};
-	TranslationData.prototype.add = function(domain, data) {
-		var src;
-		if (data && data.locale_data) {
-			src = data.locale_data[domain];
-			// Support older po files built for older jed (see https://github.com/SlexAxton/Jed/issues/36).
-			var count = 0;
-			var v;
-			for (var k in src) {
-				if (src.hasOwnProperty(k)) {
-					v = src[k];
-					if (v.constructor === Array && v[0] === null) {
-						v.shift();
-					} else {
-						count++;
-					}
-					if (count > 1) {
-						break;
-					}
-				}
-			}
-		}
-		var dst = this.data.locale_data[domain];
-		if (!dst) {
-			dst = this.data.locale_data[domain] = {
-				"": {
-					"domain": domain,
-					"plural_forms": "nplurals=2; plural=(n != 1);"
-				}
-			}
-		}
-		_.extend(dst, src);
-	};
-	TranslationData.prototype.load = function(domain, url) {
-		var that = this;
-		return this.getHTTP(url).
-			success(function(data) {
-				//console.log("loaded translation data", data);
-				that.add(domain, data);
-			}).
-			error(function(data, status) {
-				console.warn("Failed to load translation data: " + status);
-				that.add(domain, null);
-			});
-	};
-	TranslationData.prototype.get = function() {
-		return this.data;
-	};
-
 	var create = function(ms, launcher) {
-
-		// Create translation data instance.
-		var translationData = launcher.translationData = new TranslationData("en", launcher);
-
 		var modules = ['ui.bootstrap', 'ngSanitize', 'ngAnimate', 'ngHumanize', 'ngRoute'];
 		if (ms && ms.length) {
 			_.each(ms, function(module) {
@@ -145,22 +77,6 @@ define([
 				initialize.resolve();
 			}, 0);
 		}]);
-
-
-		app.provider("translationData", function translationDataProvider() {
-
-			// Make available functions for config phase.
-			this.add = _.bind(translationData.add, translationData);
-			this.load = _.bind(translationData.load, translationData);
-			this.language = _.bind(translationData.language, translationData);
-			this.default_language = _.bind(translationData.default_language, translationData);
-
-			// Out creater returns raw data.
-			this.$get = [function translationDataFactory() {
-				return translationData.get();
-			}];
-
-		});
 
 		app.directive("spreedWebrtc", [function() {
 			return {
@@ -227,29 +143,8 @@ define([
 		}());
 		console.info("Selected language: "+lang);
 
-		// Set language and load default translations.
-		launcher.translationData.lang = lang;
-		var translationDomain = "messages";
-		if (lang === launcher.translationData.default_lang) {
-			// No need to load default language as it is built in.
-			launcher.translationData.add(translationDomain, null);
-			deferred.resolve();
-		} else {
-			// Load default translation catalog.
-			var url = require.toUrl('translation/'+translationDomain+"-"+lang+'.json');
-			launcher.translationData.load(translationDomain, url).then(function() {
-				deferred.resolve();
-			}, function() {
-				// Ignore errors.
-				deferred.resolve();
-			});
-		}
-
 		// Set momemt language.
 		moment.lang(lang);
-
-		return deferred.promise;
-
 	};
 
 	return {
