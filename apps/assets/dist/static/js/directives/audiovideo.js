@@ -23,8 +23,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			$scope.peersTalking = {};
 
-			$scope.rendererName = $scope.defaultRendererName = "onepeople";
-
 			$scope.addRemoteStream = function (stream, currentcall) {
 
 				var id = currentcall.getStreamId(stream);
@@ -114,7 +112,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 							scope.onlyaudio = true;
 							$timeout(function () {
 								scope.$emit("active", currentcall);
-								$scope.redraw();
 							});
 							return;
 						} else {
@@ -139,7 +136,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 									});
 								}
 								scope.$emit("active", currentcall);
-								$scope.redraw();
+
 							}, function () {
 								if (scope.destroyed) {
 									console.log("No longer wait for video on destroyed scope.");
@@ -147,7 +144,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 								}
 								console.warn("We did not receive video data for remote stream", currentcall, stream, video);
 								scope.$emit("active", currentcall);
-								$scope.redraw();
 							});
 							scope.dummy = null;
 						}
@@ -172,7 +168,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 						subscope.element.remove();
 					}
 					subscope.$destroy();
-					$scope.redraw();
 				}
 
 			};
@@ -244,7 +239,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 						streamscope.$destroy();
 						delete streams[k];
 					});
-					scope.rendererName = scope.defaultRendererName;
+
 					scope.haveStreams = false;
 				});
 
@@ -293,69 +288,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 			return function (scope, iElement, iAttrs, controller) {
 
 				//console.log("compile", arguments)
-
 				iElement.on("doubletap dblclick", _.debounce(scope.toggleFullscreen, 100, true));
-
-				var rendererName = null;
-				var getRendererName = function () {
-					// Return name of current renderer.
-					if (rendererName !== null) {
-						return rendererName;
-					} else {
-						return scope.rendererName;
-					}
-				};
-				var forceRendererName = function (name) {
-					// Allow change between some renderes when forced.
-					if (name === "classroom") {
-						rendererName = "classroom";
-					} else {
-						rendererName = "smally";
-					}
-				};
-
-				scope.setRenderer = function (name) {
-					scope.rendererName = name;
-					if (rendererName && rendererName !== name) {
-						forceRendererName(name);
-					}
-				};
-
-				var needsRedraw = false;
-				scope.redraw = function () {
-					needsRedraw = true;
-				};
-
-				var redraw = function () {
-				};
-
-				// Make sure we draw on resize.
-				$($window).on("resize", scope.redraw);
-				scope.$on("mainresize", function (event, main) {
-					if (main) {
-						// Force smally renderer or pin classroom when we have a main view.
-						forceRendererName(scope.rendererName);
-					} else if (rendererName) {
-						rendererName = null;
-					}
-					_.defer(scope.redraw);
-				});
-				scope.redraw();
-
-				// Make sure we draw when the renderer was changed.
-				scope.$watch("rendererName", function () {
-					_.defer(scope.redraw);
-				});
-
-				// Update function run in rendering thread.
-				var update = function () {
-					if (needsRedraw) {
-						needsRedraw = false;
-						redraw();
-					}
-				}
-				animationFrame.register(update);
-
 			}
 
 		};
