@@ -23,7 +23,6 @@ require.config({
 		'toastr': 'libs/toastr',
 		'visibly': 'libs/visibly',
 		'injectCSS': 'libs/jquery/jquery.injectCSS',
-		'jed': 'libs/jed',
 		'audiocontext': 'libs/audiocontext',
 		'rAF': 'libs/rAF',
 		'humanize': 'libs/humanize',
@@ -31,7 +30,6 @@ require.config({
 		'sjcl': 'libs/sjcl',
 
 		'partials': '../partials',
-		'translation': '../translation'
 	},
 	shim: {
 		'modernizr': {

@@ -7,7 +7,6 @@ define([ // Helper module to put non dependency base libraries together.
 	'Howler',
 	'bigscreen',
 	'visibly',
-	'jed',
 	'audiocontext',
 	'rAF',
 	'humanize',

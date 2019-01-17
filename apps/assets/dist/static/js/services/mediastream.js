@@ -59,7 +59,7 @@ define([
 					}
 				});
 			},
-			initialize: function ($rootScope, translation) {
+			initialize: function ($rootScope) {
 
 				var cont = false;
 				var ready = false;

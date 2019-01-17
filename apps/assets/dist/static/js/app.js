@@ -136,11 +136,10 @@ define([
 			$locationProvider.html5Mode(true);
 		}]);
 
-		app.run(["$rootScope", "$timeout", "mediaStream", "translation", "continueConnector", function($rootScope, $timeout, mediaStream, translation, continueConnector) {
-			translation.inject($rootScope);
+		app.run(["$rootScope", "$timeout", "mediaStream", "continueConnector", function($rootScope, $timeout, mediaStream, continueConnector) {
 			console.log("Initializing ...");
 			var initialize = continueConnector.defer();
-			mediaStream.initialize($rootScope, translation);
+			mediaStream.initialize($rootScope);
 			$timeout(function() {
 				console.log("Initializing complete.")
 				initialize.resolve();
