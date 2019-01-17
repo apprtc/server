@@ -3,13 +3,10 @@
 "use strict";
 define([
 	'underscore',
-
-	'filters/displayname',
 	'filters/displayuserid',
-	'filters/displaynameforsession'], function (_, displayName, displayUserid, displayNameForSession) {
+	'filters/displaynameforsession'], function (_, displayUserid, displayNameForSession) {
 
 		var filters = {
-			displayName: displayName,
 			displayUserid: displayUserid,
 			displayNameForSession: displayNameForSession
 		};

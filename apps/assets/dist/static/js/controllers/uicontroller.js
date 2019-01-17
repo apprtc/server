@@ -3,14 +3,14 @@
 "use strict";
 define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, moment, sjcl, Modernizr) {
 
-	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "toastr", "translation", "localStorage", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, toastr, translation, localStorage, localStatus, rooms, constraints) {
+	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "toastr", "translation", "localStorage", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, toastr, translation, localStorage, localStatus, rooms, constraints) {
 
 		// Avoid accidential reloads or exits when in a call.
 		$($window).on("beforeunload", function (event) {
 			if (appData.flags.manualUnload || !$scope.peer) {
 				return;
 			}
-			return translation._("Close this window and disconnect?");
+			return "Close this window and disconnect?";
 		});
 
 		$($window).on("unload", function () {
@@ -72,8 +72,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			});
 
 		};
-
-		var displayName = safeDisplayName;
 
 		// Init STUN from server config.
 		(function () {
@@ -337,11 +335,11 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 		mediaStream.webrtc.e.on("error", function (event, message, msgid) {
 			switch (msgid) {
 				case "failed_getusermedia":
-					message = translation._("Failed to access camera/microphone.");
+					message = "Failed to access camera/microphone.";
 					break;
 				case "failed_peerconnection_setup":
 				case "failed_peerconnection":
-					message = translation._("Failed to establish peer connection.")
+					message = "Failed to establish peer connection."
 					break;
 			}
 			if (!message) {
@@ -588,21 +586,21 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			var message = null;
 			switch (type) {
 				case "busy":
-					message = displayName(details.from) + translation._(" is busy. Try again later.");
+					message = details.from + " is busy. Try again later.";
 					break;
 				case "reject":
-					message = displayName(details.from) + translation._(" rejected your call.");
+					message = details.from + " rejected your call.";
 					break;
 				case "pickuptimeout":
-					message = displayName(details.from) + translation._(" does not pick up.");
+					message = details.from + " does not pick up.";
 					break;
 				case "incomingbusy":
-					toastr.info(moment().format("lll"), displayName(details.from) + translation._(" tried to call you"));
+					toastr.info(moment().format("lll"), details.from + " tried to call you");
 					break;
 				case "abortbeforepickup":
 				// Fall through
 				case "incomingpickuptimeout":
-					toastr.info(moment().format("lll"), displayName(details.from) + translation._(" called you"));
+					toastr.info(moment().format("lll"), details.from + " called you");
 					break;
 			}
 			if (message) {

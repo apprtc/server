@@ -17,7 +17,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 		$scope.authorizing = false;
 		$scope.roomsHistory = [];
 		$scope.defaults = {
-			displayName: null,
 			message: null,
 			settings: {
 				videoQuality: "high",
