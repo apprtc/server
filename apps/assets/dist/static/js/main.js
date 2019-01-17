@@ -20,9 +20,7 @@ require.config({
 		'angular-animate': 'libs/angular/angular-animate.min',
 		'angular-route': 'libs/angular/angular-route.min',
 		'angular-humanize': 'modules/angular-humanize',
-		'toastr': 'libs/toastr',
 		'visibly': 'libs/visibly',
-		'injectCSS': 'libs/jquery/jquery.injectCSS',
 		'audiocontext': 'libs/audiocontext',
 		'rAF': 'libs/rAF',
 		'humanize': 'libs/humanize',
@@ -61,16 +59,8 @@ require.config({
 			deps: ['angular', 'humanize'],
 			exports: 'angular'
 		},
-		'toastr': {
-			deps: ['jquery'],
-			exports: 'toastr'
-		},
 		'visibly': {
 			exports: 'visibly'
-		},
-		'injectCSS': {
-			deps: ['jquery'],
-			exports: '$'
 		}
 	}
 });

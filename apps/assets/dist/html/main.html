@@ -7,12 +7,9 @@
     <%template "head" .%>
 </head>
 
-<body webrtc-app>
-    <div id="background"></div>
+<body webrtc-app style="background-color:#000">
     <div id="loader">
-        <div><i class="fa fa-circle-o-notch fa-spin"></i>
-            <div class="loader-message"></div>
-        </div>
+        <div class="loader-message"></div>
     </div>
     <ui></ui>
     <script data-main="<%.Cfg.S%>/js/<%.App%>" data-plugin="<%.Cfg.Plugin%>" src="<%.Cfg.S%>/js/libs/require/require.js"></script>

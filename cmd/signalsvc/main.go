@@ -53,10 +53,6 @@ func runner(runtime phoenix.Runtime) error {
 		return fmt.Errorf("Configured root '%s' is not a directory.", rootFolder)
 	}
 
-	if !httputils.HasFilePath(path.Join(rootFolder, "static", "css", "main.min.css")) {
-		return fmt.Errorf("Unable to find client. Path correct and compiled css?")
-	}
-
 	statsEnabled, err := runtime.GetBool("http", "stats")
 	if err != nil {
 		statsEnabled = false
