@@ -3,13 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, moment, sjcl, Modernizr) {
 
-	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "alertify", "toastr", "translation", "localStorage", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, alertify, toastr, translation, localStorage, localStatus, rooms, constraints) {
-
-		alertify.dialog.registerCustom({
-			baseType: 'notify',
-			type: 'webrtcUnsupported',
-			message: translation._("Your browser does not support WebRTC. No calls possible.")
-		});
+	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeDisplayName", "safeApply", "mediaStream", "appData", "toastr", "translation", "localStorage", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeDisplayName, safeApply, mediaStream, appData, toastr, translation, localStorage, localStatus, rooms, constraints) {
 
 		// Avoid accidential reloads or exits when in a call.
 		$($window).on("beforeunload", function (event) {
@@ -260,20 +254,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 			constraints.stun(data.Stun);
 			$scope.refreshWebrtcSettings();
 
-			if (data.Version !== mediaStream.version) {
-				console.info("Server was upgraded. Reload required.");
-				if (!reloadDialog) {
-					reloadDialog = true;
-					_.delay(function () {
-						alertify.dialog.confirm(translation._("Restart required to apply updates. Click ok to restart now."), function () {
-							$scope.manualReloadApp();
-						}, function () {
-							reloadDialog = false;
-						});
-					}, 300);
-				}
-			}
-
 			// Support to upgrade stuff when ttl was reached.
 			if (data.Turn.ttl) {
 				ttlTimeout = $timeout(function () {
@@ -368,9 +348,9 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 				message = msgid;
 			}
 			if (!message) {
-				message = translation._("We are sorry but something went wrong. Boo boo.");
+				message = "We are sorry but something went wrong. Boo boo.";
 			}
-			alertify.dialog.alert(translation._("Oops") + "<br/>" + message);
+			alert(message);
 		});
 
 		mediaStream.webrtc.e.on("usermedia", function (event, usermedia) {
@@ -463,7 +443,7 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 					var wasConnected = !currentcall.closed;
 					mediaStream.webrtc.doHangup("failed", currentcall.id);
 					if (!wasConnected) {
-						alertify.dialog.alert(translation._("Peer connection failed. Check your settings."));
+						alert("Peer connection failed. Check your settings.");
 					}
 					break;
 			}
@@ -569,7 +549,7 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 					break;
 				case "error":
 					console.log("User cannot accept call because of error");
-					alertify.dialog.alert(translation._("Oops") + "<br/>" + translation._("User hung up because of error."));
+					alert("User hung up because of error.");
 					break;
 				case "abort":
 					console.log("Remote call was aborted before we did pick up");
@@ -626,18 +606,18 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'web
 					break;
 			}
 			if (message) {
-				alertify.dialog.alert(message);
+				alert(message);
 			}
 			appData.e.triggerHandler("uiNotification", [type, details]);
 		});
 
 		_.defer(function () {
 			if (!$window.webrtcDetectedVersion || $window.webrtcDetectedBrowser === "edge") {
-				alertify.dialog.custom("webrtcUnsupported");
+				alert("Your browser does not support WebRTC. No calls possible.");
 				return;
 			}
 			if (!Modernizr.websockets || $window.webrtcDetectedVersion < $window.webrtcMinimumVersion) {
-				alertify.dialog.alert(translation._("Your browser is not supported. Please upgrade to a current version."));
+				alert("Your browser is not supported. Please upgrade to a current version.");
 				$scope.setStatus("unsupported");
 				return;
 			}
