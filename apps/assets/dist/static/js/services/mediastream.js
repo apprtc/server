@@ -5,11 +5,10 @@ define([
 	'jquery',
 	'underscore',
 	'ua-parser',
-	'sjcl',
 	'modernizr',
 	'webrtc.adapter'
 
-], function ($, _, uaparser, sjcl, Modernizr) {
+], function ($, _, uaparser, Modernizr) {
 
 	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "visibility", "$http", "safeApply", "$timeout", "$sce", "continueConnector", "restURL", function (context, connector, api, webrtc, appData, $route, $location, $window, visibility, $http, safeApply, $timeout, $sce, continueConnector, restURL) {
 
@@ -20,9 +19,6 @@ define([
 		console.log("Secure Contextual Escaping: " + $sce.isEnabled());
 
 		var connectMarker = null;
-
-		// Create encryption key from server token and browser name.
-		var secureKey = sjcl.codec.base64.fromBits(sjcl.hash.sha256.hash(context.Cfg.Token + uaparser().browser.name));
 
 		// Apply configuration details.
 		webrtc.settings.renegotiation = context.Cfg.Renegotiation && true;

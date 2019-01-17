@@ -27,7 +27,6 @@ require.config({
 		'rAF': 'libs/rAF',
 		'humanize': 'libs/humanize',
 		'sha': 'libs/sha',
-		'sjcl': 'libs/sjcl',
 
 		'partials': '../partials',
 	},

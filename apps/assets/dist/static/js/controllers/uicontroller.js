@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'bigscreen', 'moment', 'sjcl', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, moment, sjcl, Modernizr) {
+define(['jquery', 'underscore', 'bigscreen', 'moment', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, moment, Modernizr) {
 
 	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "toastr", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, toastr, localStatus, rooms, constraints) {
 
