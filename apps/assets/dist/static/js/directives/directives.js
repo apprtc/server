@@ -5,7 +5,8 @@ define([
 	'underscore',
 	'directives/buddylist',
 	'directives/audiovideo',
-	'directives/ui'], function (_, buddyList,
+	'directives/ui'], function (_,
+		buddyList,
 		audioVideo,
 		ui) {
 
