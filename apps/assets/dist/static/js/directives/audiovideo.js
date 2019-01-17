@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/audiovideopeer.html', 'bigscreen', 'webrtc.adapter'], function ($, _, template, templatePeer, BigScreen) {
 
-	return ["$window", "$compile", "mediaStream", "safeApply", "videoWaiter", "animationFrame", "$timeout", "dummyStream", function ($window, $compile, mediaStream, safeApply, videoWaiter, animationFrame, $timeout, DummyStream) {
+	return ["$window", "$compile", "mediaStream", "safeApply", "videoWaiter", "$timeout", "dummyStream", function ($window, $compile, mediaStream, safeApply, videoWaiter, $timeout, DummyStream) {
 
 		var peerTemplate = $compile(templatePeer);
 

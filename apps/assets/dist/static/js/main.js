@@ -19,7 +19,6 @@ require.config({
 		'angular-route': 'libs/angular/angular-route.min',
 		'visibly': 'libs/visibly',
 		'audiocontext': 'libs/audiocontext',
-		'rAF': 'libs/rAF',
 
 		'partials': '../partials',
 	},
