@@ -78,7 +78,7 @@ define([
 			}, 0);
 		}]);
 
-		app.directive("spreedWebrtc", [function () {
+		app.directive("webrtcApp", [function () {
 			return {
 				restrict: "A",
 				scope: false,

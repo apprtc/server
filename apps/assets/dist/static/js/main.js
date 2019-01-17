@@ -26,7 +26,6 @@ require.config({
 		'audiocontext': 'libs/audiocontext',
 		'rAF': 'libs/rAF',
 		'humanize': 'libs/humanize',
-		'sha': 'libs/sha',
 
 		'partials': '../partials',
 	},
