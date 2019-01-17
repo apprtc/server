@@ -458,22 +458,6 @@ define(['jquery', 'underscore', 'bigscreen', 'moment', 'modernizr', 'webrtc.adap
 			$scope.setConnectedStatus();
 		});
 
-		$scope.$on("mainview", function (event, mainview, state) {
-			console.info("Main view update", mainview, state);
-			var changed = false;
-			var layout = $scope.layout;
-			if (layout.main === mainview && !state) {
-				layout.main = null;
-				changed = true;
-			} else if (state) {
-				layout.main = mainview;
-				changed = true;
-			}
-			if (changed) {
-				$scope.$broadcast("mainresize", layout.main);
-			}
-		});
-
 		$scope.$on("room.updated", function (event, room) {
 			$scope.roomType = room ? room.Type : null;
 		});

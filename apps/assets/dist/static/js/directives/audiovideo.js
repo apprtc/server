@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/audiovideopeer.html', 'bigscreen', 'webrtc.adapter'], function ($, _, template, templatePeer, BigScreen) {
 
-	return ["$window", "$compile", "$filter", "mediaStream", "safeApply", "buddyData", "videoWaiter", "videoLayout", "animationFrame", "$timeout", "dummyStream", function ($window, $compile, $filter, mediaStream, safeApply, buddyData, videoWaiter, videoLayout, animationFrame, $timeout, DummyStream) {
+	return ["$window", "$compile", "$filter", "mediaStream", "safeApply", "buddyData", "videoWaiter", "animationFrame", "$timeout", "dummyStream", function ($window, $compile, $filter, mediaStream, safeApply, buddyData, videoWaiter, animationFrame, $timeout, DummyStream) {
 
 		var peerTemplate = $compile(templatePeer);
 
@@ -327,22 +327,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				};
 
 				var redraw = function () {
-					var size = {
-						width: scope.layoutparent.width(),
-						height: scope.layoutparent.height()
-					}
-					var name;
-					if (size.width < 1 || size.height < 1) {
-						// Use invisible renderer when no size available.
-						name = "invisible";
-					} else {
-						name = getRendererName();
-					}
-					var again = videoLayout.update(name, size, scope, controller);
-					if (again) {
-						// Layout needs a redraw.
-						needsRedraw = true;
-					}
 				};
 
 				// Make sure we draw on resize.
