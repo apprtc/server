@@ -10,7 +10,6 @@ define([
 
 	'services/services',
 	'directives/directives',
-	'filters/filters',
 	'controllers/controllers',
 
 	'ui-bootstrap',
@@ -18,7 +17,7 @@ define([
 	'angular-animate',
 	'angular-route',
 
-], function (require, $, _, angular, modernizr, services, directives, filters, controllers) {
+], function (require, $, _, angular, modernizr, services, directives, controllers) {
 
 	// Simple and fast split based URL query parser based on location.search. We require this before the
 	// angular App is bootstrap to control initialization parameters like translation based on URL parameters.
@@ -53,7 +52,6 @@ define([
 		var app = angular.module('app', modules);
 		services.initialize(app);
 		directives.initialize(app);
-		filters.initialize(app);
 		controllers.initialize(app);
 
 		app.config(["$compileProvider", "$locationProvider", "$routeProvider", function ($compileProvider, $locationProvider, $routeProvider) {
