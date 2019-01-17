@@ -3,22 +3,21 @@
 "use strict";
 define([
 	'underscore',
-	'filters/displayuserid',
-	'filters/displaynameforsession'], function (_, displayUserid, displayNameForSession) {
+	'filters/displayuserid'
+], function (_, displayUserid) {
 
-		var filters = {
-			displayUserid: displayUserid,
-			displayNameForSession: displayNameForSession
-		};
+	var filters = {
+		displayUserid: displayUserid,
+	};
 
-		var initialize = function (angModule) {
-			_.each(filters, function (filter, name) {
-				angModule.filter(name, filter);
-			})
-		}
+	var initialize = function (angModule) {
+		_.each(filters, function (filter, name) {
+			angModule.filter(name, filter);
+		})
+	}
 
-		return {
-			initialize: initialize
-		};
+	return {
+		initialize: initialize
+	};
 
-	});
+});
