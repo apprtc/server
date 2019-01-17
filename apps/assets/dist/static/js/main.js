@@ -18,11 +18,9 @@ require.config({
 		'angular-sanitize': 'libs/angular/angular-sanitize.min',
 		'angular-animate': 'libs/angular/angular-animate.min',
 		'angular-route': 'libs/angular/angular-route.min',
-		'angular-humanize': 'modules/angular-humanize',
 		'visibly': 'libs/visibly',
 		'audiocontext': 'libs/audiocontext',
 		'rAF': 'libs/rAF',
-		'humanize': 'libs/humanize',
 
 		'partials': '../partials',
 	},
@@ -52,10 +50,6 @@ require.config({
 		},
 		'angular-animate': {
 			deps: ['angular'],
-			exports: 'angular'
-		},
-		'angular-humanize': {
-			deps: ['angular', 'humanize'],
 			exports: 'angular'
 		},
 		'visibly': {

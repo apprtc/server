@@ -17,7 +17,6 @@ define([
 	'ui-bootstrap',
 	'angular-sanitize',
 	'angular-animate',
-	'angular-humanize',
 	'angular-route',
 
 ], function (require, $, _, angular, modernizr, moment, services, directives, filters, controllers) {
@@ -45,7 +44,7 @@ define([
 	var appConfig = {};
 
 	var create = function (ms, launcher) {
-		var modules = ['ui.bootstrap', 'ngSanitize', 'ngAnimate', 'ngHumanize', 'ngRoute'];
+		var modules = ['ui.bootstrap', 'ngSanitize', 'ngAnimate', 'ngRoute'];
 		if (ms && ms.length) {
 			_.each(ms, function (module) {
 				modules.push(module);

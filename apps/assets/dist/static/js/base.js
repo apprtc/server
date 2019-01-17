@@ -8,5 +8,4 @@ define([ // Helper module to put non dependency base libraries together.
 	'visibly',
 	'audiocontext',
 	'rAF',
-	'humanize',
 	'text'], function() {});
