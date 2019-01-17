@@ -20,8 +20,6 @@ function($, _, PeerCall, PeerConference, UserMedia, utils) {
 		console.log("This seems to be Android");
 	}
 
-	var roomTypeConference = "Conference";
-
 	var InternalPC = function(call) {
 		this.currentcall = call;
 		this.isinternal = true;
@@ -138,42 +136,10 @@ function($, _, PeerCall, PeerConference, UserMedia, utils) {
 			return;
 		}
 
-		if (this.isConferenceRoom()) {
-			// Switching from a conference room closes all current connections.
-			this.leavingConference = true;
-			this.e.one("stop", _.bind(function() {
-				_.defer(_.bind(function() {
-					this.leavingConference = false;
-					while (this.pendingMessages.length) {
-						var args = this.pendingMessages.shift();
-						this.processReceivedMessage.apply(this, args);
-					}
-				}, this));
-			}, this));
-			_.defer(_.bind(function() {
-				this.doHangup();
-			}, this));
-		}
 		console.log("Joined room", room, this.api.id);
 		this.currentroom = room;
-		_.defer(_.bind(function() {
-			this.maybeStartLocalVideo();
-		}, this), 100);
 	};
 
-	WebRTC.prototype.isConferenceRoom = function() {
-		return this.currentroom && this.currentroom.Type === roomTypeConference;
-	};
-
-	WebRTC.prototype.maybeStartLocalVideo = function() {
-		if (!this.isConferenceRoom()) {
-			return;
-		}
-
-		console.log("Start local video");
-		var call = new InternalCall(this);
-		this._doCallUserMedia(call);
-	};
 
 	WebRTC.prototype.stopLocalVideo = function() {
 		if (this.usermedia) {
@@ -330,34 +296,6 @@ function($, _, PeerCall, PeerConference, UserMedia, utils) {
 	};
 
 	WebRTC.prototype._processConference = function(to, data, type, to2, from) {
-		var ids = this.conference.getCallIds();
-		if (!ids.length && !this.isConferenceRoom()) {
-			console.warn("Received Conference for unknown call -> ignore.", to, data);
-			return;
-		} else if (ids.length == 1) {
-			// Peer-to-peer call will be upgraded to conference. Only is allowed
-			// if currently active call is in the list of conference participants
-			// and the "Conference" is received from him. Upgrading is always
-			// allowed for server-managed conference rooms.
-			if ((from !== ids[0] || data.indexOf(ids[0]) === -1) && !this.isConferenceRoom()) {
-				console.warn("Received Conference for unknown call -> ignore.", to, data);
-				return;
-			}
-			this.conference.id = to;
-		} else if (this.conference.id && this.conference.id !== to) {
-			console.warn("Received Conference for wrong id -> ignore.", to, this.conference);
-			return;
-		}
-
-		if (!this.conference.id) {
-			if (!this.isConferenceRoom()) {
-				console.warn("Received initial Conference for non-conference room -> ignore.", to, this.conference);
-				return;
-			}
-			this.conference.id = to;
-			console.log("Setting received conference id", to);
-		}
-
 		console.log("Applying conference update", data);
 		var myid = this.api.id;
 		_.each(data, _.bind(function(id) {
@@ -471,7 +409,6 @@ function($, _, PeerCall, PeerConference, UserMedia, utils) {
 				this.e.triggerHandler("usermedia", [null]);
 				this.usermediaReady = false;
 				this.usermedia = null;
-				this.maybeStartLocalVideo();
 			}
 		}, this));
 		this.e.one("stop", function() {
@@ -533,22 +470,6 @@ function($, _, PeerCall, PeerConference, UserMedia, utils) {
 		this.e.triggerHandler("peercall", [call]);
 		if (!autocall) {
 			this.e.triggerHandler("connecting", [call]);
-		}
-		if ((autocall && count > 0) || this.isConferenceRoom()) {
-			call.e.on("sessiondescription", _.bind(function(event, sessionDescription) {
-				var cid = this.conference.getOrCreateId();
-				console.log("Injected conference id into sessionDescription", cid);
-				sessionDescription._conference = cid;
-			}, this));
-		}
-		if (count > 0) {
-			if (count === 1) {
-				// Notify UI that it's a conference now.
-				this.e.triggerHandler("peerconference", [this.conference]);
-			}
-			if (this._doAutoStartCall(call)) {
-				return;
-			}
 		}
 
 		if (!this._doCallUserMedia(call)) {

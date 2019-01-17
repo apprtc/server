@@ -131,10 +131,6 @@ define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], fun
 			localStatus.update(status);
 		};
 
-		$scope.isConferenceRoom = function () {
-			return mediaStream.webrtc.isConferenceRoom();
-		};
-
 		$scope.updatePeerFromConference = function () {
 			if (!$scope.conferenceObject) {
 				$scope.conferencePeers.length = 0;
@@ -161,11 +157,8 @@ define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], fun
 				return;
 			}
 
-			if ($scope.conference || $scope.isConferenceRoom()) {
-				$scope.setStatus("conference");
-			} else {
-				$scope.setStatus("connected");
-			}
+			$scope.setStatus("connected");
+
 		};
 
 		$scope.clearConnectedStatus = function () {

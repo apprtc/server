@@ -166,11 +166,6 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 	};
 
 	PeerConference.prototype.pushUpdate = function(forceAll) {
-		if (this.webrtc.isConferenceRoom()) {
-			// Conference is managed on the server.
-			return;
-		}
-
 		var ids = _.keys(this.connectedCalls);
 		if (forceAll) {
 			// Include "disconnected" calls to try to recover from a previous
