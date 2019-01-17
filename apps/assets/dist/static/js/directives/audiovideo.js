@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/audiovideopeer.html', 'bigscreen', 'webrtc.adapter'], function ($, _, template, templatePeer, BigScreen) {
 
-	return ["$window", "$compile", "$filter", "mediaStream", "safeApply", "buddyData", "videoWaiter", "animationFrame", "$timeout", "dummyStream", function ($window, $compile, $filter, mediaStream, safeApply, buddyData, videoWaiter, animationFrame, $timeout, DummyStream) {
+	return ["$window", "$compile", "mediaStream", "safeApply", "videoWaiter", "animationFrame", "$timeout", "dummyStream", function ($window, $compile, mediaStream, safeApply, videoWaiter, animationFrame, $timeout, DummyStream) {
 
 		var peerTemplate = $compile(templatePeer);
 
@@ -73,7 +73,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				subscope = callscope.$new();
 				callscope.streams++;
 				var peerid = subscope.peerid = currentcall.id;
-				buddyData.push(peerid);
+
 				subscope.unattached = true;
 				subscope.withvideo = false;
 				subscope.onlyaudio = false;
@@ -166,7 +166,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 				var subscope = streams[id];
 				if (subscope) {
-					buddyData.pop(currentcall.id);
+
 					delete streams[id];
 					if (subscope.element) {
 						subscope.element.remove();
