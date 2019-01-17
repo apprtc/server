@@ -292,20 +292,6 @@ define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
 
 	};
 
-	Api.prototype.requestAuthentication = function (userid, nonce) {
-
-		var data = {
-			Type: "Authentication",
-			Authentication: {
-				Userid: userid,
-				Nonce: nonce
-			}
-		}
-
-		return this.send("Authentication", data);
-
-	};
-
 	Api.prototype.updateStatus = function (status) {
 
 		var data = {
