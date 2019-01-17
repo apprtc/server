@@ -21,7 +21,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 			$scope.isActive = false;
 			$scope.haveStreams = false;
 
-			$scope.peersTalking = {};
+
 
 			$scope.addRemoteStream = function (stream, currentcall) {
 
@@ -172,13 +172,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			};
 
-			// Talking updates receiver.
-			mediaStream.api.e.on("received.talking", function (event, id, from, talking) {
-				$scope.$apply(function (scope) {
-					scope.peersTalking[from] = !!talking;
-				});
-			});
-
 			$scope.$on("active", function (currentcall) {
 
 				//console.log("active 2");
@@ -218,7 +211,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					}
 					scope.hasUsermedia = false;
 					scope.isActive = false;
-					scope.peersTalking = {};
+
 					if (BigScreen.enabled) {
 						BigScreen.exit();
 					}

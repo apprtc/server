@@ -170,9 +170,7 @@ define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
 				this.e.triggerHandler("received.status", [data]);
 				break;
 
-			case "Talking":
-				this.e.triggerHandler("received.talking", [d.To, d.From, data.Talking]);
-				break;
+
 			case "Alive":
 				// Do nothing.
 				//console.log("Alive response received.");
