@@ -20,12 +20,12 @@ define([
 	'angular-humanize',
 	'angular-route',
 
-], function(require, $, _, angular, modernizr, moment, services, directives, filters, controllers) {
+], function (require, $, _, angular, modernizr, moment, services, directives, filters, controllers) {
 
 	// Simple and fast split based URL query parser based on location.search. We require this before the
 	// angular App is bootstrap to control initialization parameters like translation based on URL parameters.
-	var urlQuery = (function() {
-		return (function(a) {
+	var urlQuery = (function () {
+		return (function (a) {
 			if (a === "") {
 				return {};
 			}
@@ -44,10 +44,10 @@ define([
 	// Base application config shared during initialization.
 	var appConfig = {};
 
-	var create = function(ms, launcher) {
+	var create = function (ms, launcher) {
 		var modules = ['ui.bootstrap', 'ngSanitize', 'ngAnimate', 'ngHumanize', 'ngRoute'];
 		if (ms && ms.length) {
-			_.each(ms, function(module) {
+			_.each(ms, function (module) {
 				modules.push(module);
 			});
 		}
@@ -58,7 +58,7 @@ define([
 		filters.initialize(app);
 		controllers.initialize(app);
 
-		app.config(["$compileProvider", "$locationProvider", "$routeProvider", function($compileProvider, $locationProvider, $routeProvider) {
+		app.config(["$compileProvider", "$locationProvider", "$routeProvider", function ($compileProvider, $locationProvider, $routeProvider) {
 			// Allow angular to use filesystem: hrefs which would else be prefixed with unsafe:.
 			$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|filesystem|blob):/);
 			$compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|file|filesystem|blob):|data:image\//);
@@ -68,32 +68,23 @@ define([
 			$locationProvider.html5Mode(true);
 		}]);
 
-		app.run(["$rootScope", "$timeout", "mediaStream", "continueConnector", function($rootScope, $timeout, mediaStream, continueConnector) {
+		app.run(["$rootScope", "$timeout", "mediaStream", "continueConnector", function ($rootScope, $timeout, mediaStream, continueConnector) {
 			console.log("Initializing ...");
 			var initialize = continueConnector.defer();
 			mediaStream.initialize($rootScope);
-			$timeout(function() {
+			$timeout(function () {
 				console.log("Initializing complete.")
 				initialize.resolve();
 			}, 0);
 		}]);
 
-		app.directive("spreedWebrtc", [function() {
+		app.directive("spreedWebrtc", [function () {
 			return {
 				restrict: "A",
 				scope: false,
 				controller: "AppController"
 			}
 		}]);
-
-		// app.directive("uiLogo", ["globalContext", function(globalContext) {
-		// 	return {
-		// 		restrict: "A",
-		// 		link: function($scope, $element, $attrs) {
-		// 			$attrs.$set("title", globalContext.Cfg.Title || "");
-		// 		}
-		// 	}
-		// }]);
 
 		return app;
 
@@ -103,45 +94,22 @@ define([
 	// breaking changes to plugins can check on it.
 	var apiversion = 1.1;
 
-	var initialize = function(app, launcher) {
-
-		var deferred = launcher.$q.defer();
-
+	var initialize = function (app, launcher) {
 		var globalContext = JSON.parse(document.getElementById("globalcontext").innerHTML);
 		if (!globalContext.Cfg.Version) {
-            globalContext.Cfg.Version = "unknown";
-        }
+			globalContext.Cfg.Version = "unknown";
+		}
 		app.constant("globalContext", globalContext);
 
-		// Configure language.
-		var lang = (function() {
 
-			var lang = "en";
-			var wanted = [];
-			var addLanguage = function(l) {
-				wanted.push(l);
-				if (l.indexOf("-") != -1) {
-					wanted.push(l.split("-")[0]);
-				}
-			};
+		var lang = "en";
 
-			// Get from storage.
-			if (modernizr.localstorage) {
-				var lsl = localStorage.getItem("mediastream-language");
-				if (lsl && lsl !== "undefined") {
-					wanted.push(lsl);
-				}
-			}
+		// Storage at DOM.
+		var html = document.getElementsByTagName("html")[0];
+		html.setAttribute("lang", lang);
 
 
-			// Storage at DOM.
-			var html = document.getElementsByTagName("html")[0];
-			html.setAttribute("lang", "zh-CN");
-
-			return lang;
-
-		}());
-		console.info("Selected language: "+lang);
+		console.info("Selected language: " + lang);
 
 		// Set momemt language.
 		moment.lang(lang);
