@@ -139,13 +139,6 @@ func (api *channellingAPI) OnIncoming(sender channelling.Sender, session *channe
 		//log.Println("Status", msg.Status)
 		session.Update(&channelling.SessionUpdate{Types: []string{"Status"}, Status: msg.Status.Status})
 		session.BroadcastStatus()
-	case "Chat":
-		if msg.Chat == nil || msg.Chat.Chat == nil {
-			log.Println("Received invalid chat message.", msg)
-			break
-		}
-
-		api.HandleChat(session, msg.Chat)
 	case "Conference":
 		if msg.Conference == nil {
 			log.Println("Received invalid conference message.", msg)

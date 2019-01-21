@@ -268,13 +268,6 @@ define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], fun
 
 			// Propagate authentication event.
 			appData.e.triggerHandler("selfReceived", [data]);
-
-			// Select room if settings have an alternative default room.
-			if (rooms.inDefaultRoom() && $scope.master.settings.defaultRoom) {
-				console.log("Selecting default room from settings:", [$scope.master.settings.defaultRoom]);
-				rooms.joinByName($scope.master.settings.defaultRoom, true);
-			}
-
 		});
 
 		mediaStream.webrtc.e.on("peercall", function (event, peercall) {

@@ -23,9 +23,6 @@ import (
 	"github.com/apprtc/server/phoenix"
 	"github.com/apprtc/server/sloth"
 
-	_ "github.com/apprtc/server/cmd/statik" // TODO: Replace with the absolute import path
-	"github.com/rakyll/statik/fs"
-
 	"github.com/gorilla/mux"
 )
 
@@ -213,12 +210,6 @@ func runner(runtime phoenix.Runtime) error {
 	// Start bus.
 	busManager.Start()
 
-	statikFS, err := fs.New()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	statikFS.Open(".")
 	// Add handlers.
 	r.HandleFunc("/", httputils.MakeGzipHandler(mainHandler))
 

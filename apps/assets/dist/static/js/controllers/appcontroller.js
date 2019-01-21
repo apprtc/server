@@ -14,7 +14,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 		appData.set($scope);
 
 		// User related scope data.
-		$scope.roomsHistory = [];
 		$scope.defaults = {
 			message: null,
 			settings: {
@@ -67,18 +66,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 				$window.location.reload(true);
 			}
 		};
-
-		$scope.$on("room.joined", function(event, roomName) {
-			if (roomName) {
-				_.pull($scope.roomsHistory, roomName);
-				$scope.roomsHistory.unshift(roomName);
-				if ($scope.roomsHistory.length > 15) {
-					// Limit the history.
-					$scope.roomsHistory = $scope.roomsHistory.splice(0, 15);
-				}
-			}
-		});
-
 
 		$scope.reset(); // Call once for bootstrap.
 

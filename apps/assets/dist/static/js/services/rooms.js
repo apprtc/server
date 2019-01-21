@@ -7,11 +7,10 @@ define([
 	'underscore'
 ], function (angular, $, _) {
 
-	return ["$window", "$location", "$timeout", "$q", "$route", "$rootScope", "$http", "globalContext", "safeApply", "connector", "api", "restURL", "appData", "mediaStream", function ($window, $location, $timeout, $q, $route, $rootScope, $http, globalContext, safeApply, connector, api, restURL, appData, mediaStream) {
+	return ["$window", "$location", "$timeout", "$q", "$route", "$rootScope", "$http", "globalContext", "safeApply", "connector", "api", "appData", "mediaStream", function ($window, $location, $timeout, $q, $route, $rootScope, $http, globalContext, safeApply, connector, api, appData, mediaStream) {
 
 		var body = $("body");
 
-		var url = restURL.api("rooms");
 		var requestedRoomName = "";
 		var priorRoomName = null;
 		var helloedRoomName = null;
@@ -31,11 +30,6 @@ define([
 				case "default_room_disabled":
 					priorRoomName = null;
 					rooms.randomRoom();
-					break;
-				case "room_join_requires_account":
-					console.log("Room join requires a logged in user.");
-					alert("Please sign in to create rooms.");
-					rooms.joinPriorOrDefault(true);
 					break;
 				default:
 					console.log("Unknown error", error, "while joining room ", requestedRoomName);
@@ -123,31 +117,6 @@ define([
 
 		// Public API.
 		rooms = {
-			inDefaultRoom: function () {
-				return (currentRoom !== null ? currentRoom.Name : requestedRoomName) === "";
-			},
-			joinByName: function (name, replace) {
-				var nn = restURL.encodeRoomURL(name, "", function (url) {
-					// Apply new URL.
-					safeApply($rootScope, function (scope) {
-						$location.path(url);
-						if (replace) {
-							$location.replace();
-						}
-					});
-				});
-				return nn;
-			},
-			joinDefault: function (replace) {
-				return rooms.joinByName("", replace);
-			},
-			joinPriorOrDefault: function (replace) {
-				if (!priorRoomName || requestedRoomName === priorRoomName) {
-					rooms.joinDefault(replace);
-				} else {
-					rooms.joinByName(priorRoomName, replace);
-				}
-			}
 		};
 
 		return rooms;

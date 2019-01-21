@@ -10,7 +10,7 @@ define([
 
 ], function ($, _, uaparser, Modernizr) {
 
-	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "visibility", "$http", "safeApply", "$timeout", "$sce", "continueConnector", "restURL", function (context, connector, api, webrtc, appData, $route, $location, $window, visibility, $http, safeApply, $timeout, $sce, continueConnector, restURL) {
+	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "visibility", "$http", "safeApply", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $route, $location, $window, visibility, $http, safeApply, $timeout, $sce, continueConnector) {
 
 		var url = (context.Ssl ? "wss" : "ws") + "://" + context.Host + (context.Cfg.B || "/") + "ws";
 		var version = context.Cfg.Version;
