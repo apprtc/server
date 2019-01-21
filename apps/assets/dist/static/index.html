@@ -1,0 +1,34 @@
+<!doctype html>
+<html class="no-js wf-loading">
+
+<head>
+    <title>
+        webrtc
+    </title>
+    <meta name="fragment" content="!">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="referrer" content="no-referrer">
+    <base href="/">
+
+    <script id="globalcontext" type="application/json">
+    {"App":"main",
+    "Cfg":{"Title":"WebRTC","S":"/","B":"/","Token":"i-did-not-change-the-public-token-boo",
+    "Renegotiation":false,"StunURIs":[],"TurnURIs":[],"Tokens":false,
+    "Modules":[]},
+    "Host":"127.0.0.1:8443","Ssl":true,"Csp":false,
+    "Languages":["zh-cn","zh"],"S":"/"}
+    </script>
+</head>
+
+<body webrtc-app style="background-color:#000">
+    <div id="loader">
+        <div class="loader-message"></div>
+    </div>
+    <ui></ui>
+    <script data-main="./js/main" src="./js/libs/require/require.js"></script>
+</body>
+
+</html>

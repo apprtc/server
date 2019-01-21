@@ -1,7 +1,6 @@
 package signalsvc
 
 import (
-	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"flag"
@@ -9,12 +8,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	_ "net/http/pprof"
 	"os"
 	"path"
 	"path/filepath"
-	goruntime "runtime"
-	"sort"
 	"strings"
 	"time"
 
@@ -26,6 +22,10 @@ import (
 	"github.com/apprtc/server/httputils"
 	"github.com/apprtc/server/phoenix"
 	"github.com/apprtc/server/sloth"
+
+	_ "github.com/apprtc/server/cmd/statik" // TODO: Replace with the absolute import path
+	"github.com/rakyll/statik/fs"
+
 	"github.com/gorilla/mux"
 )
 
@@ -33,8 +33,6 @@ var version = "unreleased"
 var defaultConfig = "./server.conf"
 
 var templates *template.Template
-var templatesExtraDHead template.HTML
-var templatesExtraDBody template.HTML
 var config *channelling.Config
 
 func runner(runtime phoenix.Runtime) error {
@@ -56,14 +54,6 @@ func runner(runtime phoenix.Runtime) error {
 	statsEnabled, err := runtime.GetBool("http", "stats")
 	if err != nil {
 		statsEnabled = false
-	}
-
-	pprofListen, err := runtime.GetString("http", "pprofListen")
-	if err == nil && pprofListen != "" {
-		log.Printf("Starting pprof HTTP server on %s", pprofListen)
-		go func() {
-			log.Println(http.ListenAndServe(pprofListen, nil))
-		}()
 	}
 
 	pipelinesEnabled, err := runtime.GetBool("app", "pipelinesEnabled")
@@ -173,65 +163,11 @@ func runner(runtime phoenix.Runtime) error {
 		return fmt.Errorf("Failed to load templates: %s", err)
 	}
 
-	// Load extra templates folder
-	extraFolder, err := runtime.GetString("app", "extra")
-	if err == nil {
-		if !httputils.HasDirPath(extraFolder) {
-			return fmt.Errorf("Configured extra '%s' is not a directory.", extraFolder)
-		}
-		templates, err = templates.ParseGlob(path.Join(extraFolder, "*.html"))
-		if err != nil {
-			return fmt.Errorf("Failed to load extra templates: %s", err)
-		}
-		log.Printf("Loaded extra templates from: %s", extraFolder)
-	}
-
-	// Load extra.d folder
-	extraDFolder, err := runtime.GetString("app", "extra.d")
-	if err == nil {
-		if !httputils.HasDirPath(extraDFolder) {
-			return fmt.Errorf("Configured extra.d '%s' is not a directory.", extraDFolder)
-		}
-		err = loadExtraD(extraDFolder)
-		if err != nil {
-			return fmt.Errorf("Failed to process extra.d folder: %s", err)
-		}
-	}
-
 	// Define incoming channeling API limit it byte. Larger messages will be discarded.
 	incomingCodecLimit := 1024 * 1024 // 1MB
 
 	// Create realm string from config.
 	computedRealm := fmt.Sprintf("%s.%s", serverRealm, config.Token)
-
-	// Set number of go routines if it is 1
-	if goruntime.GOMAXPROCS(0) == 1 {
-		nCPU := goruntime.NumCPU()
-		goruntime.GOMAXPROCS(nCPU)
-		log.Printf("Using the number of CPU's (%d) as GOMAXPROCS\n", nCPU)
-	}
-
-	// // Get current number of max open files.
-	// var rLimit syscall.Rlimit
-	// err = syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rLimit)
-	// if err != nil {
-	// 	log.Println("Error getting max numer of open files", err)
-	// } else {
-	// 	log.Printf("Max open files are %d\n", rLimit.Max)
-	// }
-
-	// // Try to increase number of file open files. This only works as root.
-	// maxfd, err := runtime.GetInt("http", "maxfd")
-	// if err == nil {
-	// 	rLimit.Max = rlimitType(maxfd)
-	// 	rLimit.Cur = rlimitType(maxfd)
-	// 	err = syscall.Setrlimit(syscall.RLIMIT_NOFILE, &rLimit)
-	// 	if err != nil {
-	// 		log.Println("Error setting max open files", err)
-	// 	} else {
-	// 		log.Printf("Set max open files successfully to %d\n", rlimitType(maxfd))
-	// 	}
-	// }
 
 	// Create router.
 	router := mux.NewRouter()
@@ -277,11 +213,20 @@ func runner(runtime phoenix.Runtime) error {
 	// Start bus.
 	busManager.Start()
 
+	statikFS, err := fs.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	statikFS.Open(".")
 	// Add handlers.
 	r.HandleFunc("/", httputils.MakeGzipHandler(mainHandler))
-	r.Handle("/static/img/buddy/{flags}/{imageid}/{idx:.*}", http.StripPrefix(config.B, makeImageHandler(buddyImages, time.Duration(24)*time.Hour)))
+
+	// if os.Getenv("webrtc-debug") == "1" {
 	r.Handle("/static/{path:.*}", http.StripPrefix(config.B, httputils.FileStaticServer(http.Dir(rootFolder))))
-	r.HandleFunc("/.well-known/spreed-configuration", wellKnownHandler)
+	// } else {
+	// 	r.Handle("/static/{path:.*}", http.StripPrefix(config.B, httputils.FileStaticServer(statikFS)))
+	// }
 
 	// Add RESTful API end points.
 	rest := sloth.NewAPI()
@@ -309,22 +254,6 @@ func runner(runtime phoenix.Runtime) error {
 		log.Println("Pipelines API is enabled!")
 	}
 
-	// Add extra/static support if configured and exists.
-	if extraFolder != "" {
-		extraFolderStatic, _ := filepath.Abs(path.Join(extraFolder, "static"))
-		if _, err = os.Stat(extraFolderStatic); err == nil {
-			r.Handle("/extra/static/{path:.*}", http.StripPrefix(fmt.Sprintf("%sextra", config.B), httputils.FileStaticServer(http.Dir(extraFolder))))
-			log.Printf("Added URL handler /extra/static/... for static files in %s/...\n", extraFolderStatic)
-		}
-	}
-
-	// Add extra.d/static support if configured.
-	if extraDFolder != "" {
-		extraDFolderStatic, _ := filepath.Abs(extraDFolder)
-		r.Handle("/extra.d/static/{ver}/{extra}/{path:.*}", http.StripPrefix(fmt.Sprintf("%sextra.d/static", config.B), rewriteExtraDUrl(httputils.FileStaticServer(http.Dir(extraDFolderStatic)))))
-		log.Printf("Added URL handler /extra.d/static/... for static files in %s/.../static/... \n", extraDFolderStatic)
-	}
-
 	// Finally add websocket handler.
 	r.Handle("/ws", makeWSHandler(statsManager, sessionManager, codec, channellingAPI, users))
 
@@ -336,61 +265,6 @@ func runner(runtime phoenix.Runtime) error {
 	rooms.HandleFunc("/{room:.*}", httputils.MakeGzipHandler(roomHandler))
 
 	return runtime.Start()
-}
-
-func loadExtraD(extraDFolder string) error {
-	f, err := os.Open(extraDFolder)
-	if err != nil {
-		return err
-	}
-
-	extras, err := f.Readdirnames(-1)
-	if err != nil {
-		return err
-	}
-	f.Close()
-
-	// Sort by name.
-	sort.Strings(extras)
-
-	var headBuf bytes.Buffer
-	var bodyBuf bytes.Buffer
-	context := &channelling.Context{
-		Cfg: config,
-	}
-
-	for _, extra := range extras {
-		info, err := os.Stat(filepath.Join(extraDFolder, extra))
-		if err != nil {
-			log.Println("Failed to add extra.d folder", extra, err)
-			continue
-		}
-		if !info.IsDir() {
-			continue
-		}
-
-		context.S = fmt.Sprintf("extra.d/%s/%s", config.S, extra)
-		extraDTemplates := template.New("")
-		extraDTemplates.Delims("<%", "%>")
-		extraBase := path.Join(extraDFolder, extra)
-		extraDTemplates.ParseFiles(path.Join(extraBase, "head.html"), path.Join(extraBase, "body.html"))
-		if headTemplate := extraDTemplates.Lookup("head.html"); headTemplate != nil {
-			if err := headTemplate.Execute(&headBuf, context); err != nil {
-				log.Println("Failed to parse extra.d template", extraBase, "head.html", err)
-			}
-
-		}
-		if bodyTemplate := extraDTemplates.Lookup("body.html"); bodyTemplate != nil {
-			if err := bodyTemplate.Execute(&bodyBuf, context); err != nil {
-				log.Println("Failed to parse extra.d template", extraBase, "body.html", err)
-			}
-		}
-	}
-
-	templatesExtraDHead = template.HTML(headBuf.String())
-	templatesExtraDBody = template.HTML(bodyBuf.String())
-
-	return nil
 }
 
 func boot() error {

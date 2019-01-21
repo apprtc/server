@@ -32,6 +32,7 @@ func Main() {
 }
 
 func main() {
+
 	core.CoreApplication().Initialize("Focusteach.Ltd", "Focusteach")
 
 	core.Run(Main)

@@ -1,4 +1,3 @@
-
 package signalsvc
 
 import (
@@ -51,31 +50,22 @@ func handleRoomView(room string, w http.ResponseWriter, r *http.Request) {
 
 	// Prepare context to deliver to HTML..
 	context := &channelling.Context{
-		Cfg:        config,
-		App:        "main",
-		Host:       r.Host,
-		Scheme:     scheme,
-		Ssl:        ssl,
-		Csp:        csp,
-		Languages:  langs,
-		Room:       room,
-		S:          config.S,
-		ExtraDHead: templatesExtraDHead,
-		ExtraDBody: templatesExtraDBody,
+		Cfg:       config,
+		App:       "main",
+		Host:      r.Host,
+		Scheme:    scheme,
+		Ssl:       ssl,
+		Csp:       csp,
+		Languages: langs,
+		Room:      room,
+		S:         config.S,
 	}
 
 	// Get URL parameters.
 	r.ParseForm()
 
-	// Check if incoming request is a crawler which supports AJAX crawling.
-	// See https://developers.google.com/webmasters/ajax-crawling/docs/getting-started for details.
-	if _, ok := r.Form["_escaped_fragment_"]; ok {
-		// Render crawlerPage template..
-		err = templates.ExecuteTemplate(w, "crawlerPage", context)
-	} else {
-		// Render mainPage template.
-		err = templates.ExecuteTemplate(w, "mainPage", context)
-	}
+	// Render mainPage template.
+	err = templates.ExecuteTemplate(w, "mainPage", context)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

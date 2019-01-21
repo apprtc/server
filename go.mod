@@ -17,6 +17,7 @@ require (
 	github.com/nats-io/nuid v1.0.0 // indirect
 	github.com/pions/pkg v0.0.0-20181115215726-b60cd756f712
 	github.com/pions/turn v0.0.0-20180613054722-26a6e990dde0
+	github.com/rakyll/statik v0.1.5
 	github.com/satori/go.uuid v1.2.0
 	golang.org/x/net v0.0.0-20181220203305-927f97764cc3 // indirect
 	golang.org/x/sync v0.0.0-20181221193216-37e7f081c4d4 // indirect
