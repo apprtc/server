@@ -1,23 +1,16 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/audiovideopeer.html', 'webrtc.adapter'], function ($, _, template, templatePeer) {
+define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter'], function ($, _, template) {
 
 	return ["$window", "$compile", "mediaStream", "safeApply", "videoWaiter", "$timeout", "dummyStream", function ($window, $compile, mediaStream, safeApply, videoWaiter, $timeout, DummyStream) {
 
-		var peerTemplate = $compile(templatePeer);
 
 		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
 
 			var streams = this.streams = {};
 			var calls = {};
 
-			$scope.container = $element[0];
-			$scope.layoutparent = $element.parent();
-
-			$scope.remoteVideos = $element.find(".remoteVideos")[0];
-
-			$scope.hasUsermedia = false;
 			$scope.isActive = false;
 			$scope.haveStreams = false;
 
@@ -102,57 +95,52 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				// Add created scope.
 				streams[id] = subscope;
 
-				// Render template.
-				peerTemplate(subscope, function (clonedElement, scope) {
-					clonedElement.data("peerid", scope.peerid);
-					scope.element = clonedElement;
-					scope.attachStream = function (stream) {
-						if (DummyStream.is(stream)) {
-							scope.withvideo = false;
-							scope.onlyaudio = true;
-							$timeout(function () {
-								scope.$emit("active", currentcall);
-							});
+
+				$scope.attachStream(stream, currentcall);
+			};
+
+			$scope.attachStream = function (stream, currentcall) {
+				if (DummyStream.is(stream)) {
+					$scope.withvideo = false;
+					$scope.onlyaudio = true;
+					$timeout(function () {
+						$scope.$emit("active", currentcall);
+					});
+					return;
+				} else {
+					var video = $element.find("video")[0];
+					$window.attachMediaStream(video, stream);
+					// Waiter callbacks also count as connected, as browser support (FireFox 25) is not setting state changes properly.
+					videoWaiter.wait(video, stream, function (withvideo) {
+						if ($scope.destroyed) {
+							console.log("Abort wait for video on destroyed scope.");
 							return;
-						} else {
-							var video = clonedElement.find("video")[0];
-							$window.attachMediaStream(video, stream);
-							// Waiter callbacks also count as connected, as browser support (FireFox 25) is not setting state changes properly.
-							videoWaiter.wait(video, stream, function (withvideo) {
-								if (scope.destroyed) {
-									console.log("Abort wait for video on destroyed scope.");
-									return;
-								}
-								if (withvideo) {
-									scope.$apply(function ($scope) {
-										$scope.withvideo = true;
-										$scope.onlyaudio = false;
-									});
-								} else {
-									console.info("Incoming stream has no video tracks.");
-									scope.$apply(function ($scope) {
-										$scope.withvideo = false;
-										$scope.onlyaudio = true;
-									});
-								}
-								scope.$emit("active", currentcall);
-
-							}, function () {
-								if (scope.destroyed) {
-									console.log("No longer wait for video on destroyed scope.");
-									return;
-								}
-								console.warn("We did not receive video data for remote stream", currentcall, stream, video);
-								scope.$emit("active", currentcall);
-							});
-							scope.dummy = null;
 						}
-						scope.unattached = false;
-					};
-					scope.attachStream(stream);
-					$($scope.remoteVideos).append(clonedElement);
-				});
+						if (withvideo) {
+							$scope.$apply(function ($scope) {
+								$scope.withvideo = true;
+								$scope.onlyaudio = false;
+							});
+						} else {
+							console.info("Incoming stream has no video tracks.");
+							$scope.$apply(function ($scope) {
+								$scope.withvideo = false;
+								$scope.onlyaudio = true;
+							});
+						}
+						$scope.$emit("active", currentcall);
 
+					}, function () {
+						if ($scope.destroyed) {
+							console.log("No longer wait for video on destroyed scope.");
+							return;
+						}
+						console.warn("We did not receive video data for remote stream", currentcall, stream, video);
+						scope.$emit("active", currentcall);
+					});
+					$scope.dummy = null;
+				}
+				$scope.unattached = false;
 			};
 
 			$scope.removeRemoteStream = function (stream, currentcall) {
@@ -164,24 +152,10 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 				if (subscope) {
 
 					delete streams[id];
-					if (subscope.element) {
-						subscope.element.remove();
-					}
 					subscope.$destroy();
 				}
 
 			};
-
-			$scope.$on("active", function (currentcall) {
-
-				//console.log("active 2");
-				if (!$scope.isActive) {
-					$scope.isActive = true;
-					$scope.remoteVideos.style.opacity = 1;
-					$element.addClass("active");
-				}
-
-			});
 
 
 			mediaStream.webrtc.e.on("usermedia", function (event, usermedia) {
@@ -197,23 +171,14 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					if (!scope.isActive) {
 						return;
 					}
-					scope.hasUsermedia = false;
 					scope.isActive = false;
 
-
-					var removeVideos = function () {
-						if (scope.isActive) {
-							return;
-						}
-						$(scope.remoteVideos).children(".remoteVideo").remove();
-					};
 					if (event.type === "stop") {
 						removeVideos();
 					} else {
 						$timeout(removeVideos, 1500);
 					}
-					scope.remoteVideos.style.opacity = 0;
-					$element.removeClass('active');
+
 					_.each(streams, function (streamscope, k) {
 						streamscope.$destroy();
 						delete streams[k];
@@ -262,23 +227,13 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 		}];
 
-		var compile = function (tElement, tAttr) {
-
-			return function (scope, iElement, iAttrs, controller) {
-
-				//console.log("compile", arguments)
-
-			}
-
-		};
 
 		return {
 			restrict: 'E',
 			replace: true,
 			scope: true,
 			template: template,
-			controller: controller,
-			compile: compile
+			controller: controller
 		}
 
 	}];
