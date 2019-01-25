@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter'], function ($, _, template) {
 
-	return ["$window", "$compile", "mediaStream", "safeApply", "videoWaiter", "$timeout", "dummyStream", function ($window, $compile, mediaStream, safeApply, videoWaiter, $timeout, DummyStream) {
+	return ["$window", "$compile", "mediaStream", "safeApply", "$timeout", "dummyStream", function ($window, $compile, mediaStream, safeApply,  $timeout, DummyStream) {
 
 
 		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
@@ -110,34 +110,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 				} else {
 					var video = $element.find("video")[0];
 					$window.attachMediaStream(video, stream);
-					// Waiter callbacks also count as connected, as browser support (FireFox 25) is not setting state changes properly.
-					videoWaiter.wait(video, stream, function (withvideo) {
-						if ($scope.destroyed) {
-							console.log("Abort wait for video on destroyed scope.");
-							return;
-						}
-						if (withvideo) {
-							$scope.$apply(function ($scope) {
-								$scope.withvideo = true;
-								$scope.onlyaudio = false;
-							});
-						} else {
-							console.info("Incoming stream has no video tracks.");
-							$scope.$apply(function ($scope) {
-								$scope.withvideo = false;
-								$scope.onlyaudio = true;
-							});
-						}
-						$scope.$emit("active", currentcall);
-
-					}, function () {
-						if ($scope.destroyed) {
-							console.log("No longer wait for video on destroyed scope.");
-							return;
-						}
-						console.warn("We did not receive video data for remote stream", currentcall, stream, video);
-						scope.$emit("active", currentcall);
-					});
 					$scope.dummy = null;
 				}
 				$scope.unattached = false;
