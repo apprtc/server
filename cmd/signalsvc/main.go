@@ -21,7 +21,6 @@ import (
 
 	"github.com/apprtc/server/httputils"
 	"github.com/apprtc/server/phoenix"
-	"github.com/apprtc/server/sloth"
 
 	"github.com/gorilla/mux"
 )
@@ -46,16 +45,6 @@ func runner(runtime phoenix.Runtime) error {
 
 	if !httputils.HasDirPath(rootFolder) {
 		return fmt.Errorf("Configured root '%s' is not a directory.", rootFolder)
-	}
-
-	statsEnabled, err := runtime.GetBool("http", "stats")
-	if err != nil {
-		statsEnabled = false
-	}
-
-	pipelinesEnabled, err := runtime.GetBool("app", "pipelinesEnabled")
-	if err != nil {
-		pipelinesEnabled = false
 	}
 
 	var sessionSecret []byte
@@ -219,34 +208,8 @@ func runner(runtime phoenix.Runtime) error {
 	// 	r.Handle("/static/{path:.*}", http.StripPrefix(config.B, httputils.FileStaticServer(statikFS)))
 	// }
 
-	// Add RESTful API end points.
-	rest := sloth.NewAPI()
-	rest.SetMux(r.PathPrefix("/api/v1/").Subrouter())
-	rest.AddResource(&server.Rooms{}, "/rooms")
-	rest.AddResource(config, "/config")
-	rest.AddResourceWithWrapper(&server.Tokens{tokenProvider}, httputils.MakeGzipHandler, "/tokens")
-
-	var users *server.Users
-	if config.UsersEnabled {
-		// Create Users handler.
-		users = server.NewUsers(hub, tickets, sessionManager, config.UsersMode, serverRealm, runtime)
-		rest.AddResource(&server.Sessions{tickets, hub, users}, "/sessions/{id}/")
-		if config.UsersAllowRegistration {
-			rest.AddResource(users, "/users")
-		}
-	}
-	if statsEnabled {
-		rest.AddResourceWithWrapper(&server.Stats{statsManager}, httputils.MakeGzipHandler, "/stats")
-		log.Println("Stats are enabled!")
-	}
-	if pipelinesEnabled {
-		pipelineManager.Start()
-		rest.AddResource(&server.Pipelines{pipelineManager, channellingAPI}, "/pipelines/{id}")
-		log.Println("Pipelines API is enabled!")
-	}
-
 	// Finally add websocket handler.
-	r.Handle("/ws", makeWSHandler(statsManager, sessionManager, codec, channellingAPI, users))
+	r.Handle("/ws", makeWSHandler(statsManager, sessionManager, codec, channellingAPI, nil))
 
 	// Simple room handler.
 	r.HandleFunc("/{room}", httputils.MakeGzipHandler(roomHandler))

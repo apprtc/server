@@ -13,7 +13,6 @@ require.config({
 		'angular': 'libs/angular/angular.min',
 		'ui-bootstrap': 'libs/angular/ui-bootstrap-tpls.min',
 		'ua-parser': 'libs/ua-parser',
-		'bigscreen': 'libs/bigscreen.min',
 		'angular-sanitize': 'libs/angular/angular-sanitize.min',
 		'angular-animate': 'libs/angular/angular-animate.min',
 		'angular-route': 'libs/angular/angular-route.min',
@@ -35,9 +34,6 @@ require.config({
 		},
 		'ui-bootstrap': {
 			deps: ['angular']
-		},
-		'bigscreen': {
-			exports: 'BigScreen'
 		},
 		'angular-sanitize': {
 			deps: ['angular'],

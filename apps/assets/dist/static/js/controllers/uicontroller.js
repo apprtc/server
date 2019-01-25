@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], function ($, _, BigScreen, Modernizr) {
+define(['jquery', 'underscore',  'modernizr', 'webrtc.adapter'], function ($, _, Modernizr) {
 
 	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, localStatus, rooms, constraints) {
 
@@ -19,13 +19,6 @@ define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], fun
 				mediaStream.api.connector.disabled = true;
 			}
 		});
-
-		// Enable app full screen listener.
-		$("#bar .logo").on("doubletap dblclick", _.debounce(function () {
-			if (BigScreen.enabled) {
-				BigScreen.toggle($("body").get(0));
-			}
-		}, 100, true));
 
 		// Helper to test WebRTC stats api.
 		$window.showCiphers = function () {
@@ -100,12 +93,9 @@ define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], fun
 		$scope.conferenceObject = null;
 		$scope.conferencePeers = [];
 		$scope.incoming = null;
-		$scope.microphoneMute = false;
-		$scope.cameraMute = false;
 		$scope.layout = {
 			main: null,
 		};
-		$scope.chatMessagesUnseen = 0;
 		$scope.autoAccept = null;
 		$scope.isCollapsed = true;
 		$scope.usermedia = null;
@@ -215,15 +205,6 @@ define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], fun
 			}
 
 		};
-
-
-		$scope.$watch("cameraMute", function (cameraMute) {
-			mediaStream.webrtc.setVideoMute(cameraMute);
-		});
-
-		$scope.$watch("microphoneMute", function (cameraMute) {
-			mediaStream.webrtc.setAudioMute(cameraMute);
-		});
 
 
 		var dialerEnabled = false;
@@ -580,8 +561,11 @@ define(['jquery', 'underscore', 'bigscreen', 'modernizr', 'webrtc.adapter'], fun
 		});
 
 		_.defer(function () {
+			return;
+			
+			alert("$window.webrtcDetectedVersion:" + $window.webrtcDetectedVersion);
 			if (!$window.webrtcDetectedVersion || $window.webrtcDetectedBrowser === "edge") {
-				alert("Your browser does not support WebRTC. No calls possible.");
+				alert("ui controller Your browser does not support WebRTC. No calls possible.");
 				return;
 			}
 			if (!Modernizr.websockets || $window.webrtcDetectedVersion < $window.webrtcMinimumVersion) {

@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/audiovideopeer.html', 'bigscreen', 'webrtc.adapter'], function ($, _, template, templatePeer, BigScreen) {
+define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/audiovideopeer.html', 'webrtc.adapter'], function ($, _, template, templatePeer) {
 
 	return ["$window", "$compile", "mediaStream", "safeApply", "videoWaiter", "$timeout", "dummyStream", function ($window, $compile, mediaStream, safeApply, videoWaiter, $timeout, DummyStream) {
 
@@ -183,18 +183,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 
 			});
 
-			$scope.toggleFullscreen = function () {
-				//console.log("Toggle full screen", BigScreen.enabled, $scope.isActive, $scope.hasUsermedia);
-				if (BigScreen.enabled && ($scope.isActive || $scope.hasUsermedia)) {
-					BigScreen.toggle($scope.layoutparent[0], function () {
-						// onEnter
-						$scope.layoutparent.addClass("fullscreen");
-					}, function () {
-						// onExit
-						$scope.layoutparent.removeClass("fullscreen");
-					});
-				}
-			};
 
 			mediaStream.webrtc.e.on("usermedia", function (event, usermedia) {
 
@@ -212,9 +200,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 					scope.hasUsermedia = false;
 					scope.isActive = false;
 
-					if (BigScreen.enabled) {
-						BigScreen.exit();
-					}
+
 					var removeVideos = function () {
 						if (scope.isActive) {
 							return;
@@ -281,7 +267,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'text!partials/
 			return function (scope, iElement, iAttrs, controller) {
 
 				//console.log("compile", arguments)
-				iElement.on("doubletap dblclick", _.debounce(scope.toggleFullscreen, 100, true));
+
 			}
 
 		};

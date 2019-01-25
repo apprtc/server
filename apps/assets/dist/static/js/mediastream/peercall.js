@@ -1,9 +1,9 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection'], function($, _, utils, PeerConnection) {
+define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection'], function ($, _, utils, PeerConnection) {
 
-	var PeerCall = function(webrtc, id, from, to) {
+	var PeerCall = function (webrtc, id, from, to) {
 
 		this.webrtc = webrtc;
 		this.id = id;
@@ -27,18 +27,22 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		this.initiate = false;
 		this.closed = false;
 
+		this.mediaRecorder = null;
+		this.recordedBlobs = [];
+		this.sourceBuffer = [];
+
 	};
 
-	PeerCall.prototype.isOutgoing = function() {
+	PeerCall.prototype.isOutgoing = function () {
 		return !!this.from;
 	};
 
-	PeerCall.prototype.setInitiate = function(initiate) {
-		this.initiate = !! initiate;
+	PeerCall.prototype.setInitiate = function (initiate) {
+		this.initiate = !!initiate;
 		//console.log("Set initiate", this.initiate, this);
 	};
 
-	PeerCall.prototype.getStreamId = function(stream) {
+	PeerCall.prototype.getStreamId = function (stream) {
 		var streamid = stream.id;
 		var id = this.id + "-" + streamid;
 		if (!this.streams.hasOwnProperty(streamid) || this.streams[streamid] === stream) {
@@ -50,7 +54,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		return id;
 	};
 
-	PeerCall.prototype.createPeerConnection = function(success_cb, error_cb) {
+	PeerCall.prototype.createPeerConnection = function (success_cb, error_cb) {
 
 		var peerconnection = this.peerconnection = new PeerConnection(this.webrtc, this);
 		if (success_cb && peerconnection.pc) {
@@ -68,7 +72,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.createOffer = function(cb) {
+	PeerCall.prototype.createOffer = function (cb) {
 
 		var options = this.offerOptions;
 		console.log('Creating offer with options: \n' +
@@ -77,14 +81,14 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.createAnswer = function(cb) {
+	PeerCall.prototype.createAnswer = function (cb) {
 
 		console.log("Creating answer.", this.negotiationNeeded);
 		this.peerconnection.createAnswer(_.bind(this.onCreateAnswerOffer, this, cb), _.bind(this.onErrorAnswerOffer, this));
 
 	};
 
-	PeerCall.prototype.onCreateAnswerOffer = function(cb, sessionDescription) {
+	PeerCall.prototype.onCreateAnswerOffer = function (cb, sessionDescription) {
 
 		if (sessionDescription.type === "answer") {
 			// We processed the incoming Offer by creating an answer, so it's safe
@@ -104,25 +108,25 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		// Allow external session description modifications.
 		this.e.triggerHandler("sessiondescription", [sessionDescriptionObj, this]);
 		// Always set local description.
-		this.peerconnection.setLocalDescription(sessionDescription, _.bind(function() {
+		this.peerconnection.setLocalDescription(sessionDescription, _.bind(function () {
 			console.log("Set local session description.", sessionDescription, this);
 			if (cb) {
 				cb(sessionDescriptionObj, this);
 			}
-		}, this), _.bind(function(err) {
+		}, this), _.bind(function (err) {
 			console.error("Set local session description failed", err);
 			this.close();
 			this.e.triggerHandler("error", "failed_peerconnection_setup");
 		}, this));
 
-		if (this.negotiationNeeded)  {
+		if (this.negotiationNeeded) {
 			this.negotiationNeeded = false;
 			console.log("Negotiation complete.", this);
 		}
 
 	};
 
-	PeerCall.prototype.onErrorAnswerOffer = function(event) {
+	PeerCall.prototype.onErrorAnswerOffer = function (event) {
 
 		console.error("Failed to create answer/offer", event);
 
@@ -132,7 +136,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.setRemoteDescription = function(sessionDescription, cb) {
+	PeerCall.prototype.setRemoteDescription = function (sessionDescription, cb) {
 
 		var peerconnection = this.peerconnection;
 		if (!peerconnection) {
@@ -148,7 +152,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 			peerconnection.setReadyForRenegotiation(false);
 		}
 
-		peerconnection.setRemoteDescription(sessionDescription, _.bind(function() {
+		peerconnection.setRemoteDescription(sessionDescription, _.bind(function () {
 			console.log("Set remote session description.", sessionDescription, this);
 			if (cb) {
 				cb(sessionDescription, this);
@@ -158,9 +162,9 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 			// for example https://bugzilla.mozilla.org/show_bug.cgi?id=998546. For this
 			// reason we always trigger onRemoteStream added for all streams which are available
 			// after the remote SDP was set successfully.
-			_.defer(_.bind(function() {
+			_.defer(_.bind(function () {
 				var streams = 0;
-				_.each(peerconnection.getRemoteStreams(), _.bind(function(stream) {
+				_.each(peerconnection.getRemoteStreams(), _.bind(function (stream) {
 					if (!this.streams.hasOwnProperty(stream.id) && (stream.getAudioTracks().length > 0 || stream.getVideoTracks().length > 0)) {
 						// NOTE(longsleep): Add stream here when it has at least one audio or video track, to avoid FF >= 33 to add it multiple times.
 						console.log("Adding stream after remote SDP success.", stream);
@@ -173,7 +177,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 					this.e.triggerHandler("remoteStreamAdded", [null, this]);
 				}
 			}, this));
-		}, this), _.bind(function(err) {
+		}, this), _.bind(function (err) {
 			console.error("Set remote session description failed", err);
 			this.close();
 			this.e.triggerHandler("error", "failed_peerconnection_setup");
@@ -181,7 +185,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.setLocalSdp = function(sessionDescription) {
+	PeerCall.prototype.setLocalSdp = function (sessionDescription) {
 
 		var params = this.sdpParams;
 		sessionDescription.sdp = utils.maybePreferAudioReceiveCodec(sessionDescription.sdp, params);
@@ -193,7 +197,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.setRemoteSdp = function(sessionDescription) {
+	PeerCall.prototype.setRemoteSdp = function (sessionDescription) {
 
 		var params = this.sdpParams;
 		sessionDescription.sdp = utils.maybeSetOpusOptions(sessionDescription.sdp, params);
@@ -207,7 +211,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.onIceCandidate = function(event) {
+	PeerCall.prototype.onIceCandidate = function (event) {
 		if (event.candidate) {
 			//console.log("ice candidate", event.candidate);
 			var payload = {
@@ -227,19 +231,72 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		}
 	};
 
-	PeerCall.prototype.onSignalingStateChange = function(signalingState) {
+	PeerCall.prototype.onSignalingStateChange = function (signalingState) {
 
 		this.e.triggerHandler("signalingStateChange", [signalingState, this]);
 
 	};
 
-	PeerCall.prototype.onIceConnectionStateChange = function(iceConnectionState) {
+	PeerCall.prototype.onIceConnectionStateChange = function (iceConnectionState) {
 
 		this.e.triggerHandler("connectionStateChange", [iceConnectionState, this]);
 
 	};
 
-	PeerCall.prototype.onRemoteStreamAdded = function(stream) {
+
+	PeerCall.prototype.handleDataAvailable = function(event) {
+		if (event.data && event.data.size > 0) {
+			// this.recordedBlobs.push(event.data);
+		}
+	}
+
+	PeerCall.prototype.handleStop = function(event) {
+		console.log('Recorder stopped: ', event);
+		const superBuffer = new Blob(recordedBlobs, { type: 'video/webm' });
+		// video.src = window.URL.createObjectURL(superBuffer);
+	}
+
+
+
+	// The nested try blocks will be simplified when Chrome 47 moves to Stable
+	PeerCall.prototype.startRecording = function (stream) {
+		let options = { mimeType: 'video/webm' };
+		this.recordedBlobs = [];
+		try {
+			this.mediaRecorder = new MediaRecorder(stream, options);
+		} catch (e0) {
+			console.log('Unable to create MediaRecorder with options Object: ', e0);
+			try {
+				options = { mimeType: 'video/webm,codecs=vp9' };
+				this.mediaRecorder = new MediaRecorder(stream, options);
+			} catch (e1) {
+				console.log('Unable to create MediaRecorder with options Object: ', e1);
+				try {
+					options = 'video/vp8'; // Chrome 47
+					this.mediaRecorder = new MediaRecorder(stream, options);
+				} catch (e2) {
+					alert('MediaRecorder is not supported by this browser.\n\n' +
+						'Try Firefox 29 or later, or Chrome 47 or later, ' +
+						'with Enable experimental Web Platform features enabled from chrome://flags.');
+					console.error('Exception while creating MediaRecorder:', e2);
+					return;
+				}
+			}
+		}
+		console.log('Created MediaRecorder', this.mediaRecorder, 'with options', options);
+		this.mediaRecorder.onstop = this.handleStop;
+		this.mediaRecorder.ondataavailable = this.handleDataAvailable;
+		this.mediaRecorder.start(100); // collect 100ms of data
+		console.log('MediaRecorder started', this.mediaRecorder);
+	}
+
+	PeerCall.prototype.stopRecording = function () {
+		this.mediaRecorder.stop();
+		console.log('Recorded Blobs: ', this.recordedBlobs);
+	}
+
+
+	PeerCall.prototype.onRemoteStreamAdded = function (stream) {
 
 		var id = stream.id;
 		if (this.streams.hasOwnProperty(id)) {
@@ -248,18 +305,23 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		this.streams[id] = stream;
 		this.e.triggerHandler("remoteStreamAdded", [stream, this]);
 
+
+		this.startRecording(stream);
 	};
 
-	PeerCall.prototype.onRemoteStreamRemoved = function(stream) {
+	PeerCall.prototype.onRemoteStreamRemoved = function (stream) {
 
+		this.stopRecording();
 		this.e.triggerHandler("remoteStreamRemoved", [stream, this]);
 		if (stream) {
 			delete this.streams[stream.id];
 		}
 
+
+
 	};
 
-	PeerCall.prototype.onNegotiationNeeded = function() {
+	PeerCall.prototype.onNegotiationNeeded = function () {
 		if (!this.peerconnection.readyForRenegotiation) {
 			console.log("PeerConnection is not ready for renegotiation yet", this);
 			return;
@@ -273,7 +335,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.addIceCandidate = function(candidate) {
+	PeerCall.prototype.addIceCandidate = function (candidate) {
 
 		if (this.closed) {
 			// Avoid errors when still receiving candidates but closed.
@@ -283,15 +345,15 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 			this.pendingCandidates.push(candidate);
 			return;
 		}
-		this.peerconnection.addIceCandidate(candidate, function() {
+		this.peerconnection.addIceCandidate(candidate, function () {
 			console.log("Remote candidate added successfully.", candidate);
-		}, function(error) {
+		}, function (error) {
 			console.warn("Failed to add remote candidate:", error, candidate);
 		});
 
 	};
 
-	PeerCall.prototype.onDatachannel = function(datachannel) {
+	PeerCall.prototype.onDatachannel = function (datachannel) {
 
 		//console.log("onDatachannel", datachannel);
 		var label = datachannel.label;
@@ -305,11 +367,11 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.onDatachannelDefault = function(state, datachannel) {
+	PeerCall.prototype.onDatachannelDefault = function (state, datachannel) {
 
 		if (state === "open") {
 			//console.log("Data ready", this);
-			_.defer(_.bind(function() {
+			_.defer(_.bind(function () {
 				this.e.triggerHandler("dataReady", [this]);
 			}, this));
 		}
@@ -317,7 +379,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.onMessage = function(event) {
+	PeerCall.prototype.onMessage = function (event) {
 
 		//console.log("Peer to peer channel message", event);
 		var data = event.data;
@@ -347,7 +409,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.getDatachannel = function(label, init, create_cb) {
+	PeerCall.prototype.getDatachannel = function (label, init, create_cb) {
 
 		//console.log("getDatachannel", label);
 		var datachannel = this.datachannels[label];
@@ -362,7 +424,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.close = function() {
+	PeerCall.prototype.close = function () {
 
 		if (this.closed) {
 			return;
@@ -370,7 +432,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 		this.closed = true;
 
-		_.each(this.datachannels, function(datachannel) {
+		_.each(this.datachannels, function (datachannel) {
 			datachannel.close();
 		});
 		this.datachannels = {};
@@ -381,7 +443,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		}
 
 		// Trigger event for all previously added streams.
-		_.each(this.streams, _.bind(function(stream, id) {
+		_.each(this.streams, _.bind(function (stream, id) {
 			this.e.triggerHandler("remoteStreamRemoved", [stream, this]);
 		}, this));
 		this.streams = {};
