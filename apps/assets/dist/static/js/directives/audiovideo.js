@@ -66,8 +66,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 				var peerid = subscope.peerid = currentcall.id;
 
 				subscope.unattached = true;
-				subscope.withvideo = false;
-				subscope.onlyaudio = false;
 				subscope.destroyed = false;
 				subscope.$on("active", function () {
 					console.log("Stream scope is now active", id, peerid);
@@ -101,8 +99,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 
 			$scope.attachStream = function (stream, currentcall) {
 				if (DummyStream.is(stream)) {
-					$scope.withvideo = false;
-					$scope.onlyaudio = true;
 					$timeout(function () {
 						$scope.$emit("active", currentcall);
 					});
