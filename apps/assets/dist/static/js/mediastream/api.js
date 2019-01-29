@@ -165,6 +165,11 @@ define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
 				console.log("User action received", dataType, data);
 				this.e.triggerHandler("received.userleftorjoined", [dataType, data]);
 				break;
+			case "Status":
+				console.log("User status received", dataType, data);
+				this.e.triggerHandler("received.status", [data]);
+				break;
+
 
 			case "Alive":
 				// Do nothing.
@@ -271,6 +276,16 @@ define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
 
 	};
 
+	Api.prototype.updateStatus = function (status) {
+
+		var data = {
+			Type: "Status",
+			Status: status
+		}
+
+		return this.send("Status", data);
+
+	};
 
 	Api.prototype.sendBye = function (to, reason) {
 
@@ -286,6 +301,22 @@ define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
 
 	};
 
+	Api.prototype.sendChat = function (to, message, status, mid) {
+
+		var data = {
+			To: to,
+			Type: "Chat",
+			Chat: {
+				Mid: mid,
+				Message: message,
+				Status: status,
+				NoEcho: true // This client shows own messages internally.
+			}
+		}
+
+		return this.send("Chat", data);
+
+	};
 
 	Api.prototype.sendConference = function (id, ids) {
 

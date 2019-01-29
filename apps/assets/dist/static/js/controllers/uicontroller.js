@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore',  'modernizr', 'webrtc.adapter'], function ($, _, Modernizr) {
 
-	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, rooms, constraints) {
+	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, localStatus, rooms, constraints) {
 
 		// Avoid accidential reloads or exits when in a call.
 		$($window).on("beforeunload", function (event) {
@@ -107,6 +107,18 @@ define(['jquery', 'underscore',  'modernizr', 'webrtc.adapter'], function ($, _,
 
 		$scope.getStatus = function () {
 			return $scope.status;
+		};
+
+		$scope.updateStatus = function (clear) {
+			// This is the user status.
+			var status = {
+				displayName: $scope.master.displayName || null,
+				message: $scope.master.message || null
+			}
+			if (clear) {
+				localStatus.clear();
+			}
+			localStatus.update(status);
 		};
 
 		$scope.updatePeerFromConference = function () {
@@ -354,6 +366,7 @@ define(['jquery', 'underscore',  'modernizr', 'webrtc.adapter'], function ($, _,
 				case "open":
 					appData.flags.connected = true;
 					appData.flags.autoreconnectDelay = 0;
+					$scope.updateStatus(true);
 					$scope.setStatus("waiting");
 					break;
 				case "error":
