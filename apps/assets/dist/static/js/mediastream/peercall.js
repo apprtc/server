@@ -27,10 +27,6 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		this.initiate = false;
 		this.closed = false;
 
-		this.mediaRecorder = null;
-		this.recordedBlobs = [];
-		this.sourceBuffer = [];
-
 	};
 
 	PeerCall.prototype.isOutgoing = function () {
@@ -243,59 +239,6 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-
-	PeerCall.prototype.handleDataAvailable = function(event) {
-		if (event.data && event.data.size > 0) {
-			// this.recordedBlobs.push(event.data);
-		}
-	}
-
-	PeerCall.prototype.handleStop = function(event) {
-		console.log('Recorder stopped: ', event);
-		const superBuffer = new Blob(recordedBlobs, { type: 'video/webm' });
-		// video.src = window.URL.createObjectURL(superBuffer);
-	}
-
-
-
-	// The nested try blocks will be simplified when Chrome 47 moves to Stable
-	PeerCall.prototype.startRecording = function (stream) {
-		let options = { mimeType: 'video/webm' };
-		this.recordedBlobs = [];
-		try {
-			this.mediaRecorder = new MediaRecorder(stream, options);
-		} catch (e0) {
-			console.log('Unable to create MediaRecorder with options Object: ', e0);
-			try {
-				options = { mimeType: 'video/webm,codecs=vp9' };
-				this.mediaRecorder = new MediaRecorder(stream, options);
-			} catch (e1) {
-				console.log('Unable to create MediaRecorder with options Object: ', e1);
-				try {
-					options = 'video/vp8'; // Chrome 47
-					this.mediaRecorder = new MediaRecorder(stream, options);
-				} catch (e2) {
-					alert('MediaRecorder is not supported by this browser.\n\n' +
-						'Try Firefox 29 or later, or Chrome 47 or later, ' +
-						'with Enable experimental Web Platform features enabled from chrome://flags.');
-					console.error('Exception while creating MediaRecorder:', e2);
-					return;
-				}
-			}
-		}
-		console.log('Created MediaRecorder', this.mediaRecorder, 'with options', options);
-		this.mediaRecorder.onstop = this.handleStop;
-		this.mediaRecorder.ondataavailable = this.handleDataAvailable;
-		this.mediaRecorder.start(100); // collect 100ms of data
-		console.log('MediaRecorder started', this.mediaRecorder);
-	}
-
-	PeerCall.prototype.stopRecording = function () {
-		this.mediaRecorder.stop();
-		console.log('Recorded Blobs: ', this.recordedBlobs);
-	}
-
-
 	PeerCall.prototype.onRemoteStreamAdded = function (stream) {
 
 		var id = stream.id;
@@ -304,9 +247,6 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		}
 		this.streams[id] = stream;
 		this.e.triggerHandler("remoteStreamAdded", [stream, this]);
-
-
-		this.startRecording(stream);
 	};
 
 	PeerCall.prototype.onRemoteStreamRemoved = function (stream) {

@@ -12,7 +12,9 @@ define([
 	'mediastream/peerconference',
 	'mediastream/usermedia',
 	'mediastream/utils',
-	'webrtc.adapter'],
+	'webrtc.adapter',
+	'RecordRTC'
+],
 
 function($, _, PeerCall, PeerConference, UserMedia, utils) {
 
