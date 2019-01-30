@@ -1,6 +1,8 @@
 package signalsvc
 
 import (
+	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/apprtc/server/channelling"
@@ -12,6 +14,54 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
 	handleRoomView(vars["room"], w, r)
+}
+
+var mainPage *template.Template
+var tmplMain = `
+<%define "mainPage"%>
+<!doctype html>
+<html class="no-js wf-loading" <%if.Csp%> ng-csp
+<%end%>>
+
+<head>
+	<title>
+		<%.Cfg.Title%>
+	</title>
+	<meta name="fragment" content="!">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="mobile-web-app-capable" content="yes">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="referrer" content="no-referrer">
+	<base href="<%.Cfg.B%>">
+	<!-- <link rel="stylesheet" type="text/css" href="<%.Cfg.S%>/css/main.min.css"> -->
+
+	<script id="globalcontext" type="application/json"><%$%></script>
+	<script src="../static/js/libs/EBML.js"></script>
+</head>
+
+<body webrtc-app style="background-color:#000">
+    <div id="loader">
+        <div class="loader-message"></div>
+    </div>
+    <ui></ui>
+    <script data-main="<%.Cfg.S%>/js/<%.App%>" data-plugin="<%.Cfg.Plugin%>" src="<%.Cfg.S%>/js/libs/require/require.js"></script>
+</body>
+
+</html>
+<%end%>
+`
+
+func init() {
+	// Load templates.
+	mainPage = template.New("mainPage")
+	mainPage.Delims("<%", "%>")
+	mainPage, err := mainPage.Parse(tmplMain)
+	if err != nil {
+		fmt.Println("error=", err)
+	}
+
+	fmt.Println("main name=", mainPage.Name())
 }
 
 func handleRoomView(room string, w http.ResponseWriter, r *http.Request) {
@@ -65,7 +115,7 @@ func handleRoomView(room string, w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	// Render mainPage template.
-	err = templates.ExecuteTemplate(w, "mainPage", context)
+	err = mainPage.Execute(w, context)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

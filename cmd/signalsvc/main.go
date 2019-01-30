@@ -5,47 +5,33 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/apprtc/server/channelling"
 	"github.com/apprtc/server/channelling/api"
 	"github.com/apprtc/server/channelling/server"
 	"github.com/apprtc/server/natsconnection"
+	"github.com/rakyll/statik/fs"
 
 	"github.com/apprtc/server/httputils"
 	"github.com/apprtc/server/phoenix"
 
 	"github.com/gorilla/mux"
+
+	_ "github.com/apprtc/server/cmd/statik"
 )
 
-var version = "unreleased"
+var version = "0.1"
 var defaultConfig = "./server.conf"
 
-var templates *template.Template
 var config *channelling.Config
 
 func runner(runtime phoenix.Runtime) error {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
-
-	rootFolder, err := runtime.GetString("http", "root")
-	if err != nil {
-		cwd, err2 := os.Getwd()
-		if err2 != nil {
-			return fmt.Errorf("Error while getting current directory: %s", err)
-		}
-		rootFolder = cwd
-	}
-
-	if !httputils.HasDirPath(rootFolder) {
-		return fmt.Errorf("Configured root '%s' is not a directory.", rootFolder)
-	}
 
 	var sessionSecret []byte
 	sessionSecretString, err := runtime.GetString("app", "sessionSecret")
@@ -129,26 +115,6 @@ func runner(runtime phoenix.Runtime) error {
 		return err
 	}
 
-	// Load templates.
-	templates = template.New("")
-	templates.Delims("<%", "%>")
-
-	// Load html templates folder
-	err = filepath.Walk(path.Join(rootFolder, "html"), func(path string, info os.FileInfo, err error) error {
-		if err == nil {
-			if strings.HasSuffix(path, ".html") {
-				_, err = templates.ParseFiles(path)
-				if err != nil {
-					return err
-				}
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		return fmt.Errorf("Failed to load templates: %s", err)
-	}
-
 	// Define incoming channeling API limit it byte. Larger messages will be discarded.
 	incomingCodecLimit := 1024 * 1024 // 1MB
 
@@ -202,11 +168,11 @@ func runner(runtime phoenix.Runtime) error {
 	// Add handlers.
 	r.HandleFunc("/", httputils.MakeGzipHandler(mainHandler))
 
-	// if os.Getenv("webrtc-debug") == "1" {
-	r.Handle("/static/{path:.*}", http.StripPrefix(config.B, httputils.FileStaticServer(http.Dir(rootFolder))))
-	// } else {
-	// 	r.Handle("/static/{path:.*}", http.StripPrefix(config.B, httputils.FileStaticServer(statikFS)))
-	// }
+	statikFS, err := fs.New()
+	if err != nil {
+		log.Fatal(err)
+	}
+	r.Handle("/static/{path:.*}", http.StripPrefix(config.B, httputils.FileStaticServer(statikFS)))
 
 	// Finally add websocket handler.
 	r.Handle("/ws", makeWSHandler(statsManager, sessionManager, codec, channellingAPI, nil))
