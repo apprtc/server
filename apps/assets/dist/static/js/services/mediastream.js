@@ -10,7 +10,7 @@ define([
 
 ], function ($, _, uaparser, Modernizr) {
 
-	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "visibility", "$http", "safeApply", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $route, $location, $window, visibility, $http, safeApply, $timeout, $sce, continueConnector) {
+	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "$http", "safeApply", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $route, $location, $window, $http, safeApply, $timeout, $sce, continueConnector) {
 
 		var url = (context.Ssl ? "wss" : "ws") + "://" + context.Host + (context.Cfg.B || "/") + "ws";
 		var version = context.Cfg.Version;
@@ -85,20 +85,8 @@ define([
 					connect();
 				});
 
-				visibility.afterPrerendering(function () {
-
-					// Hide loader when we are visible.
-					var loader = $("#loader");
-					loader.addClass("done");
-					_.delay(function () {
-						loader.remove();
-					}, 1000);
-
-
-					cont = true;
-					connect();
-				});
-
+				cont = true;
+				connect();
 			}
 		};
 

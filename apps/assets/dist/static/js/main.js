@@ -17,7 +17,6 @@ require.config({
 		'angular-sanitize': 'libs/angular/angular-sanitize.min',
 		'angular-animate': 'libs/angular/angular-animate.min',
 		'angular-route': 'libs/angular/angular-route.min',
-		'visibly': 'libs/visibly',
 
 		'partials': '../partials',
 	},
@@ -42,9 +41,6 @@ require.config({
 		'angular-animate': {
 			deps: ['angular'],
 			exports: 'angular'
-		},
-		'visibly': {
-			exports: 'visibly'
 		}
 	}
 });
