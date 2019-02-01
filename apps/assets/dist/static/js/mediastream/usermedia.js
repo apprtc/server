@@ -1,11 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'audiocontext', 'mediastream/dummystream', 'webrtc.adapter'], function($, _, AudioContext, DummyStream) {
-
-	// Create AudioContext singleton, if supported.
-	var context = AudioContext ? new AudioContext() : null;
-
+define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], function($, _, DummyStream) {
 	// Converter helpers to convert media constraints to new API.
 	var mergeConstraints = function(constraints, k, v, mandatory) {
 		var prefix = k.substring(0, 3);
@@ -131,50 +127,6 @@ define(['jquery', 'underscore', 'audiocontext', 'mediastream/dummystream', 'webr
 		this.videoMute = options.videoMute && true;
 		this.mediaConstraints = null;
 
-		// Audio level.
-		this.audioLevel = 0;
-		if (!this.options.noAudio && context && context.createScriptProcessor) {
-
-			this.audioSource = null;
-			this.audioProcessor = context.createScriptProcessor(2048, 1, 1);
-			this.audioProcessor.onaudioprocess = _.bind(function(event) {
-				// Compute audio input level based on raw PCM data.
-				if (!this.audioSource) {
-					return;
-				}
-				var input = event.inputBuffer.getChannelData(0);
-				var len = input.length
-				var total = 0;
-				var i = 0;
-				while (i < len) {
-					total += Math.abs(input[i++]);
-				}
-				// http://en.wikipedia.org/wiki/Root_mean_square
-				var rms = Math.sqrt(total / len);
-				this.audioLevel = rms;
-				//console.log("this.audioLevel", this.audioLevel);
-			}, this);
-
-			// Connect stream to audio processor if supported.
-			if (context.createMediaStreamSource) {
-				this.e.on("localstream", _.bind(function(event, stream) {
-					if (this.audioSource) {
-						this.audioSource.disconnect();
-					}
-					var audioTracks = stream.getAudioTracks();
-					if (audioTracks.length < 1) {
-						this.audioSource = null;
-						return;
-					}
-					// Connect to audioProcessor.
-					this.audioSource = context.createMediaStreamSource(stream);
-					//console.log("got source", this.audioSource);
-					this.audioSource.connect(this.audioProcessor);
-					this.audioProcessor.connect(context.destination);
-				}, this));
-			}
-
-		}
 
 		this.e.on("localstream", _.bind(function(event, stream, oldstream) {
 			// Update stream support.
@@ -316,7 +268,9 @@ define(['jquery', 'underscore', 'audiocontext', 'mediastream/dummystream', 'webr
 
 	UserMedia.prototype.onUserMediaError = function(error) {
 		console.error('Failed to get access to local media. Error was ' + error.name, error);
-
+		this.onUserMediaSuccess(new DummyStream());
+		return;
+		
 		if (!this.started) {
 			return;
 		}

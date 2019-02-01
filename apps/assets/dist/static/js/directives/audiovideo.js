@@ -53,7 +53,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 						return;
 					}
 				} else {
-					//console.log("xxx create call scope", currentcall.id, id);
+					console.log("xxx create call scope", currentcall.id, id);
 					// Create scope.
 					callscope = $scope.$new();
 					calls[currentcall.id] = callscope;
@@ -105,14 +105,14 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 					});
 					return;
 				} else {
-					var video = $element.find("video")[0];
-					$window.attachMediaStream(video, stream);
-					$scope.dummy = null;
-					// RecordRTC
+					// var video = $element.find("video")[0];
+					// $window.attachMediaStream(video, stream);
 
-					// recorder = RecordRTC(stream, {
-					// 	type: 'video'
-					// });
+					const video = document.querySelector('video');
+					video.srcObject = stream;
+
+
+					$scope.dummy = null;
 
 
 					recorder = RecordRTC(stream, {

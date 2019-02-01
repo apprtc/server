@@ -9,12 +9,10 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"time"
 
 	"github.com/apprtc/server/channelling"
 	"github.com/apprtc/server/channelling/api"
 	"github.com/apprtc/server/channelling/server"
-	"github.com/apprtc/server/natsconnection"
 	"github.com/rakyll/statik/fs"
 
 	"github.com/apprtc/server/httputils"
@@ -94,21 +92,6 @@ func runner(runtime phoenix.Runtime) error {
 		tokenProvider = channelling.TokenFileProvider(tokenFile)
 	}
 
-	// Nats pub/sub supports.
-	natsChannellingTrigger, _ := runtime.GetBool("nats", "channelling_trigger")
-	natsChannellingTriggerSubject, _ := runtime.GetString("nats", "channelling_trigger_subject")
-	if natsURL, err := runtime.GetString("nats", "url"); err == nil {
-		if natsURL != "" {
-			natsconnection.DefaultURL = natsURL
-		}
-	}
-	if natsEstablishTimeout, err := runtime.GetInt("nats", "establishTimeout"); err == nil {
-		if natsEstablishTimeout != 0 {
-			natsconnection.DefaultEstablishTimeout = time.Duration(natsEstablishTimeout) * time.Second
-		}
-	}
-	natsClientId, _ := runtime.GetString("nats", "client_id")
-
 	// Load remaining configuration items.
 	config, err = server.NewConfig(runtime, tokenProvider != nil)
 	if err != nil {
@@ -152,7 +135,7 @@ func runner(runtime phoenix.Runtime) error {
 	tickets := channelling.NewTickets(sessionSecret, encryptionSecret, computedRealm)
 	sessionManager := channelling.NewSessionManager(config, tickets, hub, roomManager, roomManager, buddyImages, sessionSecret)
 	statsManager := channelling.NewStatsManager(hub, roomManager, sessionManager)
-	busManager := channelling.NewBusManager(apiConsumer, natsClientId, natsChannellingTrigger, natsChannellingTriggerSubject)
+	busManager := channelling.NewBusManager(apiConsumer, "", false, "")
 	pipelineManager := channelling.NewPipelineManager(busManager, sessionManager, sessionManager, sessionManager)
 	if err := roomManager.SetBusManager(busManager); err != nil {
 		return err

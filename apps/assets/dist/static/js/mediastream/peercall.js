@@ -35,7 +35,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	PeerCall.prototype.setInitiate = function (initiate) {
 		this.initiate = !!initiate;
-		//console.log("Set initiate", this.initiate, this);
+		console.log("Set initiate", this.initiate, this);
 	};
 
 	PeerCall.prototype.getStreamId = function (stream) {
@@ -240,7 +240,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 	};
 
 	PeerCall.prototype.onRemoteStreamAdded = function (stream) {
-
+		console.log("onRemoteStreamAdded", stream);
 		var id = stream.id;
 		if (this.streams.hasOwnProperty(id)) {
 			return;
@@ -295,7 +295,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	PeerCall.prototype.onDatachannel = function (datachannel) {
 
-		//console.log("onDatachannel", datachannel);
+		console.log("onDatachannel", datachannel);
 		var label = datachannel.label;
 		if (this.datachannels.hasOwnProperty(label)) {
 			console.warn("Received duplicated datachannel label", label, datachannel, this.datachannels);
@@ -310,7 +310,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 	PeerCall.prototype.onDatachannelDefault = function (state, datachannel) {
 
 		if (state === "open") {
-			//console.log("Data ready", this);
+			console.log("Data ready", this);
 			_.defer(_.bind(function () {
 				this.e.triggerHandler("dataReady", [this]);
 			}, this));
@@ -321,7 +321,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	PeerCall.prototype.onMessage = function (event) {
 
-		//console.log("Peer to peer channel message", event);
+		console.log("Peer to peer channel message", event);
 		var data = event.data;
 
 		if (data instanceof Blob) {
@@ -334,7 +334,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 				// change the comment it you know what this is.
 				return;
 			}
-			//console.log("Datachannel message", [event.data, event.data.length, event.data.charCodeAt(0)]);
+			console.log("Datachannel message", [event.data, event.data.length, event.data.charCodeAt(0)]);
 			var msg = JSON.parse(event.data);
 			this.webrtc.api.received({
 				Type: msg.Type,
@@ -351,7 +351,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	PeerCall.prototype.getDatachannel = function (label, init, create_cb) {
 
-		//console.log("getDatachannel", label);
+		console.log("getDatachannel", label);
 		var datachannel = this.datachannels[label];
 		if (!datachannel) {
 			console.log("Creating new datachannel", label, init);

@@ -40,7 +40,7 @@ var tmplMain = `
 	<script src="../static/js/libs/EBML.js"></script>
 </head>
 
-<body webrtc-app style="background-color:#000">
+<body webrtc-app style="background-color:#000; overflow-x: hidden; overflow-y: hidden;">
     <div id="loader">
         <div class="loader-message"></div>
     </div>

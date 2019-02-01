@@ -18,7 +18,6 @@ require.config({
 		'angular-animate': 'libs/angular/angular-animate.min',
 		'angular-route': 'libs/angular/angular-route.min',
 		'visibly': 'libs/visibly',
-		'audiocontext': 'libs/audiocontext',
 
 		'partials': '../partials',
 	},
@@ -51,23 +50,23 @@ require.config({
 });
 
 
-(function() {
+(function () {
 	var debugDefault = window.location.href.match(/(\?|&)debug($|&|=)/);
 	// Overwrite console to not log stuff per default.
 	// Write debug(true) in console to enable or start with ?debug parameter.
 	window.consoleBackup = null;
-	window.debug = function(flag) {
+	window.debug = function (flag) {
 		if (!flag) {
 			if (window.consoleBackup === null) {
 				window.consoleBackup = window.console;
 			}
 			window.console = {
-				log: function() {},
-				info: function() {},
-				warn: function() {},
-				error: function() {},
-				debug: function() {},
-				trace: function() {}
+				log: function () { },
+				info: function () { },
+				warn: function () { },
+				error: function () { },
+				debug: function () { },
+				trace: function () { }
 			}
 		} else {
 			if (window.consoleBackup) {
@@ -78,51 +77,39 @@ require.config({
 	window.debug(debugDefault && true);
 }());
 
-function fakeAlert(text) {
-	var loader = document.getElementById("loader");
-	loader.className = "fake-alert";
-	if (loader) {
-		loader.innerHTML = text;
-	} else {
-		window.alert(text);
-	}
-}
-
-require.onError = (function() {
-	return function(err) {
+require.onError = (function () {
+	return function (err) {
 		if (err.requireType === "timeout" || err.requireType === "scripterror") {
 			console.error("Error while loading " + err.requireType, err.requireModules);
-			fakeAlert('Failed to load app!');
 		} else {
 			throw err;
 		}
 	};
 }());
 
-// Make sure the browser knows ES5.
-if (Object.create) {
 
-	define([
-		'jquery',
-		'underscore',
-		'angular',
-		'require',
-		'base'], function($, _, angular, require) {
+
+define([
+	'jquery',
+	'underscore',
+	'angular',
+	'require',
+	'base'], function ($, _, angular, require) {
 
 
 		var launcherApp = angular.module('launcherApp', []);
-		launcherApp.run(["$q", "$window", "$http", function($q, $window, $http) {
+		launcherApp.run(["$q", "$window", "$http", function ($q, $window, $http) {
 
 			// Dynamic app loader with plugin support.
 			var load = ['app'];
-			_.each($window.document.getElementsByTagName('script'), function(script) {
+			_.each($window.document.getElementsByTagName('script'), function (script) {
 				var dataPlugin = script.getAttribute('data-plugin');
 				if (dataPlugin) {
 					load.push(dataPlugin);
 				}
 			});
 
-			require(load, function(App) {
+			require(load, function (App) {
 
 				// All other arguments are plugins.
 				var args = Array.prototype.slice.call(arguments, 1);
@@ -134,7 +121,7 @@ if (Object.create) {
 
 				// Add Angular modules from plugins.
 				var modules = [];
-				_.each(args, function(plugin) {
+				_.each(args, function (plugin) {
 					if (plugin && plugin.module) {
 						plugin.module(modules);
 					}
@@ -159,7 +146,7 @@ if (Object.create) {
 				var app = App.create(modules, launcher);
 
 				// Helper function to initialize with deferreds.
-				var initialize = function(obj) {
+				var initialize = function (obj) {
 					if (obj && obj.initialize) {
 						var result = obj.initialize(app, launcher);
 						if (result && result.then) {
@@ -170,13 +157,13 @@ if (Object.create) {
 				};
 
 				// Wait until dom is ready before we initialize.
-				angular.element(document).ready(function() {
+				angular.element(document).ready(function () {
 
 					// Init base application.
 					initialize(App);
 
 					// Init plugins.
-					_.each(args, function(plugin) {
+					_.each(args, function (plugin) {
 						initialize(plugin);
 					});
 
@@ -189,7 +176,7 @@ if (Object.create) {
 					loading.resolve();
 
 					// Wait for all others to complete and then boostrap the main app.
-					$q.all(promises).then(function() {
+					$q.all(promises).then(function () {
 						console.log("Bootstrapping ...");
 						angular.bootstrap(document.body, ['app'], {
 							strictDi: true
@@ -209,7 +196,3 @@ if (Object.create) {
 		});
 
 	});
-
-} else {
-	fakeAlert("Your browser does not support this application. Please update your browser to the latest version.");
-}
