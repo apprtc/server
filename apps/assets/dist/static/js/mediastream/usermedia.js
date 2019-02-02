@@ -62,26 +62,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 		});
 		return c;
 	};
-	// Adapter to support navigator.mediaDevices API.
-	// http://w3c.github.io/mediacapture-main/getusermedia.html#mediadevices
-	var getUserMedia = (function() {
-		if (window.webrtcDetectedBrowser === "firefox"&& window.webrtcDetectedVersion >= 38) {
-			console.info("Enabled mediaDevices adapter ...");
-			return function(constraints, success, error) {
-				// Full constraints syntax with plain values and ideal-algorithm supported in FF38+.
-				// Note on FF32-37: Plain values and ideal are not supported.
-				// See https://wiki.mozilla.org/Media/getUserMedia for details.
-				// Examples here: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
-				var c = {audio: convertConstraints(constraints.audio), video: convertConstraints(constraints.video)};
-				// mediaDevices API returns a promise.
-				console.log("Constraints for mediaDevices", c);
-				window.navigator.mediaDevices.getUserMedia(c).then(success).catch(error);
-			}
-		} else {
-			// Use existing adapter.
-			return window.getUserMedia;
-		}
-	})();
+
 
 	var stopUserMediaStream = (function() {
 		return function(stream) {
@@ -145,55 +126,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	// Static.
-	UserMedia.testGetUserMedia = function(success_cb, error_cb) {
 
-		console.log("Requesting testGetUserMedia");
-		(function(complete) {
-			var timeout = null;
-			var success_helper = function(stream) {
-				if (timeout) {
-					clearTimeout(timeout);
-					timeout = null;
-				}
-				stopUserMediaStream(stream);
-				if (complete.done) {
-					return;
-				}
-				complete.done = true;
-				var args = Array.prototype.slice.call(arguments, 1);
-				success_cb.apply(this, args);
-			};
-			var error_helper = function() {
-				if (timeout) {
-					clearTimeout(timeout);
-					timeout = null;
-				}
-				if (complete.done) {
-					return;
-				}
-				complete.done = true;
-				var args = Array.prototype.slice.call(arguments, 1);
-				error_cb.apply(this, args);
-			};
-			try {
-				getUserMedia({
-					video: true,
-					audio: true
-				}, success_helper, error_helper);
-			} catch (e) {
-				console.error('getUserMedia failed with exception: ' + e.message);
-				error_helper(e);
-			}
-			timeout = setTimeout(function() {
-				var e = new Error("Timeout while waiting for getUserMedia");
-				console.error('getUserMedia timed out');
-				error_helper(e);
-			}, 10000);
-		})({});
-
-	};
-	UserMedia.getUserMedia = getUserMedia;
 	UserMedia.stopUserMediaStream = stopUserMediaStream;
 
 	UserMedia.prototype.doGetUserMedia = function(currentcall, mediaConstraints) {
@@ -243,7 +176,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 		try {
 			console.log('Requesting access to local media with mediaConstraints:\n' +
 				'  \'' + JSON.stringify(constraints) + '\'', constraints);
-			getUserMedia(constraints, _.bind(this.onUserMediaSuccess, this), _.bind(this.onUserMediaError, this));
+			navigator.getUserMedia(constraints, _.bind(this.onUserMediaSuccess, this), _.bind(this.onUserMediaError, this));
 			this.started = true;
 			return true;
 		} catch (e) {
