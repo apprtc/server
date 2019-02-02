@@ -20,7 +20,7 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 		this.peerconnection = null;
 		this.pendingCandidates = [];
-		this.datachannels = {};
+
 		this.streams = {};
 
 		this.negotiationNeeded = false;
@@ -293,77 +293,6 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 
 	};
 
-	PeerCall.prototype.onDatachannel = function (datachannel) {
-
-		console.log("onDatachannel", datachannel);
-		var label = datachannel.label;
-		if (this.datachannels.hasOwnProperty(label)) {
-			console.warn("Received duplicated datachannel label", label, datachannel, this.datachannels);
-			return;
-		}
-		// Remember it for correct cleanups.
-		this.datachannels[label] = datachannel;
-		this.e.triggerHandler("datachannel", ["new", datachannel, this]);
-
-	};
-
-	PeerCall.prototype.onDatachannelDefault = function (state, datachannel) {
-
-		if (state === "open") {
-			console.log("Data ready", this);
-			_.defer(_.bind(function () {
-				this.e.triggerHandler("dataReady", [this]);
-			}, this));
-		}
-		this.e.triggerHandler("datachannel.default", [state, datachannel, this]);
-
-	};
-
-	PeerCall.prototype.onMessage = function (event) {
-
-		console.log("Peer to peer channel message", event);
-		var data = event.data;
-
-		if (data instanceof Blob) {
-			console.warn("Blob data received - not implemented.", data);
-		} else if (data instanceof ArrayBuffer) {
-			console.warn("ArrayBuffer data received - not implemented.", data);
-		} else if (typeof data === "string") {
-			if (data.charCodeAt(0) === 2) {
-				// Ignore whatever shit is this (sent by Chrome 34 and FireFox). Feel free to
-				// change the comment it you know what this is.
-				return;
-			}
-			console.log("Datachannel message", [event.data, event.data.length, event.data.charCodeAt(0)]);
-			var msg = JSON.parse(event.data);
-			this.webrtc.api.received({
-				Type: msg.Type,
-				Data: msg,
-				To: this.webrtc.api.id,
-				From: this.id,
-				p2p: true
-			}); //XXX(longsleep): use event for this?
-		} else {
-			console.warn("Unknow data type received -> igored", typeof data, [data]);
-		}
-
-	};
-
-	PeerCall.prototype.getDatachannel = function (label, init, create_cb) {
-
-		console.log("getDatachannel", label);
-		var datachannel = this.datachannels[label];
-		if (!datachannel) {
-			console.log("Creating new datachannel", label, init);
-			datachannel = this.peerconnection.createDatachannel(label, init);
-			if (create_cb) {
-				create_cb(datachannel);
-			}
-		}
-		return datachannel;
-
-	};
-
 	PeerCall.prototype.close = function () {
 
 		if (this.closed) {
@@ -371,11 +300,6 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 		}
 
 		this.closed = true;
-
-		_.each(this.datachannels, function (datachannel) {
-			datachannel.close();
-		});
-		this.datachannels = {};
 
 		if (this.peerconnection) {
 			this.peerconnection.close();

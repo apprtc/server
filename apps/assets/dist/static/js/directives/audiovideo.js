@@ -99,6 +99,8 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 			};
 
 			$scope.attachStream = function (stream, currentcall) {
+
+				console.log("attachStream", stream, currentcall);
 				if (DummyStream.is(stream)) {
 					$timeout(function () {
 						$scope.$emit("active", currentcall);
@@ -110,7 +112,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 
 					const video = document.querySelector('video');
 					video.srcObject = stream;
-
 
 					$scope.dummy = null;
 

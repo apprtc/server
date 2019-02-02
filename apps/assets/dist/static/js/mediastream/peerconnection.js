@@ -4,7 +4,6 @@
 define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	var count = 0;
-	var dataChannelDefaultLabel = "default";
 
 	var PeerConnection = function(webrtc, currentcall) {
 
@@ -12,8 +11,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 		this.id = count++;
 		this.currentcall = null;
 		this.pc = null;
-		this.datachannel = null;
-		this.datachannelReady = false;
 		this.readyForRenegotiation = true;
 
 		if (currentcall) {
@@ -79,7 +76,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 			} else {
 				pc.onnegotiationneeded = _.bind(this.onNegotiationNeeded, this);
 			}
-			pc.ondatachannel = _.bind(this.onDatachannel, this);
 			pc.onsignalingstatechange = _.bind(this.onSignalingStateChange, this);
 			// NOTE(longsleep):
 			// Support old callback too (https://groups.google.com/forum/?fromgroups=#!topic/discuss-webrtc/glukq0OWwVM)
@@ -93,22 +89,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 					}
 				});
 			}, this);
-
-			// Create default data channel when we are in initiate mode.
-			if (currentcall.initiate) {
-				if (window.webrtcDetectedBrowser !== "chrome" || !window.webrtcDetectedAndroid || (window.webrtcDetectedBrowser === "chrome" && window.webrtcDetectedVersion >= 33)) {
-					// NOTE(longsleep): Android (Chrome 32) does have broken SCTP data channels
-					// which makes connection fail because of sdp set error for answer/offer.
-					// See https://code.google.com/p/webrtc/issues/detail?id=2253 Lets hope the
-					// crap gets fixed with Chrome on Android 33. For now disable SCTP in flags
-					// on Adroid to be able to accept offers with SCTP in it.
-					// chrome://flags/#disable-sctp-data-channels
-					this.createDatachannel(dataChannelDefaultLabel, {
-						ordered: true
-					});
-				}
-			}
-
 		}
 
 		return pc;
@@ -119,92 +99,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 		// Per default this does nothing as the browser is expected to handle this.
 	};
 
-	PeerConnection.prototype.createDatachannel = function(label, init) {
-
-		if (!label) {
-			console.error("Refusing to create a datachannel without a label.", label, init);
-			return;
-		}
-
-		var rtcinit = $.extend({}, init);
-		console.debug("Creating datachannel:", label, rtcinit, this);
-
-		// Create datachannel.
-		var datachannel;
-		try {
-			datachannel = this.pc.createDataChannel(label, rtcinit);
-			// Fake onDatachannel event.
-			this.onDatachannel({
-				channel: datachannel
-			});
-		} catch (e) {
-			console.error('Failed to create DataChannel, exception: ' + e.message);
-			if (label === dataChannelDefaultLabel) {
-				this.datachannel = null;
-				this.datachannelReady = false;
-			}
-		}
-		return datachannel;
-
-	};
-
-	PeerConnection.prototype.onDatachannel = function(event) {
-
-		var datachannel = event.channel;
-		if (datachannel) {
-			if (datachannel.label === dataChannelDefaultLabel) {
-				datachannel.binaryType = "arraybuffer";
-				// We handle the default data channel ourselves.
-				console.debug("Got default datachannel", datachannel.label, this.id, datachannel, this);
-				this.datachannel = datachannel;
-				var eventHandler = _.bind(this.currentcall.onDatachannelDefault, this.currentcall);
-				// Bind datachannel events and settings.
-				datachannel.onmessage = _.bind(this.currentcall.onMessage, this.currentcall);
-				datachannel.onopen = _.bind(function(event) {
-					console.log("Datachannel opened", datachannel.label, this.id, event);
-					this.datachannelReady = true;
-					eventHandler("open", datachannel);
-				}, this);
-				datachannel.onclose = _.bind(function(event) {
-					console.log("Datachannel closed", datachannel.label, this.id, event);
-					this.datachannelReady = false;
-					eventHandler("close", datachannel);
-				}, this);
-				datachannel.onerror = _.bind(function(event) {
-					console.warn("Datachannel error", datachannel.label, this.id, event);
-					this.datachannelReady = false;
-					eventHandler("error", datachannel);
-				}, this);
-			} else {
-				// Delegate.
-				console.debug("Got datachannel", datachannel.label, this.id, datachannel);
-				_.defer(_.bind(this.currentcall.onDatachannel, this.currentcall), datachannel);
-			}
-		}
-
-	};
-
-	PeerConnection.prototype.send = function(data) {
-
-		if (!this.datachannelReady) {
-			console.error("Unable to send message by datachannel because datachannel is not ready.", data);
-			return;
-		}
-		if (data instanceof Blob) {
-			this.datachannel.send(data);
-		} else if (data instanceof ArrayBuffer) {
-			this.datachannel.send(data);
-		} else {
-			try {
-				this.datachannel.send(JSON.stringify(data));
-			} catch (e) {
-				console.warn("Data channel failed to send string -> closing.", e);
-				this.datachannelReady = false;
-				this.datachannel.close();
-			}
-		}
-
-	};
 
 	PeerConnection.prototype.onSignalingStateChange = function(event) {
 
@@ -249,14 +143,10 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	PeerConnection.prototype.close = function() {
 
-		if (this.datachannel) {
-			this.datachannel.close()
-		}
 		if (this.pc) {
 			this.pc.close();
 		}
 
-		this.datachannel = null;
 		this.pc = null;
 
 	};

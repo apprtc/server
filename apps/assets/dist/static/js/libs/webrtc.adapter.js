@@ -946,7 +946,6 @@ if (typeof window === 'undefined' || !window.navigator) {
       this.onsignalingstatechange = null;
       this.oniceconnectionstatechange = null;
       this.onnegotiationneeded = null;
-      this.ondatachannel = null;
 
       this.localStreams = [];
       this.remoteStreams = [];
