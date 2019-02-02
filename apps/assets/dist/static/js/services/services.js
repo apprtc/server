@@ -13,8 +13,7 @@ define([
 	'services/localstatus',
 	'services/rooms',
 	'services/constraints',
-	'services/dummystream',
-	'services/playpromise'], function (_,
+	'services/dummystream'], function (_,
 		safeApply,
 		connector,
 		api,
@@ -25,8 +24,7 @@ define([
 		localStatus,
 		rooms,
 		constraints,
-		dummyStream,
-		playPromise) {
+		dummyStream) {
 
 		var services = {
 			safeApply: safeApply,
@@ -40,7 +38,6 @@ define([
 			rooms: rooms,
 			constraints: constraints,
 			dummyStream: dummyStream,
-			playPromise: playPromise
 		};
 
 		var initialize = function (angModule) {
