@@ -28,7 +28,7 @@ define(["jquery"], function($) {
 	// - flags (map)       : Flag table.
 
 	// appData
-	return ["randomGen", "$window", function(randomGen, $window) {
+	return ["$window", function($window) {
 
 		var service = this;
 
@@ -38,8 +38,6 @@ define(["jquery"], function($) {
 			resurrect: null
 		};
 
-		service.language = $window.document.getElementsByTagName("html")[0].getAttribute("lang");
-		service.id = randomGen.id();
 
 		service.get = function() {
 			return service.data;
@@ -48,8 +46,6 @@ define(["jquery"], function($) {
 			service.data = d;
 			return d;
 		};
-
-		console.info("App runtime id: "+service.id);
 		return service;
 
 	}];
