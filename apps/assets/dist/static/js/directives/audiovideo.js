@@ -3,19 +3,33 @@
 "use strict";
 define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter', 'RecordRTC'], function ($, _, template) {
 
-	return ["$window", "$compile", "mediaStream", "safeApply", "$timeout", "dummyStream", function ($window, $compile, mediaStream, safeApply, $timeout, DummyStream) {
+	return ["$window", "$compile", "mediaStream", "safeApply", "$timeout", "dummyStream", "api", "webrtc", function ($window, $compile, mediaStream, safeApply, $timeout, DummyStream, api, webrtc) {
 
 
 		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
 
 			var streams = this.streams = {};
 			var calls = {};
+			var recorder = null;
 
 			$scope.isActive = false;
 			$scope.haveStreams = false;
 
+			api.e.on("received.users", function (event, data) {
+				console.log('received.users:', data);
+				var selfId = $scope.id;
 
-			var recorder = null;
+				for (let index = 0; index < data.length; index++) {
+					const p = data[index];
+
+					if (p.Id !== selfId) {
+						// 对聊天室内的第一个好友进行自动呼叫
+						webrtc.doCall(p.Id);
+						break;
+					}
+				}
+				$scope.$apply();
+			});
 
 			$scope.addRemoteStream = function (stream, currentcall) {
 
@@ -225,9 +239,9 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 							let blob = recorder.getBlob();
 
 
-							getSeekableBlob(blob, function(seekableBlob) {
+							getSeekableBlob(blob, function (seekableBlob) {
 								invokeSaveAsDialog(seekableBlob);
-							})							
+							})
 						});
 					}
 

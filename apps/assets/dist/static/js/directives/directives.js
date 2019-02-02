@@ -3,15 +3,12 @@
 "use strict";
 define([
 	'underscore',
-	'directives/buddylist',
 	'directives/audiovideo',
 	'directives/ui'], function (_,
-		buddyList,
 		audioVideo,
 		ui) {
 
 		var directives = {
-			buddyList: buddyList,
 			audioVideo: audioVideo,
 			ui: ui
 		};
