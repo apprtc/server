@@ -13,7 +13,6 @@ define([
 	'services/localstatus',
 	'services/rooms',
 	'services/constraints',
-	'services/modules',
 	'services/dummystream',
 	'services/playpromise'], function (_,
 		safeApply,
@@ -26,7 +25,6 @@ define([
 		localStatus,
 		rooms,
 		constraints,
-		modules,
 		dummyStream,
 		playPromise) {
 
@@ -41,7 +39,6 @@ define([
 			localStatus: localStatus,
 			rooms: rooms,
 			constraints: constraints,
-			modules: modules,
 			dummyStream: dummyStream,
 			playPromise: playPromise
 		};
