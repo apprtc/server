@@ -15,9 +15,7 @@ define([
 	'services/rooms',
 	'services/constraints',
 	'services/modules',
-	'services/mediadevices',
 	'services/dummystream',
-	'services/usermedia',
 	'services/playpromise'], function (_,
 		safeApply,
 		connector,
@@ -31,9 +29,7 @@ define([
 		rooms,
 		constraints,
 		modules,
-		mediaDevices,
 		dummyStream,
-		userMedia,
 		playPromise) {
 
 		var services = {
@@ -49,9 +45,7 @@ define([
 			rooms: rooms,
 			constraints: constraints,
 			modules: modules,
-			mediaDevices: mediaDevices,
 			dummyStream: dummyStream,
-			userMedia: userMedia,
 			playPromise: playPromise
 		};
 
