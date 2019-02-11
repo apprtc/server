@@ -6,7 +6,6 @@ define([
 	'jquery',
 	'underscore',
 	'angular',
-	'modernizr',
 
 	'services/services',
 	'directives/directives',
@@ -17,7 +16,7 @@ define([
 	'angular-animate',
 	'angular-route',
 
-], function (require, $, _, angular, modernizr, services, directives, controllers) {
+], function (require, $, _, angular, services, directives, controllers) {
 
 	// Simple and fast split based URL query parser based on location.search. We require this before the
 	// angular App is bootstrap to control initialization parameters like translation based on URL parameters.

@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore',  'modernizr', 'webrtc.adapter'], function ($, _, Modernizr) {
+define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, localStatus, rooms, constraints) {
 
@@ -558,30 +558,6 @@ define(['jquery', 'underscore',  'modernizr', 'webrtc.adapter'], function ($, _,
 				alert(message);
 			}
 			appData.e.triggerHandler("uiNotification", [type, details]);
-		});
-
-		_.defer(function () {
-			return;
-			
-			alert("$window.webrtcDetectedVersion:" + $window.webrtcDetectedVersion);
-			if (!$window.webrtcDetectedVersion || $window.webrtcDetectedBrowser === "edge") {
-				alert("ui controller Your browser does not support WebRTC. No calls possible.");
-				return;
-			}
-			if (!Modernizr.websockets || $window.webrtcDetectedVersion < $window.webrtcMinimumVersion) {
-				alert("Your browser is not supported. Please upgrade to a current version.");
-				$scope.setStatus("unsupported");
-				return;
-			}
-			if (mediaStream.config.Renegotiation && $window.webrtcDetectedBrowser === "firefox" && $window.webrtcDetectedVersion < 38) {
-				// See https://bugzilla.mozilla.org/show_bug.cgi?id=1017888
-				// and https://bugzilla.mozilla.org/show_bug.cgi?id=840728
-				// and https://bugzilla.mozilla.org/show_bug.cgi?id=842455
-				// XXX(longsleep): It seems that firefox has implemented new API which
-				// supports addTrack, removeTrack see http://w3c.github.io/mediacapture-main/#dom-mediastream-removetrack
-				console.warn("Renegotiation enabled -> currently not compatible with Firefox.");
-				return;
-			}
 		});
 
 	}];

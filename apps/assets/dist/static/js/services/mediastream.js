@@ -4,10 +4,9 @@
 define([
 	'jquery',
 	'underscore',
-	'modernizr',
 	'webrtc.adapter'
 
-], function ($, _, Modernizr) {
+], function ($, _) {
 
 	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "$http", "safeApply", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $route, $location, $window, $http, safeApply, $timeout, $sce, continueConnector) {
 
@@ -63,11 +62,6 @@ define([
 				$rootScope.connect = false;
 
 				var connect = function () {
-					// We need websocket support to connect.
-					if (!Modernizr.websockets) {
-						console.error("This browser has no support for websockets. Connect aborted.");
-						return;
-					}
 					if (ready && cont) {
 						// Inject connector function into scope, so that controllers can pick it up.
 						console.log("Ready to connect ...");

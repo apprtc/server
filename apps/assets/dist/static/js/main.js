@@ -8,7 +8,6 @@ require.config({
 		"text": "libs/require/text",
 		"jquery": 'libs/jquery/jquery.min',
 		"underscore": 'libs/lodash.min', // alternative to underscore
-		"modernizr": 'libs/modernizr',
 		'webrtc.adapter': 'libs/webrtc.adapter',
 		'RecordRTC': 'libs/RecordRTC',
 		'angular': 'libs/angular/angular.min',
@@ -20,9 +19,6 @@ require.config({
 		'partials': '../partials',
 	},
 	shim: {
-		'modernizr': {
-			exports: 'Modernizr'
-		},
 		'underscore': {
 			exports: '_'
 		},
