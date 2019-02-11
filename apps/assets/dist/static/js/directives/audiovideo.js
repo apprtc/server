@@ -112,6 +112,7 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 
 					const video = document.querySelector('video');
 					video.srcObject = stream;
+					// video.classList.add('active');
 
 					$scope.dummy = null;
 
@@ -213,6 +214,10 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 
 				var id = currentcall.getStreamId(stream);
 				console.log("Stream removed", id);
+
+				const video = document.querySelector('video');
+				video.srcObject = stream;
+				// video.classList.remove('active');
 
 				var subscope = streams[id];
 				if (subscope) {

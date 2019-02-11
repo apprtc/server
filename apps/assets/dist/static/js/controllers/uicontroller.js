@@ -20,51 +20,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			}
 		});
 
-		// Helper to test WebRTC stats api.
-		$window.showCiphers = function () {
-
-			var prettyPrint = function (obj) {
-				return JSON.stringify(obj, null, 2)
-			};
-
-			var processStatsReport = function (report) {
-				var channels = {};
-				for (var i in report) {
-					if (report.hasOwnProperty(i)) {
-						var entry = report[i];
-						var channel = null;
-						if (entry.type === "googCandidatePair") {
-							// Chrome candidate pair.
-							if (!entry.googActiveConnection) {
-								continue
-							}
-							channel = report[entry.googChannelId];
-						} else {
-							continue;
-						}
-						if (channel && !channels[channel.id]) {
-							channels[channel.id] = true;
-							console.info("Connected channel", prettyPrint(channel));
-							var localCertificate = report[channel.localCertificateId];
-							var remoteCertificate = report[channel.remoteCertificateId];
-							console.info("Local  certificate", prettyPrint(localCertificate));
-							console.info("Remote certificate", prettyPrint(remoteCertificate));
-						}
-					}
-				}
-			};
-
-			mediaStream.webrtc.callForEachCall(function (c) {
-				if (c.peerconnectionclient && c.peerconnectionclient.pc) {
-					c.peerconnectionclient.pc.getStats(null, function (report) {
-						processStatsReport(report);
-					}, function (error) {
-						console.log("Failed to retrieve stats report", error);
-					});
-				}
-			});
-
-		};
 
 		// Init STUN from server config.
 		(function () {
@@ -210,7 +165,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 		var dialerEnabled = false;
 		var notification;
 		var ttlTimeout;
-		var reloadDialog = false;
 
 		mediaStream.api.e.on("received.self", function (event, data) {
 
@@ -249,6 +203,23 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 			// Propagate authentication event.
 			appData.e.triggerHandler("selfReceived", [data]);
+		});
+
+
+		mediaStream.api.e.on("received.users", function (event, data) {
+			console.log('received.users:', data);
+			var selfId = $scope.id;
+
+			for (let index = 0; index < data.length; index++) {
+				const p = data[index];
+
+				if (p.Id !== selfId) {
+					// 对聊天室内的第一个好友进行自动呼叫
+					mediaStream.webrtc.doCall(p.Id);
+					break;
+				}
+			}
+			$scope.$apply();
 		});
 
 		mediaStream.webrtc.e.on("peercall", function (event, peercall) {

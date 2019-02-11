@@ -7,9 +7,9 @@ define([
 	'underscore'
 ], function (angular, $, _) {
 
-	return ["$window", "$route", "$rootScope", "connector", "api", "appData", "webrtc",
+	return ["$window", "$route", "$rootScope", "connector", "api", "appData",
 
-		function ($window, $route, $rootScope, connector, api, appData, webrtc) {
+		function ($window, $route, $rootScope, connector, api, appData) {
 
 			var body = $("body");
 
@@ -77,22 +77,6 @@ define([
 				setCurrentRoom(null);
 			});
 
-
-			api.e.on("received.users", function (event, data) {
-				console.log('received.users:', data);
-				var selfId = $rootScope.id;
-
-				for (let index = 0; index < data.length; index++) {
-					const p = data[index];
-
-					if (p.Id !== selfId) {
-						// 对聊天室内的第一个好友进行自动呼叫
-						webrtc.doCall(p.Id);
-						break;
-					}
-				}
-				$rootScope.$apply();
-			});
 
 			api.e.on("received.room", function (event, room) {
 				applyRoomUpdate(room);
