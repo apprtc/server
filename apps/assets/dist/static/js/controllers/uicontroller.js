@@ -55,8 +55,8 @@ define(['jquery', 'underscore',  'modernizr', 'webrtc.adapter'], function ($, _,
 			};
 
 			mediaStream.webrtc.callForEachCall(function (c) {
-				if (c.peerconnection && c.peerconnection.pc) {
-					c.peerconnection.pc.getStats(null, function (report) {
+				if (c.peerconnectionclient && c.peerconnectionclient.pc) {
+					c.peerconnectionclient.pc.getStats(null, function (report) {
 						processStatsReport(report);
 					}, function (error) {
 						console.log("Failed to retrieve stats report", error);

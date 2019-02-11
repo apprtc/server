@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util', 'mediastream/sdputils'], function ($, _, PeerConnection) {
+define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream/util', 'mediastream/sdputils'], function ($, _, PeerConnectionClient) {
 
 	var PeerCall = function (webrtc, id, from, to) {
 
@@ -18,7 +18,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 		this.sdpParams = $.extend(true, {}, this.webrtc.settings.sdpParams);
 		this.offerOptions = $.extend(true, {}, this.webrtc.settings.offerOptions);
 
-		this.peerconnection = null;
+		this.peerconnectionclient = null;
 		this.pendingCandidates = [];
 
 		this.streams = {};
@@ -52,19 +52,19 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 
 	PeerCall.prototype.createPeerConnection = function (success_cb, error_cb) {
 
-		var peerconnection = this.peerconnection = new PeerConnection(this.webrtc, this);
-		if (success_cb && peerconnection.pc) {
-			success_cb(peerconnection);
+		var peerconnectionclient = this.peerconnectionclient = new PeerConnectionClient(this.webrtc, this);
+		if (success_cb && peerconnectionclient.pc) {
+			success_cb(peerconnectionclient);
 		}
-		if (error_cb && !peerconnection.pc) {
+		if (error_cb && !peerconnectionclient.pc) {
 			// TODO(longsleep): Check if this can happen?
-			error_cb(peerconnection);
+			error_cb(peerconnectionclient);
 		}
 		while (this.pendingCandidates.length > 0) {
 			var candidate = this.pendingCandidates.shift();
 			this.addIceCandidate(candidate);
 		}
-		return peerconnection;
+		return peerconnectionclient;
 
 	};
 
@@ -73,14 +73,14 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 		var options = this.offerOptions;
 		console.log('Creating offer with options: \n' +
 			'  \'' + JSON.stringify(options, null, '\t') + '\'.', this.negotiationNeeded);
-		this.peerconnection.createOffer(_.bind(this.onCreateAnswerOffer, this, cb), _.bind(this.onErrorAnswerOffer, this), options);
+		this.peerconnectionclient.createOffer(_.bind(this.onCreateAnswerOffer, this, cb), _.bind(this.onErrorAnswerOffer, this), options);
 
 	};
 
 	PeerCall.prototype.createAnswer = function (cb) {
 
 		console.log("Creating answer.", this.negotiationNeeded);
-		this.peerconnection.createAnswer(_.bind(this.onCreateAnswerOffer, this, cb), _.bind(this.onErrorAnswerOffer, this));
+		this.peerconnectionclient.createAnswer(_.bind(this.onCreateAnswerOffer, this, cb), _.bind(this.onErrorAnswerOffer, this));
 
 	};
 
@@ -89,7 +89,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 		if (sessionDescription.type === "answer") {
 			// We processed the incoming Offer by creating an answer, so it's safe
 			// to create own Offers to perform renegotiation.
-			this.peerconnection.setReadyForRenegotiation(true);
+			this.peerconnectionclient.setReadyForRenegotiation(true);
 		}
 
 		this.setLocalSdp(sessionDescription);
@@ -104,7 +104,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 		// Allow external session description modifications.
 		this.e.triggerHandler("sessiondescription", [sessionDescriptionObj, this]);
 		// Always set local description.
-		this.peerconnection.setLocalDescription(sessionDescription, _.bind(function () {
+		this.peerconnectionclient.setLocalDescription(sessionDescription, _.bind(function () {
 			console.log("Set local session description.", sessionDescription, this);
 			if (cb) {
 				cb(sessionDescriptionObj, this);
@@ -128,14 +128,14 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 
 		// Even though the Offer/Answer could not be created, we now allow
 		// to create own Offers to perform renegotiation again.
-		this.peerconnection.setReadyForRenegotiation(true);
+		this.peerconnectionclient.setReadyForRenegotiation(true);
 
 	};
 
 	PeerCall.prototype.setRemoteDescription = function (sessionDescription, cb) {
 
-		var peerconnection = this.peerconnection;
-		if (!peerconnection) {
+		var peerconnectionclient = this.peerconnectionclient;
+		if (!peerconnectionclient) {
 			console.log("Got a remote description but not connected -> ignored.");
 			return;
 		}
@@ -145,10 +145,10 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 		if (sessionDescription.type === "offer") {
 			// Prevent creation of Offer messages to renegotiate streams while the
 			// remote Offer is being processed.
-			peerconnection.setReadyForRenegotiation(false);
+			peerconnectionclient.setReadyForRenegotiation(false);
 		}
 
-		peerconnection.setRemoteDescription(sessionDescription, _.bind(function () {
+		peerconnectionclient.setRemoteDescription(sessionDescription, _.bind(function () {
 			console.log("Set remote session description.", sessionDescription, this);
 			if (cb) {
 				cb(sessionDescription, this);
@@ -158,21 +158,25 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 			// for example https://bugzilla.mozilla.org/show_bug.cgi?id=998546. For this
 			// reason we always trigger onRemoteStream added for all streams which are available
 			// after the remote SDP was set successfully.
-			_.defer(_.bind(function () {
-				var streams = 0;
-				_.each(peerconnection.getRemoteStreams(), _.bind(function (stream) {
-					if (!this.streams.hasOwnProperty(stream.id) && (stream.getAudioTracks().length > 0 || stream.getVideoTracks().length > 0)) {
-						// NOTE(longsleep): Add stream here when it has at least one audio or video track, to avoid FF >= 33 to add it multiple times.
-						console.log("Adding stream after remote SDP success.", stream);
-						this.onRemoteStreamAdded(stream);
-						streams++;
-					}
-				}, this));
-				if (streams === 0 && (this.offerOptions.offerToReceiveAudio || this.offerOptions.offerToReceiveVideo)) {
-					// We assume that we will eventually receive a stream, so we trigger the event to let the UI prepare for it.
-					this.e.triggerHandler("remoteStreamAdded", [null, this]);
-				}
-			}, this));
+
+
+			// _.defer(_.bind(function () {
+			// 	var streams = 0;
+			// 	_.each(peerconnectionclient.getRemoteStreams(), _.bind(function (stream) {
+			// 		if (!this.streams.hasOwnProperty(stream.id) && (stream.getAudioTracks().length > 0 || stream.getVideoTracks().length > 0)) {
+			// 			// NOTE(longsleep): Add stream here when it has at least one audio or video track, to avoid FF >= 33 to add it multiple times.
+			// 			console.log("Adding stream after remote SDP success.", stream);
+			// 			this.onRemoteStreamAdded(stream);
+			// 			streams++;
+			// 		}
+			// 	}, this));
+			// 	if (streams === 0 && (this.offerOptions.offerToReceiveAudio || this.offerOptions.offerToReceiveVideo)) {
+			// 		// We assume that we will eventually receive a stream, so we trigger the event to let the UI prepare for it.
+			// 		this.e.triggerHandler("remoteStreamAdded", [null, this]);
+			// 	}
+			// }, this));
+
+			
 		}, this), _.bind(function (err) {
 			console.error("Set remote session description failed", err);
 			this.close();
@@ -265,8 +269,8 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 	};
 
 	PeerCall.prototype.onNegotiationNeeded = function () {
-		if (!this.peerconnection.readyForRenegotiation) {
-			console.log("PeerConnection is not ready for renegotiation yet", this);
+		if (!this.peerconnectionclient.readyForRenegotiation) {
+			console.log("PeerConnectionClient is not ready for renegotiation yet", this);
 			return;
 		}
 
@@ -284,11 +288,11 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 			// Avoid errors when still receiving candidates but closed.
 			return;
 		}
-		if (!this.peerconnection) {
+		if (!this.peerconnectionclient) {
 			this.pendingCandidates.push(candidate);
 			return;
 		}
-		this.peerconnection.addIceCandidate(candidate, function () {
+		this.peerconnectionclient.addIceCandidate(candidate, function () {
 			console.log("Remote candidate added successfully.", candidate);
 		}, function (error) {
 			console.warn("Failed to add remote candidate:", error, candidate);
@@ -304,9 +308,9 @@ define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util'
 
 		this.closed = true;
 
-		if (this.peerconnection) {
-			this.peerconnection.close();
-			this.peerconnection = null;
+		if (this.peerconnectionclient) {
+			this.peerconnectionclient.close();
+			this.peerconnectionclient = null;
 		}
 
 		// Trigger event for all previously added streams.

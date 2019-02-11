@@ -5,7 +5,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	var count = 0;
 
-	var PeerConnection = function(webrtc, currentcall) {
+	var PeerConnectionClient = function(webrtc, currentcall) {
 
 		this.webrtc = webrtc;
 		this.id = count++;
@@ -19,11 +19,11 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.setReadyForRenegotiation = function(ready) {
+	PeerConnectionClient.prototype.setReadyForRenegotiation = function(ready) {
 		this.readyForRenegotiation = !!ready;
 	};
 
-	PeerConnection.prototype.createPeerConnection = function(currentcall) {
+	PeerConnectionClient.prototype.createPeerConnection = function(currentcall) {
 
 		// XXX(longsleep): This function is a mess.
 
@@ -41,7 +41,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 				'  constraints: \'' + JSON.stringify(currentcall.pcConstraints) + '\'.');
 			pc = this.pc = new window.RTCPeerConnection(currentcall.pcConfig, currentcall.pcConstraints);
 		} catch (e) {
-			console.error('Failed to create PeerConnection, exception: ' + e.message);
+			console.error('Failed to create PeerConnectionClient, exception: ' + e.message);
 			pc = this.pc = null;
 		}
 
@@ -98,12 +98,12 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.negotiationNeeded = function() {
+	PeerConnectionClient.prototype.negotiationNeeded = function() {
 		// Per default this does nothing as the browser is expected to handle this.
 	};
 
 
-	PeerConnection.prototype.onSignalingStateChange = function(event) {
+	PeerConnectionClient.prototype.onSignalingStateChange = function(event) {
 
 		var signalingState = event.target.signalingState;
 		console.debug("Connection signaling state change", signalingState, this.currentcall.id);
@@ -111,7 +111,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.onIceConnectionStateChange = function(event) {
+	PeerConnectionClient.prototype.onIceConnectionStateChange = function(event) {
 
 		var iceConnectionState = event.target.iceConnectionState;
 		console.debug("ICE connection state change", iceConnectionState, this.currentcall.id);
@@ -119,7 +119,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.onRemoteStreamAdded = function(event) {
+	PeerConnectionClient.prototype.onRemoteStreamAdded = function(event) {
 
 		// var stream = event.stream;
 		var stream = event.streams[0];
@@ -130,7 +130,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 		}
 	};
 
-	PeerConnection.prototype.onRemoteStreamRemoved = function(event) {
+	PeerConnectionClient.prototype.onRemoteStreamRemoved = function(event) {
 
 		var stream = event.stream;
 		console.info('Remote stream removed.', stream);
@@ -138,16 +138,16 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.onNegotiationNeeded = function(event) {
+	PeerConnectionClient.prototype.onNegotiationNeeded = function(event) {
 
-		var peerconnection = event.target;
-		if (peerconnection === this.pc) {
+		var peerconnectionclient = event.target;
+		if (peerconnectionclient === this.pc) {
 			this.currentcall.onNegotiationNeeded();
 		}
 
 	};
 
-	PeerConnection.prototype.close = function() {
+	PeerConnectionClient.prototype.close = function() {
 
 		if (this.pc) {
 			this.pc.close();
@@ -157,7 +157,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.hasRemoteDescription = function() {
+	PeerConnectionClient.prototype.hasRemoteDescription = function() {
 
 		// NOTE(longsleep): Chrome seems to return empty sdp even if no remoteDescription was set.
 		if (!this.pc || !this.pc.remoteDescription || !this.pc.remoteDescription.sdp) {
@@ -167,50 +167,50 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.setRemoteDescription = function() {
+	PeerConnectionClient.prototype.setRemoteDescription = function() {
 
 		return this.pc.setRemoteDescription.apply(this.pc, arguments);
 
 	};
 
-	PeerConnection.prototype.setLocalDescription = function() {
+	PeerConnectionClient.prototype.setLocalDescription = function() {
 
 		return this.pc.setLocalDescription.apply(this.pc, arguments);
 
 	};
 
-	PeerConnection.prototype.addIceCandidate = function() {
+	PeerConnectionClient.prototype.addIceCandidate = function() {
 
 		return this.pc.addIceCandidate.apply(this.pc, arguments);
 
 	};
 
-	PeerConnection.prototype.addStream = function() {
+	PeerConnectionClient.prototype.addStream = function() {
 
 		_.defer(this.negotiationNeeded);
 		return this.pc.addStream.apply(this.pc, arguments);
 
 	};
 
-	PeerConnection.prototype.removeStream = function() {
+	PeerConnectionClient.prototype.removeStream = function() {
 
 		_.defer(this.negotiationNeeded);
 		return this.pc.removeStream.apply(this.pc, arguments);
 
 	};
 
-	PeerConnection.prototype.createAnswer = function() {
+	PeerConnectionClient.prototype.createAnswer = function() {
 		return this.pc.createAnswer.apply(this.pc, arguments);
 
 	};
 
-	PeerConnection.prototype.createOffer = function() {
+	PeerConnectionClient.prototype.createOffer = function() {
 
 		return this.pc.createOffer.apply(this.pc, arguments);
 
 	};
 
-	PeerConnection.prototype.getRemoteStreams = function() {
+	PeerConnectionClient.prototype.getRemoteStreams = function() {
 
 		if (!this.pc) {
 			return [];
@@ -219,7 +219,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.getLocalStreams = function() {
+	PeerConnectionClient.prototype.getLocalStreams = function() {
 
 		if (!this.pc) {
 			return [];
@@ -228,12 +228,12 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	};
 
-	PeerConnection.prototype.getStreamById = function() {
+	PeerConnectionClient.prototype.getStreamById = function() {
 
 		return this.pc.getStreamById.apply(this.pc, arguments);
 
 	};
 
-	return PeerConnection;
+	return PeerConnectionClient;
 
 });

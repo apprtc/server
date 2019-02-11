@@ -199,7 +199,7 @@ define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
 	Api.prototype.sendHello = function (name, pin, success, fault) {
 		var data = {
 			Version: this.version,
-			Ua: this.userAgent,
+			Ua: "",
 			Name: name,
 			Type: "" // Selects the default room type.
 		};

@@ -115,8 +115,9 @@ function($, _, PeerCall, PeerConference, UserMedia) {
 			},
 			// Set up audio and video regardless of what devices are present.
 			offerOptions: {
-				offerToReceiveAudio: true,
-				offerToReceiveVideo: true
+				offerToReceiveAudio: 1,
+				offerToReceiveVideo: 1,
+				voiceActivityDetection: false
 			},
 			renegotiation: true
 		};
@@ -200,7 +201,7 @@ function($, _, PeerCall, PeerConference, UserMedia) {
 		var call = this.conference.getCall(from);
 		if (call) {
 			// Remote peer is trying to renegotiate media.
-			if (!this.settings.renegotiation && call.peerconnection && call.peerconnection.hasRemoteDescription()) {
+			if (!this.settings.renegotiation && call.peerconnectionclient && call.peerconnectionclient.hasRemoteDescription()) {
 				// Call replace support without renegotiation.
 				this.doHangup("unsupported", from);
 				console.error("Processing new offers is not implemented without renegotiation.");
@@ -547,7 +548,7 @@ function($, _, PeerCall, PeerConference, UserMedia) {
 	WebRTC.prototype.maybeStart = function(usermedia, call, autocall) {
 
 		//console.log("maybeStart", call);
-		if (call.peerconnection) {
+		if (call.peerconnectionclient) {
 			console.log("Already started", call);
 			return;
 		}
@@ -560,10 +561,10 @@ function($, _, PeerCall, PeerConference, UserMedia) {
 				this.e.triggerHandler("done");
 			}
 		}
-		console.log('Creating PeerConnection.', call);
-		call.createPeerConnection(_.bind(function(peerconnection) {
+		console.log('Creating PeerConnectionClient.', call);
+		call.createPeerConnection(_.bind(function(peerconnectionclient) {
 			// Success call.
-			usermedia.addToPeerConnection(peerconnection);
+			usermedia.addToPeerConnection(peerconnectionclient);
 			if (!call.initiate) {
 				this.processPendingMessages(call.id);
 			}
@@ -593,7 +594,7 @@ function($, _, PeerCall, PeerConference, UserMedia) {
 	WebRTC.prototype.sendOfferWhenNegotiationNeeded = function(currentcall, to) {
 
 		// TODO(longsleep): Check if the check for stable is really required.
-		if (currentcall.peerconnection.pc.signalingState === "stable") {
+		if (currentcall.peerconnectionclient.pc.signalingState === "stable") {
 			if (!to) {
 				to = currentcall.id;
 			}
