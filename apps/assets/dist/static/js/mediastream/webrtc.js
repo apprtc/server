@@ -11,12 +11,11 @@ define([
 	'mediastream/peercall',
 	'mediastream/peerconference',
 	'mediastream/usermedia',
-	'mediastream/utils',
 	'webrtc.adapter',
 	'RecordRTC'
 ],
 
-function($, _, PeerCall, PeerConference, UserMedia, utils) {
+function($, _, PeerCall, PeerConference, UserMedia) {
 
 	if (webrtcDetectedAndroid) {
 		console.log("This seems to be Android");

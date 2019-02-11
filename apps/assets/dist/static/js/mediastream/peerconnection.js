@@ -53,7 +53,10 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 			// NOTE(longsleep): There are several szenarios where onaddstream is never fired, when
 			// the peer does not provide a certain stream type (eg. has no camera). See
 			// for example https://bugzilla.mozilla.org/show_bug.cgi?id=998546.
-			pc.onaddstream = _.bind(this.onRemoteStreamAdded, this);
+			// pc.onaddstream = _.bind(this.onRemoteStreamAdded, this);
+
+			pc.ontrack = _.bind(this.onRemoteStreamAdded, this);
+
 			pc.onremovestream = _.bind(this.onRemoteStreamRemoved, this);
 			// NOTE(longsleep): Firefox 38 has support for onaddtrack. Unfortunately Chrome does
 			// not support this and thus both are not compatible. For the time being this means
@@ -118,10 +121,13 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function($, _) {
 
 	PeerConnection.prototype.onRemoteStreamAdded = function(event) {
 
-		var stream = event.stream;
-		console.info('Remote stream added.', stream);
-		this.currentcall.onRemoteStreamAdded(stream);
+		// var stream = event.stream;
+		var stream = event.streams[0];
 
+		if (stream != null) {
+			console.info('Remote stream added.', stream);
+			this.currentcall.onRemoteStreamAdded(stream);
+		}
 	};
 
 	PeerConnection.prototype.onRemoteStreamRemoved = function(event) {

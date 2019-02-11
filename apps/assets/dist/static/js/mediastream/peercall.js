@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection'], function ($, _, utils, PeerConnection) {
+define(['jquery', 'underscore', 'mediastream/peerconnection', 'mediastream/util', 'mediastream/sdputils'], function ($, _, PeerConnection) {
 
 	var PeerCall = function (webrtc, id, from, to) {
 
@@ -182,28 +182,31 @@ define(['jquery', 'underscore', 'mediastream/utils', 'mediastream/peerconnection
 	};
 
 	PeerCall.prototype.setLocalSdp = function (sessionDescription) {
-
-		var params = this.sdpParams;
-		sessionDescription.sdp = utils.maybePreferAudioReceiveCodec(sessionDescription.sdp, params);
-		sessionDescription.sdp = utils.maybePreferVideoReceiveCodec(sessionDescription.sdp, params);
-		sessionDescription.sdp = utils.maybeSetAudioReceiveBitRate(sessionDescription.sdp, params);
-		sessionDescription.sdp = utils.maybeSetVideoReceiveBitRate(sessionDescription.sdp, params);
-		// Apply workarounds.
-		sessionDescription.sdp = utils.fixLocal(sessionDescription.sdp, params);
+		sessionDescription.sdp = maybePreferAudioReceiveCodec(sessionDescription.sdp, this.sdpParams);
+		sessionDescription.sdp = maybePreferVideoReceiveCodec(
+			sessionDescription.sdp,
+			this.sdpParams);
+		sessionDescription.sdp = maybeSetAudioReceiveBitRate(
+			sessionDescription.sdp,
+			this.sdpParams);
+		sessionDescription.sdp = maybeSetVideoReceiveBitRate(
+			sessionDescription.sdp,
+			this.sdpParams);
+		sessionDescription.sdp = maybeRemoveVideoFec(
+			sessionDescription.sdp,
+			this.sdpParams);
 
 	};
 
-	PeerCall.prototype.setRemoteSdp = function (sessionDescription) {
+	PeerCall.prototype.setRemoteSdp = function (message) {
 
-		var params = this.sdpParams;
-		sessionDescription.sdp = utils.maybeSetOpusOptions(sessionDescription.sdp, params);
-		sessionDescription.sdp = utils.maybePreferAudioSendCodec(sessionDescription.sdp, params);
-		sessionDescription.sdp = utils.maybePreferVideoSendCodec(sessionDescription.sdp, params);
-		sessionDescription.sdp = utils.maybeSetAudioSendBitRate(sessionDescription.sdp, params);
-		sessionDescription.sdp = utils.maybeSetVideoSendBitRate(sessionDescription.sdp, params);
-		sessionDescription.sdp = utils.maybeSetVideoSendInitialBitRate(sessionDescription.sdp, params);
-		// Apply workarounds.
-		sessionDescription.sdp = utils.fixRemote(sessionDescription.sdp, params);
+		message.sdp = maybeSetOpusOptions(message.sdp, this.sdpParams);
+		message.sdp = maybePreferAudioSendCodec(message.sdp, this.sdpParams);
+		message.sdp = maybePreferVideoSendCodec(message.sdp, this.sdpParams);
+		message.sdp = maybeSetAudioSendBitRate(message.sdp, this.sdpParams);
+		message.sdp = maybeSetVideoSendBitRate(message.sdp, this.sdpParams);
+		message.sdp = maybeSetVideoSendInitialBitRate(message.sdp, this.sdpParams);
+		message.sdp = maybeRemoveVideoFec(message.sdp, this.sdpParams);
 
 	};
 
