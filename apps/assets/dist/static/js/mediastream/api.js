@@ -156,10 +156,6 @@ define(['jquery', 'underscore'], function ($, _) {
 				console.log("User action received", dataType, data);
 				this.e.triggerHandler("received.userleftorjoined", [dataType, data]);
 				break;
-			case "Status":
-				console.log("User status received", dataType, data);
-				this.e.triggerHandler("received.status", [data]);
-				break;
 			case "Alive":
 				// Do nothing.
 				//console.log("Alive response received.");

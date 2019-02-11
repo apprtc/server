@@ -3,7 +3,8 @@
 "use strict";
 define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
-	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "localStatus", "rooms", "constraints", function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, localStatus, rooms, constraints) {
+	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "rooms", "constraints", 
+	function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, rooms, constraints) {
 
 		// Avoid accidential reloads or exits when in a call.
 		$($window).on("beforeunload", function (event) {
@@ -70,10 +71,8 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				displayName: $scope.master.displayName || null,
 				message: $scope.master.message || null
 			}
-			if (clear) {
-				localStatus.clear();
-			}
-			localStatus.update(status);
+			console.log("Status update commit", status);
+			mediaStream.api.updateStatus(status);
 		};
 
 		$scope.setConnectedStatus = function () {

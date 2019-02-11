@@ -10,7 +10,6 @@ define([
 	'services/mediastream',
 	'services/appdata',
 	'services/continueconnector',
-	'services/localstatus',
 	'services/rooms',
 	'services/constraints',
 	'services/dummystream'], function (_,
@@ -21,7 +20,6 @@ define([
 		mediaStream,
 		appData,
 		continueConnector,
-		localStatus,
 		rooms,
 		constraints,
 		dummyStream) {
@@ -34,7 +32,6 @@ define([
 			mediaStream: mediaStream,
 			appData: appData,
 			continueConnector: continueConnector,
-			localStatus: localStatus,
 			rooms: rooms,
 			constraints: constraints,
 			dummyStream: dummyStream,
