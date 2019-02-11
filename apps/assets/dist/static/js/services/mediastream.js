@@ -8,7 +8,7 @@ define([
 
 ], function ($, _) {
 
-	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "$http", "safeApply", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $route, $location, $window, $http, safeApply, $timeout, $sce, continueConnector) {
+	return ["globalContext", "connector", "api", "webrtc", "appData", "$window", "$http", "safeApply", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $window, $http, safeApply, $timeout, $sce, continueConnector) {
 
 		var url = (context.Ssl ? "wss" : "ws") + "://" + context.Host + (context.Cfg.B || "/") + "ws";
 		var version = context.Cfg.Version;

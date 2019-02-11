@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall) {
+define(['jquery', 'underscore'], function ($, _) {
 
 	var conferences = 0;
 
@@ -9,7 +9,7 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 	var STATE_INCOMING = "incoming";
 	var STATE_OUTGOING = "outgoing";
 
-	var PeerConference = function(webrtc) {
+	var PeerConference = function (webrtc) {
 
 		this.webrtc = webrtc;
 
@@ -26,17 +26,17 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 		this.id = null;
 
 		// Send conference updates to the other peers once we get a new connection.
-		webrtc.e.on("statechange", _.bind(function(event, iceConnectionState, currentcall) {
+		webrtc.e.on("statechange", _.bind(function (event, iceConnectionState, currentcall) {
 			this.onConnectionStateChange(iceConnectionState, currentcall);
 		}, this));
 	};
 
 	// Creates a new unique random id to be used as conference id.
-	PeerConference.prototype._createConferenceId = function() {
+	PeerConference.prototype._createConferenceId = function () {
 		return this.webrtc.api.id + "_" + (++conferences) + "_" + Math.round(Math.random() * 1e16);
 	};
 
-	PeerConference.prototype.getOrCreateId = function() {
+	PeerConference.prototype.getOrCreateId = function () {
 		if (!this.id) {
 			this.id = this._createConferenceId();
 			console.log("Created new conference id", this.id);
@@ -44,16 +44,16 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 		return this.id;
 	};
 
-	PeerConference.prototype.hasCalls = function() {
+	PeerConference.prototype.hasCalls = function () {
 		return this.callsCount > 0;
 	};
 
 	// Return number of currently active and pending calls.
-	PeerConference.prototype.getCallsCount = function() {
+	PeerConference.prototype.getCallsCount = function () {
 		return this.callsCount;
 	};
 
-	PeerConference.prototype._addCallWithState = function(id, call, state) {
+	PeerConference.prototype._addCallWithState = function (id, call, state) {
 		var oldcall = this.calls[id];
 		if (oldcall) {
 			if (!this.disconnectedCalls[id]) {
@@ -69,41 +69,41 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 		return true;
 	};
 
-	PeerConference.prototype.addIncoming = function(from, call) {
+	PeerConference.prototype.addIncoming = function (from, call) {
 		return this._addCallWithState(from, call, STATE_INCOMING);
 	};
 
-	PeerConference.prototype.addOutgoing = function(to, call) {
+	PeerConference.prototype.addOutgoing = function (to, call) {
 		return this._addCallWithState(to, call, STATE_OUTGOING);
 	};
 
-	PeerConference.prototype._setCallState = function(id, state) {
+	PeerConference.prototype._setCallState = function (id, state) {
 		if (this.callStates.hasOwnProperty(id)) {
 			this.callStates[id] = state;
 			console.log("Call state changed", id, state);
 		}
 	};
 
-	PeerConference.prototype.setCallActive = function(id) {
+	PeerConference.prototype.setCallActive = function (id) {
 		this._setCallState(id, STATE_ACTIVE);
 	};
 
-	PeerConference.prototype.getCall = function(id) {
+	PeerConference.prototype.getCall = function (id) {
 		if (this.disconnectedCalls[id]) {
 			return null;
 		}
 		return this.calls[id] || null;
 	};
 
-	PeerConference.prototype.getCalls = function() {
+	PeerConference.prototype.getCalls = function () {
 		return _.values(this.calls);
 	};
 
-	PeerConference.prototype.getCallIds = function() {
+	PeerConference.prototype.getCallIds = function () {
 		return _.keys(this.calls);
 	};
 
-	PeerConference.prototype.removeCall = function(id) {
+	PeerConference.prototype.removeCall = function (id) {
 		if (!this.calls.hasOwnProperty(id)) {
 			return null;
 		}
@@ -117,22 +117,22 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 		return call;
 	};
 
-	PeerConference.prototype.markDisconnected = function(id) {
+	PeerConference.prototype.markDisconnected = function (id) {
 		this.disconnectedCalls[id] = true;
 	};
 
-	PeerConference.prototype.isDisconnected = function(id) {
+	PeerConference.prototype.isDisconnected = function (id) {
 		return this.disconnectedCalls[id] || false;
 	};
 
-	PeerConference.prototype.getDisconnectedIds = function(id) {
+	PeerConference.prototype.getDisconnectedIds = function (id) {
 		return _.keys(this.disconnectedCalls);
 	};
 
-	PeerConference.prototype.close = function() {
+	PeerConference.prototype.close = function () {
 
 		var api = this.webrtc.api;
-		_.each(this.calls, function(c) {
+		_.each(this.calls, function (c) {
 			c.close();
 			var id = c.id;
 			if (id) {
@@ -147,7 +147,7 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 
 	};
 
-	PeerConference.prototype.onConnectionStateChange = function(iceConnectionState, currentcall) {
+	PeerConference.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
 
 		console.log("Conference peer connection state changed", iceConnectionState, currentcall);
 		switch (iceConnectionState) {
@@ -165,7 +165,7 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 
 	};
 
-	PeerConference.prototype.pushUpdate = function(forceAll) {
+	PeerConference.prototype.pushUpdate = function (forceAll) {
 		var ids = _.keys(this.connectedCalls);
 		if (forceAll) {
 			// Include "disconnected" calls to try to recover from a previous
@@ -179,7 +179,7 @@ define(['jquery', 'underscore', 'mediastream/peercall'], function($, _, PeerCall
 		}
 	};
 
-	PeerConference.prototype.peerIds = function() {
+	PeerConference.prototype.peerIds = function () {
 		return this.getCallIds();
 	};
 
