@@ -292,36 +292,6 @@ define(['jquery', 'underscore'], function ($, _) {
 
 	};
 
-	Api.prototype.sendChat = function (to, message, status, mid) {
-
-		var data = {
-			To: to,
-			Type: "Chat",
-			Chat: {
-				Mid: mid,
-				Message: message,
-				Status: status,
-				NoEcho: true // This client shows own messages internally.
-			}
-		}
-
-		return this.send("Chat", data);
-
-	};
-
-	Api.prototype.sendConference = function (id, ids) {
-
-		var data = {
-			Id: id,
-			Type: "Conference",
-			Conference: ids
-		}
-
-		return this.send("Conference", data);
-
-	};
-
-
 	Api.prototype.sendAlive = function (timestamp) {
 
 		var data = {

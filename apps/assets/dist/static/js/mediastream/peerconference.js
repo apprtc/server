@@ -155,7 +155,6 @@ define(['jquery', 'underscore'], function ($, _) {
 			case "connected":
 				if (!this.connectedCalls.hasOwnProperty(currentcall.id)) {
 					this.connectedCalls[currentcall.id] = true;
-					this.pushUpdate();
 				}
 				break;
 			case "failed":
@@ -165,19 +164,6 @@ define(['jquery', 'underscore'], function ($, _) {
 
 	};
 
-	PeerConference.prototype.pushUpdate = function (forceAll) {
-		var ids = _.keys(this.connectedCalls);
-		if (forceAll) {
-			// Include "disconnected" calls to try to recover from a previous
-			// lost connection.
-			ids = _.union(ids, this.getDisconnectedIds());
-		}
-		if (ids.length > 1) {
-			ids.push(this.webrtc.api.id);
-			console.log("Calls in conference:", ids);
-			this.webrtc.api.sendConference(this.getOrCreateId(), ids);
-		}
-	};
 
 	PeerConference.prototype.peerIds = function () {
 		return this.getCallIds();

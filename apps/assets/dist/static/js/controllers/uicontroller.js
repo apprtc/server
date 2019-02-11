@@ -76,28 +76,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			localStatus.update(status);
 		};
 
-		$scope.updatePeerFromConference = function () {
-			if (!$scope.conferenceObject) {
-				$scope.conferencePeers.length = 0;
-				return;
-			}
-
-			var peerIds = $scope.conferenceObject.getCallIds();
-			if ($scope.peer && peerIds.indexOf($scope.peer) === -1) {
-				$scope.peer = null;
-			}
-			if (!$scope.peer) {
-				$scope.peer = peerIds.length > 0 ? peerIds.shift() : null;
-			} else {
-				peerIds = _.without(peerIds, $scope.peer);
-			}
-			$scope.conferencePeers = peerIds;
-		};
-
 		$scope.setConnectedStatus = function () {
-			// Don't set connected states if no peer is known yet. Otherwise
-			// there would be "Someone" visible in the UI.
-			$scope.updatePeerFromConference();
 			if (!$scope.peer) {
 				return;
 			}
@@ -239,14 +218,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			});
 		});
 
-		mediaStream.webrtc.e.on("peerconference", function (event, peerconference) {
-			safeApply($scope, function (scope) {
-				scope.conference = peerconference ? peerconference.id : null;
-				scope.conferenceObject = peerconference ? peerconference : null;
-				scope.updatePeerFromConference();
-				scope.setConnectedStatus();
-			});
-		});
 
 		mediaStream.webrtc.e.on("offer", function (event, from, to2, to) {
 			safeApply($scope, function (scope) {

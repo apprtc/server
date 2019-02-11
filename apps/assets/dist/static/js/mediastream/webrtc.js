@@ -289,19 +289,6 @@ define([
 			this.e.triggerHandler("bye", [data.Reason, from, to, to2]);
 		};
 
-		WebRTC.prototype._processConference = function (to, data, type, to2, from) {
-			console.log("Applying conference update", data);
-			var myid = this.api.id;
-			_.each(data, _.bind(function (id) {
-				var res = myid < id ? -1 : myid > id ? 1 : 0;
-				console.log("Considering conference peers to call", res, id);
-				if (res === -1) {
-					this.doCall(id, true);
-				}
-			}, this));
-			this.e.triggerHandler("peerconference", [this.conference]);
-		};
-
 		WebRTC.prototype.processReceivedMessage = function (to, data, type, to2, from) {
 			switch (type) {
 				case "Offer":
@@ -315,9 +302,6 @@ define([
 					break;
 				case "Bye":
 					this._processBye(to, data, type, to2, from);
-					break;
-				case "Conference":
-					this._processConference(to, data, type, to2, from);
 					break;
 				default:
 					console.log("Unhandled message type", type, data);
@@ -456,7 +440,6 @@ define([
 		WebRTC.prototype.doCall = function (id, autocall) {
 			var call = this.createCall(id, null, id);
 			call.setInitiate(true);
-			var count = this.conference.getCallsCount();
 			if (!this.conference.addOutgoing(id, call)) {
 				console.log("Already has a call with", id);
 				return;
@@ -492,7 +475,6 @@ define([
 		WebRTC.prototype.stop = function () {
 
 			this.conference.close();
-			this.e.triggerHandler("peerconference", [null]);
 			this.e.triggerHandler("peercall", [null]);
 			this.e.triggerHandler("stop");
 			this.msgQueues = {};
@@ -584,19 +566,13 @@ define([
 		};
 
 		WebRTC.prototype.sendOfferWhenNegotiationNeeded = function (currentcall, to) {
-
-			// TODO(longsleep): Check if the check for stable is really required.
-			if (currentcall.peerconnectionclient.pc.signalingState === "stable") {
-				if (!to) {
-					to = currentcall.id;
-				}
-				currentcall.createOffer(_.bind(function (sessionDescription, currentcall) {
-					console.log("Sending offer with sessionDescription", sessionDescription, to, currentcall);
-					// TODO(longsleep): Support sending this through data channel too if we have one.
-					this.api.sendOffer(to, sessionDescription);
-				}, this));
+			if (!to) {
+				to = currentcall.id;
 			}
-
+			currentcall.createOffer(_.bind(function (sessionDescription, currentcall) {
+				console.log("Sending offer with sessionDescription", sessionDescription, to, currentcall);
+				this.api.sendOffer(to, sessionDescription);
+			}, this));
 		};
 
 		WebRTC.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
