@@ -10,18 +10,12 @@ define([
 	return ["$window", "$route", "$rootScope", "connector", "api", "appData",
 
 		function ($window, $route, $rootScope, connector, api, appData) {
-
-			var body = $("body");
-
 			var requestedRoomName = "";
 			var helloedRoomName = null;
 			var currentRoom = null;
 
 			var rooms;
 			var joinRequestedRoom;
-			var setCurrentRoom;
-
-			var applyRoomUpdate;
 
 			joinRequestedRoom = function () {
 				if (!connector.connected) {
@@ -40,7 +34,7 @@ define([
 						});
 						console.log("Joining room", [requestedRoomName]);
 						api.sendHello(requestedRoomName, "", function (room) {
-							setCurrentRoom(room);
+							currentRoom = room;
 						}, function (error) {
 							console.log("joining room error", error);
 						});
@@ -48,39 +42,11 @@ define([
 				}
 			};
 
-			setCurrentRoom = function (room) {
-				if (room === currentRoom) {
-					return;
-				}
-				var priorRoom = currentRoom;
-				currentRoom = room;
-				if (priorRoom) {
-					body.removeClass("roomType" + priorRoom.Type);
-					priorRoomName = priorRoom.Name;
-					console.log("Left room", [priorRoom.Name]);
-					$rootScope.$broadcast("room.left", priorRoom.Name);
-				}
-				if (currentRoom) {
-					body.addClass("roomType" + currentRoom.Type);
-					console.log("Joined room", [currentRoom.Name]);
-					$rootScope.$broadcast("room.joined", currentRoom.Name);
-				}
-			};
-
-			applyRoomUpdate = function (room) {
-				currentRoom = room;
-				$rootScope.$broadcast("room.updated", currentRoom);
-				return room;
-			};
 
 			connector.e.on("close error", function () {
-				setCurrentRoom(null);
+				currentRoom = null;
 			});
 
-
-			api.e.on("received.room", function (event, room) {
-				applyRoomUpdate(room);
-			});
 
 			appData.e.on("selfReceived", function (event, data) {
 				_.defer(joinRequestedRoom);

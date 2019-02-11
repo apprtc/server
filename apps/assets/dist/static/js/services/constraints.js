@@ -127,34 +127,12 @@
 			webrtc.settings.pcConfig.iceServers = iceServers;
 		};
 
-		// Some default constraints.
-		service.e.on("refresh", function(event, constraints) {
-
-			if ($window.webrtcDetectedBrowser === "chrome") {
-				// NOTE(longsleep): We can always enable SCTP data channels, as we have a workaround
-				// using the "active" event for Firefox < 27.
-				// SCTP does not work correctly with Chrome 31. Require M32.
-				if ($window.webrtcDetectedVersion >= 32) {
-					// SCTP is supported from Chrome M31.
-					// No need to pass DTLS constraint as it is on by default in Chrome M31.
-					// For SCTP, reliable and ordered is true by default.
-				} else {
-					// Chrome < M32 does not yet do DTLS-SRTP by default whereas Firefox only
-					// does DTLS-SRTP. In order to get interop, you must supply Chrome
-					// with a PC constructor constraint to enable DTLS.
-					console.warn("Turning on SCTP combatibility - please update your Chrome.");
-					constraints.add("pc", "DtlsSrtpKeyAgreement", true);
-				}
-			}
-
-		});
 
 		// Public API.
 		return {
 			e: service.e,
 			refresh: function(settings) {
 				var constraints = new Constraints(settings);
-				service.e.triggerHandler("refresh", [constraints]);
 				return $q.all(constraints.promises).then(function() {
 					service.mediaConstraints(constraints);
 					service.pcConstraints(constraints);

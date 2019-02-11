@@ -60,7 +60,6 @@ define([
 			this.e = $({});
 
 			this.conference = new PeerConference(this);
-			this.currentroom = null;
 			this.msgQueues = {};
 			this.usermediaReady = false;
 			this.pendingMediaCalls = [];
@@ -115,25 +114,7 @@ define([
 			};
 
 			this.api.e.bind("received.offer received.candidate received.answer received.bye received.conference", _.bind(this.processReceived, this));
-			this.api.e.bind("received.room", _.bind(this.receivedRoom, this));
 		};
-
-		WebRTC.prototype.receivedRoom = function (event, room) {
-			if (this.currentroom && room && this.currentroom.Name == room.Name) {
-				// No room change, usually happens on reconnect.
-				var ids = this.conference.getDisconnectedIds();
-				if (ids.length > 1 && this.conference.id) {
-					// User was in a conference before, try to re-establish.
-					console.log("Re-establishing conference", this.conference.id, ids);
-					this.conference.pushUpdate(true);
-				}
-				return;
-			}
-
-			console.log("Joined room", room, this.api.id);
-			this.currentroom = room;
-		};
-
 
 		WebRTC.prototype.stopLocalVideo = function () {
 			if (this.usermedia) {
@@ -211,19 +192,7 @@ define([
 			}
 
 			var autoaccept = true;
-			if (data._conference) {
-				if (this.conference.id !== data._conference) {
-					console.warn("Received Offer for unknown conference -> busy.", from);
-					this.api.sendBye(from, "busy");
-					this.e.triggerHandler("busy", [from, to2, to]);
-					return;
-				}
-
-				console.log("Received conference Offer -> auto.", from, data._conference);
-				// Clean own internal data before feeding into browser.
-				delete data._conference;
-				autoaccept = true;
-			} else if (this.conference.hasCalls() && !this.conference.isDisconnected(from)) {
+			if (this.conference.hasCalls() && !this.conference.isDisconnected(from)) {
 				// TODO(fancycode): support joining callers to currently active conference.
 				console.warn("Received Offer while already in a call -> busy.", from);
 				this.api.sendBye(from, "busy");
@@ -307,20 +276,6 @@ define([
 					console.log("Unhandled message type", type, data);
 					break;
 			}
-		};
-
-		WebRTC.prototype.testMediaAccess = function (cb) {
-
-			var success = function (stream) {
-				console.info("testMediaAccess success");
-				cb(true);
-			};
-			var failed = function () {
-				console.info("testMediaAccess failed");
-				cb(false);
-			};
-			UserMedia.testGetUserMedia(success, failed);
-
 		};
 
 		WebRTC.prototype.createCall = function (id, from, to) {
@@ -502,20 +457,14 @@ define([
 			if (reason !== "receivedbye") {
 				this.api.sendBye(id, reason);
 			}
-			var calls = this.conference.getCalls();
-			if (!calls.length) {
-				// Last peer disconnected, perform cleanup.
-				this.e.triggerHandler("peercall", [null]);
-				_.defer(_.bind(function () {
-					this.e.triggerHandler("done", [reason]);
-				}, this));
-				this.stop();
-			} else if (calls.length === 1) {
-				// Downgraded to peer-to-peer again.
-				this.conference.id = null;
-				this.e.triggerHandler("peerconference", [null]);
-				this.e.triggerHandler("peercall", [calls[0]]);
-			}
+
+			// Last peer disconnected, perform cleanup.
+			this.e.triggerHandler("peercall", [null]);
+			_.defer(_.bind(function () {
+				this.e.triggerHandler("done", [reason]);
+			}, this));
+			this.stop();
+
 			return true;
 		}
 
@@ -588,26 +537,6 @@ define([
 
 		WebRTC.prototype.onRemoteStreamRemoved = function (stream, currentcall) {
 			this.e.triggerHandler("streamremoved", [stream, currentcall]);
-		};
-
-		WebRTC.prototype.setVideoMute = function (mute) {
-
-			// Force boolean.
-			this.videoMute = !!mute;
-			if (this.usermedia) {
-				this.usermedia.applyVideoMute(this.videoMute);
-			}
-
-		};
-
-		WebRTC.prototype.setAudioMute = function (mute) {
-
-			// Force boolean.
-			this.audioMute = !!mute;
-			if (this.usermedia) {
-				this.usermedia.applyAudioMute(this.audioMute);
-			}
-
 		};
 
 		return WebRTC;

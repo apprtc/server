@@ -160,14 +160,9 @@ define(['jquery', 'underscore'], function ($, _) {
 				console.log("User status received", dataType, data);
 				this.e.triggerHandler("received.status", [data]);
 				break;
-
-
 			case "Alive":
 				// Do nothing.
 				//console.log("Alive response received.");
-				break;
-			case "Room":
-				this.e.triggerHandler("received.room", [data]);
 				break;
 			default:
 				console.log("Unhandled type received:", dataType, data);
@@ -207,7 +202,6 @@ define(['jquery', 'underscore'], function ($, _) {
 				if (success) {
 					success(data.Room);
 				}
-				that.e.triggerHandler("received.room", [data.Room]);
 				that.e.triggerHandler("received.users", [data.Users]);
 			} else {
 				if (fault) {
