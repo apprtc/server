@@ -59,7 +59,7 @@ define(['jquery', 'underscore'], function ($, _) {
 			Type: type
 		};
 		payload[type] = data;
-		//console.log("<<<<<<<<<<<<", JSON.stringify(payload, null, 2));
+		console.log("<<<<<<<<<<<<", JSON.stringify(payload, null, 2));
 		this.connector.send(payload, noqueue);
 
 	};
@@ -123,7 +123,7 @@ define(['jquery', 'underscore'], function ($, _) {
 
 		switch (dataType) {
 			case "Self":
-				//console.log("Self received", data);
+				console.log("Self received", data);
 				if (data.Token) {
 					this.connector.token = data.Token;
 				}

@@ -9,18 +9,6 @@ define(["jquery"], function($) {
 	// - selfReceived(event, self)
 	//     self (object) : Self document as received from API.
 	//
-	// - uiNotification(event, type, details)
-	//     type (string)    : Notification type (busy, reject, pickuptimeout,
-	//                        incomingbusy, incomingpickuptimeout, chatmessage)
-	//     details (object) : Depends on event type.
-	//
-	// - mainStatus(event, status)
-	//     status (string)  : Status id (connected, waiting, ...)
-	//
-	// - userSettingsLoaded(event, loaded, user_settings)
-	//     loaded (bool)    : True if something was loaded, else false.
-	//     user_settings (map) : User map which was loaded.
-	//
 	// Other appData properties:
 	//
 	// - language (string) : ISO language code of active language.

@@ -92,20 +92,9 @@ define([
 	var initialize = function (app, launcher) {
 		var globalContext = JSON.parse(document.getElementById("globalcontext").innerHTML);
 		if (!globalContext.Cfg.Version) {
-			globalContext.Cfg.Version = "unknown";
+			globalContext.Cfg.Version = "1.0";
 		}
 		app.constant("globalContext", globalContext);
-
-
-		var lang = "en";
-
-		// Storage at DOM.
-		var html = document.getElementsByTagName("html")[0];
-		html.setAttribute("lang", lang);
-
-
-		console.info("Selected language: " + lang);
-
 	};
 
 	return {

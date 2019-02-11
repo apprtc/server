@@ -23,46 +23,6 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 			break;
 		}
 	};
-	var convertConstraints = function(constraints) {
-		if (!constraints) {
-			return false;
-		}
-		if (!constraints.hasOwnProperty("optional") && !constraints.hasOwnProperty("mandatory")) {
-			// No old style members.
-			return constraints;
-		}
-		var c = {};
-		// Process optional constraints.
-		if (constraints.optional) {
-			_.each(constraints.optional, function(o) {
-				_.each(o, function(v, k) {
-					mergeConstraints(c, k, v);
-				})
-			});
-		}
-		// Process mandatory constraints.
-		if (constraints.mandatory) {
-			_.each(constraints.mandatory, function(v, k) {
-				mergeConstraints(c, k, v, true);
-			});
-		}
-		// Fastpath.
-		if (_.isEmpty(c)) {
-			return true;
-		}
-		// Use ideal if there is only one value set.
-		_.each(c, function(v, k) {
-			if (_.isObject(v)) {
-				var values = _.values(v);
-				if (values.length === 1) {
-					// Use as ideal value if only one given.
-					c[k] = {ideal: values[0]};
-				}
-			}
-		});
-		return c;
-	};
-
 
 	var stopUserMediaStream = (function() {
 		return function(stream) {
@@ -72,13 +32,6 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 				_.each(tracks, function(t) {
 					t.stop();
 				});
-				if (window.webrtcDetectedBrowser === "firefox" && window.webrtcDetectedVersion < 44) {
-					// Always call stop for older Firefox < 44 to make sure gUM is correctly cleaned up.
-					// https://bugzilla.mozilla.org/show_bug.cgi?id=1192170
-					if (stream.stop) {
-						stream.stop();
-					}
-				}
 			} else {
 				// MediaStream.stop is deprecated.
 				stream.stop();
