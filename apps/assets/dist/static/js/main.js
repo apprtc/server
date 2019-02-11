@@ -13,7 +13,6 @@ require.config({
 		'RecordRTC': 'libs/RecordRTC',
 		'angular': 'libs/angular/angular.min',
 		'ui-bootstrap': 'libs/angular/ui-bootstrap-tpls.min',
-		'ua-parser': 'libs/ua-parser',
 		'angular-sanitize': 'libs/angular/angular-sanitize.min',
 		'angular-animate': 'libs/angular/angular-animate.min',
 		'angular-route': 'libs/angular/angular-route.min',

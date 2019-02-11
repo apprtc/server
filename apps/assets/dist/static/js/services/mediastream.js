@@ -4,11 +4,10 @@
 define([
 	'jquery',
 	'underscore',
-	'ua-parser',
 	'modernizr',
 	'webrtc.adapter'
 
-], function ($, _, uaparser, Modernizr) {
+], function ($, _, Modernizr) {
 
 	return ["globalContext", "connector", "api", "webrtc", "appData", "$route", "$location", "$window", "$http", "safeApply", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $route, $location, $window, $http, safeApply, $timeout, $sce, continueConnector) {
 

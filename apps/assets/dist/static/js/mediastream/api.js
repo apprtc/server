@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
+define(['jquery', 'underscore'], function ($, _) {
 
 	var Api = function (version, connector) {
 		this.version = version;
@@ -12,15 +12,6 @@ define(['jquery', 'underscore', 'ua-parser'], function ($, _, uaparser) {
 		this.iids = 0;
 
 		this.e = $({});
-
-		var ua = uaparser();
-		if (ua.os.name && /Spreed Desktop Caller/i.test(ua.ua)) {
-			this.userAgent = ua.ua.match(/Spreed Desktop Caller\/([\d.]+)/i)[1] + " (" + ua.os.name + ")";
-		} else if (ua.browser.name) {
-			this.userAgent = ua.browser.name + " " + ua.browser.major;
-		} else {
-			this.userAgent = ua.ua;
-		}
 
 		connector.e.on("received", _.bind(function (event, data) {
 			this.received(data);
