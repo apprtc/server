@@ -1,4 +1,4 @@
-
+// signal server通信处理
 
 "use strict";
 
@@ -13,46 +13,6 @@ define([
 ],
 
 	function ($, _, PeerCall, PeerConference, UserMedia) {
-		var InternalPC = function (call) {
-			this.currentcall = call;
-			this.isinternal = true;
-		};
-
-		InternalPC.prototype.close = function () {
-			this.currentcall.e.triggerHandler("connectionStateChange", ["closed", this.currentcall]);
-		};
-
-		InternalPC.prototype.addStream = function () {
-		};
-
-		InternalPC.prototype.removeStream = function () {
-		};
-
-		InternalPC.prototype.negotiationNeeded = function () {
-		};
-
-		var InternalCall = function (webrtc) {
-			this.id = null;
-			this.webrtc = webrtc;
-			this.e = $({});
-			this.isinternal = true;
-			this.pc = new InternalPC(this);
-
-			this.mediaConstraints = $.extend(true, {}, this.webrtc.settings.mediaConstraints);
-		};
-
-		InternalCall.prototype.setInitiate = function (initiate) {
-		};
-
-		InternalCall.prototype.createPeerConnection = function (success_cb, error_cb) {
-			success_cb(this.pc);
-		};
-
-		InternalCall.prototype.close = function () {
-			this.pc.close();
-			this.e.triggerHandler("closed", [this]);
-		};
-
 		var WebRTC = function (api) {
 
 			this.api = api;
@@ -128,19 +88,6 @@ define([
 			this.processReceivedMessage(to, data, type, to2, from);
 		};
 
-		WebRTC.prototype.findTargetCall = function (id) {
-			return this.conference.getCall(id);
-		};
-
-		WebRTC.prototype.callForEachCall = function (fn) {
-			var calls = this.conference.getCalls();
-			if (!calls.length) {
-				return 0;
-			}
-			_.map(calls, fn);
-			return calls.length;
-		};
-
 		WebRTC.prototype._getMessageQueue = function (id, create) {
 			var queue = this.msgQueues[id] || null;
 			if (queue === null && create) {
@@ -170,7 +117,7 @@ define([
 		};
 
 		WebRTC.prototype._processOffer = function (to, data, type, to2, from) {
-			console.log("Offer process.");
+			console.log("WebRTC._processOffer");
 			var call = this.conference.getCall(from);
 			if (call) {
 				// Remote peer is trying to renegotiate media.
@@ -219,6 +166,7 @@ define([
 		};
 
 		WebRTC.prototype._processCandidate = function (to, data, type, to2, from) {
+			console.log("WebRTC._processCandidate");
 			var call = this.conference.getCall(from);
 			if (!call) {
 				console.warn("Received Candidate for unknown id -> ignore.", from);
@@ -235,13 +183,13 @@ define([
 		};
 
 		WebRTC.prototype._processAnswer = function (to, data, type, to2, from) {
+			console.log("WebRTC._processAnswer");
 			var call = this.conference.getCall(from);
 			if (!call) {
 				console.warn("Received Answer from unknown id -> ignore", from);
 				return;
 			}
 
-			console.log("Answer process.");
 			this.conference.setCallActive(call.id);
 			// TODO(longsleep): In case of negotiation this could switch offer and answer
 			// and result in a offer sdp sent as answer data. We need to handle this.
@@ -279,6 +227,7 @@ define([
 		};
 
 		WebRTC.prototype.createCall = function (id, from, to) {
+			console.log("WebRTC.createCall");
 			var call = new PeerCall(this, id, from, to);
 			call.e.on("connectionStateChange", _.bind(function (event, iceConnectionState, currentcall) {
 				this.onConnectionStateChange(iceConnectionState, currentcall);
@@ -311,7 +260,7 @@ define([
 		};
 
 		WebRTC.prototype.doUserMedia = function (call) {
-
+			console.log("WebRTC.doUserMedia");
 			if (this.usermedia) {
 				// We should not create a new UserMedia object while the current one
 				// is still being used.
@@ -356,6 +305,7 @@ define([
 		};
 
 		WebRTC.prototype._doCallUserMedia = function (call) {
+			console.log("WebRTC._doCallUserMedia");
 			if (this.usermedia) {
 				if (!this.usermediaReady) {
 					this.pendingMediaCalls.push(call);
@@ -379,6 +329,7 @@ define([
 		};
 
 		WebRTC.prototype._doAutoStartCall = function (call) {
+			console.log("WebRTC._doAutoStartCall");
 			if (!this.usermedia) {
 				return false;
 			}
@@ -393,6 +344,7 @@ define([
 		};
 
 		WebRTC.prototype.doCall = function (id, autocall) {
+			console.log("WebRTC.doCall");
 			var call = this.createCall(id, null, id);
 			call.setInitiate(true);
 			if (!this.conference.addOutgoing(id, call)) {
@@ -410,6 +362,7 @@ define([
 		};
 
 		WebRTC.prototype.doAccept = function (call, autoanswer) {
+			console.log("WebRTC.doAccept");
 			if (typeof call === "string") {
 				var id = call;
 				call = this.conference.getCall(id);
@@ -428,7 +381,7 @@ define([
 		};
 
 		WebRTC.prototype.stop = function () {
-
+			console.log("WebRTC.stop");
 			this.conference.close();
 			this.e.triggerHandler("peercall", [null]);
 			this.e.triggerHandler("stop");
@@ -437,7 +390,7 @@ define([
 		}
 
 		WebRTC.prototype.doHangup = function (reason, id) {
-
+			console.log("WebRTC.doHangup");
 			if (!id) {
 				console.log("Closing all calls")
 				_.each(this.conference.getCallIds(), _.bind(function (callid) {
@@ -470,7 +423,7 @@ define([
 
 		WebRTC.prototype.maybeStart = function (usermedia, call, autocall) {
 
-			//console.log("maybeStart", call);
+			console.log("WebRTC.maybeStart");
 			if (call.peerconnectionclient) {
 				console.log("Already started", call);
 				return;
@@ -515,16 +468,18 @@ define([
 		};
 
 		WebRTC.prototype.sendOfferWhenNegotiationNeeded = function (currentcall, to) {
+			console.log("WebRTC.sendOfferWhenNegotiationNeeded");
+
 			if (!to) {
 				to = currentcall.id;
 			}
 			currentcall.createOffer(_.bind(function (sessionDescription, currentcall) {
-				console.log("Sending offer with sessionDescription", sessionDescription, to, currentcall);
 				this.api.sendOffer(to, sessionDescription);
 			}, this));
 		};
 
 		WebRTC.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
+			console.log("WebRTC.onConnectionStateChange");
 			// Defer this to allow native event handlers to complete before running more stuff.
 			_.defer(_.bind(function () {
 				this.e.triggerHandler('statechange', [iceConnectionState, currentcall]);
@@ -532,10 +487,12 @@ define([
 		};
 
 		WebRTC.prototype.onRemoteStreamAdded = function (stream, currentcall) {
+			console.log("WebRTC.onRemoteStreamAdded");
 			this.e.triggerHandler("streamadded", [stream, currentcall]);
 		};
 
 		WebRTC.prototype.onRemoteStreamRemoved = function (stream, currentcall) {
+			console.log("WebRTC.onRemoteStreamRemoved");
 			this.e.triggerHandler("streamremoved", [stream, currentcall]);
 		};
 

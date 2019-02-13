@@ -92,6 +92,8 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 			this.peerconnectionclient.setReadyForRenegotiation(true);
 		}
 
+		console.log("PeerCall.onCreateAnswerOffer type=", sessionDescription.type);
+
 		this.setLocalSdp(sessionDescription);
 
 		// Convert to object to allow custom property injection.
@@ -99,7 +101,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 		if (sessionDescriptionObj.toJSON) {
 			sessionDescriptionObj = JSON.parse(JSON.stringify(sessionDescriptionObj));
 		}
-		console.log("Created offer/answer", JSON.stringify(sessionDescriptionObj, null, "\t"));
+		// console.log("Created offer/answer", JSON.stringify(sessionDescriptionObj, null, "\t"));
 
 		// Allow external session description modifications.
 		this.e.triggerHandler("sessiondescription", [sessionDescriptionObj, this]);
@@ -176,7 +178,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 			// 	}
 			// }, this));
 
-			
+
 		}, this), _.bind(function (err) {
 			console.error("Set remote session description failed", err);
 			this.close();
@@ -247,7 +249,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 	};
 
 	PeerCall.prototype.onRemoteStreamAdded = function (stream) {
-		console.log("onRemoteStreamAdded", stream);
+		console.log("PeerCall.onRemoteStreamAdded stream");
 		var id = stream.id;
 		if (this.streams.hasOwnProperty(id)) {
 			return;
@@ -269,6 +271,8 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 	};
 
 	PeerCall.prototype.onNegotiationNeeded = function () {
+		console.log("PeerCall.onNegotiationNeeded.", this);
+		
 		if (!this.peerconnectionclient.readyForRenegotiation) {
 			console.log("PeerConnectionClient is not ready for renegotiation yet", this);
 			return;
@@ -276,7 +280,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 
 		if (!this.negotiationNeeded) {
 			this.negotiationNeeded = true;
-			console.log("Negotiation needed.", this);
+			
 			this.e.triggerHandler("negotiationNeeded", [this]);
 		}
 

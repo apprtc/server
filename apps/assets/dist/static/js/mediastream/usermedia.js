@@ -2,28 +2,6 @@
 
 "use strict";
 define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], function($, _, DummyStream) {
-	// Converter helpers to convert media constraints to new API.
-	var mergeConstraints = function(constraints, k, v, mandatory) {
-		var prefix = k.substring(0, 3);
-		switch (prefix) {
-		case "min":
-		case "max":
-			var suffix = k[3].toLowerCase()+k.substring(4);
-			if (!constraints.hasOwnProperty(suffix)) {
-				constraints[suffix]={};
-			}
-			if (mandatory && prefix === "min" && constraints[suffix].hasOwnProperty(prefix)) {
-				// Use existing min constraint as ideal.
-				constraints[suffix].ideal = constraints[suffix].min;
-			}
-			constraints[suffix][prefix]=v;
-			break;
-		default:
-			constraints[k] = v;
-			break;
-		}
-	};
-
 	var stopUserMediaStream = (function() {
 		return function(stream) {
 			if (stream && stream.getTracks) {

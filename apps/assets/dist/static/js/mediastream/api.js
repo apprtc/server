@@ -59,7 +59,10 @@ define(['jquery', 'underscore'], function ($, _) {
 			Type: type
 		};
 		payload[type] = data;
-		console.log("<<<<<<<<<<<<", JSON.stringify(payload, null, 2));
+		if (type !== "Alive") {
+			console.log("<<<<<<<<<<<<\n", JSON.stringify(payload, null, 2));
+		}
+
 		this.connector.send(payload, noqueue);
 
 	};
@@ -121,9 +124,14 @@ define(['jquery', 'underscore'], function ($, _) {
 			return;
 		}
 
+		if (dataType !== "Alive") {
+			console.log(">>>>>>>>>>>>\n", JSON.stringify(data, null, 2));
+		}
+
+
 		switch (dataType) {
 			case "Self":
-				console.log("Self received", data);
+				// console.log("Self received", data);
 				if (data.Token) {
 					this.connector.token = data.Token;
 				}
@@ -132,28 +140,28 @@ define(['jquery', 'underscore'], function ($, _) {
 				this.e.triggerHandler("received.self", [data]);
 				break;
 			case "Offer":
-				console.log("Offer received", data.To, data.Offer);
+				// console.log("Offer received", data.To, data.Offer);
 				this.e.triggerHandler("received.offer", [data.To, data.Offer, data.Type, d.To, d.From]);
 				break;
 			case "Candidate":
-				console.log("Candidate received", data.To, data.Candidate);
+				// console.log("Candidate received", data.To, data.Candidate);
 				this.e.triggerHandler("received.candidate", [data.To, data.Candidate, data.Type, d.To, d.From]);
 				break;
 			case "Answer":
-				console.log("Answer received", data.To, data.Answer);
+				// console.log("Answer received", data.To, data.Answer);
 				this.e.triggerHandler("received.answer", [data.To, data.Answer, data.Type, d.To, d.From]);
 				break;
 			case "Users":
-				console.log("Connected users: " + data.Users.length);
+				// console.log("Connected users: " + data.Users.length);
 				this.e.triggerHandler("received.users", [data.Users]);
 				break;
 			case "Bye":
-				console.log("Bye received", data.To, data.Bye);
+				// console.log("Bye received", data.To, data.Bye);
 				this.e.triggerHandler("received.bye", [data.To, data.Bye, data.Type, d.To, d.From]);
 				break;
 			case "Joined":
 			case "Left":
-				console.log("User action received", dataType, data);
+				// console.log("User action received", dataType, data);
 				this.e.triggerHandler("received.userleftorjoined", [dataType, data]);
 				break;
 			case "Alive":

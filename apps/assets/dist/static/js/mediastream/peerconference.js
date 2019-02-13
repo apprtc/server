@@ -149,7 +149,7 @@ define(['jquery', 'underscore'], function ($, _) {
 
 	PeerConference.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
 
-		console.log("Conference peer connection state changed", iceConnectionState, currentcall);
+		console.log("PeerConference.onConnectionStateChange", iceConnectionState, currentcall);
 		switch (iceConnectionState) {
 			case "completed":
 			case "connected":
