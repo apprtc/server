@@ -11,18 +11,18 @@ define([
 	'services/appdata',
 	'services/continueconnector',
 	'services/rooms',
-	'services/constraints',
-	'services/dummystream'], function (_,
-		safeApply,
-		connector,
-		api,
-		webrtc,
-		mediaStream,
-		appData,
-		continueConnector,
-		rooms,
-		constraints,
-		dummyStream) {
+	'services/constraints'
+], function (_,
+	safeApply,
+	connector,
+	api,
+	webrtc,
+	mediaStream,
+	appData,
+	continueConnector,
+	rooms,
+	constraints
+) {
 
 		var services = {
 			safeApply: safeApply,
@@ -33,8 +33,7 @@ define([
 			appData: appData,
 			continueConnector: continueConnector,
 			rooms: rooms,
-			constraints: constraints,
-			dummyStream: dummyStream,
+			constraints: constraints
 		};
 
 		var initialize = function (angModule) {

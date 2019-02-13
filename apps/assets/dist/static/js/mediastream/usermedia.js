@@ -1,13 +1,13 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], function($, _, DummyStream) {
-	var stopUserMediaStream = (function() {
-		return function(stream) {
+define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
+	var stopUserMediaStream = (function () {
+		return function (stream) {
 			if (stream && stream.getTracks) {
 				// Stop all tracks.
 				var tracks = stream.getTracks();
-				_.each(tracks, function(t) {
+				_.each(tracks, function (t) {
 					t.stop();
 				});
 			} else {
@@ -18,7 +18,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 	})();
 
 	// UserMedia.
-	var UserMedia = function(options) {
+	var UserMedia = function (options) {
 
 		this.options = $.extend({}, options);
 		this.e = $({}); // Events.
@@ -40,16 +40,12 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 		this.mediaConstraints = null;
 
 
-		this.e.on("localstream", _.bind(function(event, stream, oldstream) {
+		this.e.on("localstream", _.bind(function (event, stream, oldstream) {
 			// Update stream support.
 			if (oldstream) {
-				_.each(this.peerconnections, function(pc) {
-					if (DummyStream.not(oldstream)) {
-						pc.removeStream(oldstream);
-					}
-					if (DummyStream.not(stream)) {
-						pc.addStream(stream);
-					}
+				_.each(this.peerconnections, function (pc) {
+					pc.removeStream(oldstream);
+					pc.addStream(stream);
 					console.log("Updated usermedia stream at peer connection", pc, stream);
 				});
 			}
@@ -60,7 +56,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	UserMedia.stopUserMediaStream = stopUserMediaStream;
 
-	UserMedia.prototype.doGetUserMedia = function(currentcall, mediaConstraints) {
+	UserMedia.prototype.doGetUserMedia = function (currentcall, mediaConstraints) {
 
 		if (!mediaConstraints) {
 			mediaConstraints = currentcall.mediaConstraints;
@@ -70,7 +66,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.doGetUserMediaWithConstraints = function(mediaConstraints) {
+	UserMedia.prototype.doGetUserMediaWithConstraints = function (mediaConstraints) {
 
 		if (!mediaConstraints) {
 			mediaConstraints = this.mediaConstraints;
@@ -84,26 +80,6 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 		var constraints = $.extend(true, {}, mediaConstraints);
 
-		if (this.renegotiation) {
-
-			if (this.audioMute && this.videoMute) {
-				// Fast path as nothing should be shared.
-				_.defer(_.bind(function() {
-					this.onUserMediaSuccess(new DummyStream());
-				}, this));
-				this.started = true;
-				return true
-			}
-
-			if (this.audioMute) {
-				constraints.audio = false;
-			}
-			if (this.videoMute) {
-				constraints.video = false;
-			}
-
-		}
-
 		try {
 			console.log('Requesting access to local media with mediaConstraints:\n' +
 				'  \'' + JSON.stringify(constraints) + '\'', constraints);
@@ -112,13 +88,12 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 			return true;
 		} catch (e) {
 			console.error('getUserMedia failed with exception: ' + e.message);
-			this.onUserMediaSuccess(new DummyStream());
 			return false;
 		}
 
 	};
 
-	UserMedia.prototype.onUserMediaSuccess = function(stream) {
+	UserMedia.prototype.onUserMediaSuccess = function (stream) {
 		console.log('User has granted access to local media.');
 
 		if (!this.started) {
@@ -130,11 +105,9 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.onUserMediaError = function(error) {
+	UserMedia.prototype.onUserMediaError = function (error) {
 		console.error('Failed to get access to local media. Error was ' + error.name, error);
-		this.onUserMediaSuccess(new DummyStream());
-		return;
-		
+
 		if (!this.started) {
 			return;
 		}
@@ -144,17 +117,17 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.replaceStream = function(stream) {
+	UserMedia.prototype.replaceStream = function (stream) {
 
 		var oldStream = this.localStream;
 
 		if (oldStream && oldStream.active) {
 			// Let old stream silently end.
-			var onendedsilent = function(event) {
+			var onendedsilent = function (event) {
 				console.log("Silently ended replaced user media stream.");
 			};
 			if (oldStream.getTracks) {
-				_.each(stream.getTracks(), function(t) {
+				_.each(stream.getTracks(), function (t) {
 					t.onended = onendedsilent;
 				});
 			} else {
@@ -167,7 +140,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 		if (stream) {
 			// Catch events when streams end.
 			var trackCount = 0;
-			var onended = _.bind(function(event) {
+			var onended = _.bind(function (event) {
 				trackCount--;
 				if (this.started && trackCount <= 0) {
 					console.log("Stopping user media as a stream has ended.", event);
@@ -175,7 +148,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 				}
 			}, this);
 			if (stream.getTracks) {
-				_.each(stream.getTracks(), function(t) {
+				_.each(stream.getTracks(), function (t) {
 					t.onended = onended;
 					trackCount++;
 				});
@@ -193,16 +166,16 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.onLocalStream = function(stream) {
+	UserMedia.prototype.onLocalStream = function (stream) {
 
 		if (this.replaceStream(stream)) {
 			// We replaced a stream.
-			setTimeout(_.bind(function() {
+			setTimeout(_.bind(function () {
 				this.e.triggerHandler("mediachanged", [this]);
 			}, this), 0);
 		} else {
 			// We are new.
-			setTimeout(_.bind(function() {
+			setTimeout(_.bind(function () {
 				this.e.triggerHandler("mediasuccess", [this]);
 			}, this), 0);
 		}
@@ -215,7 +188,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.stop = function() {
+	UserMedia.prototype.stop = function () {
 
 		this.started = false;
 
@@ -240,7 +213,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.applyAudioMute = function(mute) {
+	UserMedia.prototype.applyAudioMute = function (mute) {
 
 		var m = !!mute;
 
@@ -289,7 +262,7 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.applyVideoMute = function(mute) {
+	UserMedia.prototype.applyVideoMute = function (mute) {
 
 		var m = !!mute;
 
@@ -336,17 +309,17 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.addToPeerConnection = function(pc) {
+	UserMedia.prototype.addToPeerConnection = function (pc) {
 
 		console.log("Add usermedia stream to peer connection", pc, this.localStream);
 		if (this.localStream) {
-			if (DummyStream.not(this.localStream)) {
-				pc.addStream(this.localStream);
-			}
+
+			pc.addStream(this.localStream);
+
 			var id = pc.id;
 			if (!this.peerconnections.hasOwnProperty(id)) {
 				this.peerconnections[id] = pc;
-				pc.currentcall.e.one("closed", _.bind(function() {
+				pc.currentcall.e.one("closed", _.bind(function () {
 					delete this.peerconnections[id];
 				}, this));
 			}
@@ -357,24 +330,14 @@ define(['jquery', 'underscore', 'mediastream/dummystream', 'webrtc.adapter'], fu
 
 	};
 
-	UserMedia.prototype.removeFromPeerConnection = function(pc) {
+	UserMedia.prototype.removeFromPeerConnection = function (pc) {
 
 		console.log("Remove usermedia stream from peer connection", pc, this.localStream);
 		if (this.localStream) {
-			if (DummyStream.not(this.localStream)) {
-				pc.removeStream(this.localStream);
-			}
+			pc.removeStream(this.localStream);
 			if (this.peerconnections.hasOwnProperty(pc.id)) {
 				delete this.peerconnections[pc.id];
 			}
-		}
-
-	};
-
-	UserMedia.prototype.attachMediaStream = function(video) {
-
-		if (this.localStream && DummyStream.not(this.localStream)) {
-			window.attachMediaStream(video, this.localStream);
 		}
 
 	};

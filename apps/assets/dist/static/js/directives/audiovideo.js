@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter', 'RecordRTC'], function ($, _, template) {
 
-	return ["$window", "mediaStream", "safeApply", "$timeout", "dummyStream", "api", function ($window, mediaStream, safeApply, $timeout, DummyStream, api) {
+	return ["$window", "mediaStream", "safeApply", "$timeout", function ($window, mediaStream, safeApply, $timeout) {
 
 
 		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
@@ -13,10 +13,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 
 			$scope.attachStream = function (stream, currentcall) {
 				console.log("audivideo.attachStream and start recording.stream videotracks:", stream.getVideoTracks().length, "\ncaller:\n", currentcall);
-
-
-				// var video = $element.find("video")[0];
-				// $window.attachMediaStream(video, stream);
 
 				const video = document.querySelector('video');
 				video.srcObject = stream;
