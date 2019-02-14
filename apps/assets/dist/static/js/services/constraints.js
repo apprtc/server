@@ -145,26 +145,7 @@
 			},
 			stun: function(stunData) {
 				service.stun = stunData;
-			},
-			supported: (function() {
-				var isChrome = $window.webrtcDetectedBrowser === "chrome";
-				var isFirefox = $window.webrtcDetectedBrowser === "firefox";
-				var isEdge = $window.webrtcDetectedBrowser === "edge";
-				var version = $window.webrtcDetectedVersion;
-				// Constraints support table.
-				return {
-					// Chrome supports it. FF supports new spec starting 38. See https://wiki.mozilla.org/Media/getUserMedia for FF details.
-					audioVideo: isChrome || (isFirefox && version >= 38),
-					// HD constraints in Chrome no issue. In FF we MJPEG is fixed with 38 (see https://bugzilla.mozilla.org/show_bug.cgi?id=1151628).
-					hdVideo: isChrome || (isFirefox && version >= 38),
-					// Chrome supports this on Windows only.
-					renderToAssociatedSink: isChrome && $window.navigator.platform.indexOf("Win") === 0,
-					vp9: isChrome && version >= 48,
-					chrome: isChrome,
-					firefox: isFirefox,
-					edge: isEdge
-				};
-			})()
+			}
 		};
 
 	}];

@@ -28,37 +28,16 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				constraints.stun(stun);
 			})();
 
-			// Add browser details for easy access.
-			$scope.isChrome = $window.webrtcDetectedBrowser === "chrome";
-			$scope.webrtcDetectedBrowser = $window.webrtcDetectedBrowser;
-			$scope.webrtcDetectedVersion = $window.webrtcDetectedVersion;
-
-			// Add support status.
-			$scope.supported = {
-				constraints: constraints.supported
-			};
 
 			// Default scope data.
 			$scope.status = "initializing";
 			$scope.id = $scope.myid = null;
-			$scope.userid = $scope.myuserid = null;
-			$scope.suserid = null;
 			$scope.peer = null;
-			$scope.dialing = null;
-			$scope.conferenceObject = null;
-			$scope.conferencePeers = [];
 			$scope.incoming = null;
 			$scope.layout = {
 				main: null,
 			};
-			$scope.autoAccept = null;
-			$scope.isCollapsed = true;
 			$scope.usermedia = null;
-
-			$scope.setStatus = function (status) {
-				// This is the connection status to signaling server.
-				$scope.$emit("status", status);
-			};
 
 			$scope.getStatus = function () {
 				return $scope.status;
@@ -72,23 +51,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				}
 				console.log("Status update commit", status);
 				mediaStream.api.updateStatus(status);
-			};
-
-			$scope.setConnectedStatus = function () {
-				if (!$scope.peer) {
-					return;
-				}
-
-				$scope.setStatus("connected");
-
-			};
-
-			$scope.clearConnectedStatus = function () {
-				if (mediaStream.connector.connected) {
-					$scope.setStatus("waiting");
-				} else {
-					$scope.setStatus("closed");
-				}
 			};
 
 			$scope.refreshWebrtcSettings = function () {
@@ -114,8 +76,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				$timeout.cancel(ttlTimeout);
 				safeApply($scope, function (scope) {
 					scope.id = scope.myid = data.Id;
-					scope.userid = scope.myuserid = data.Userid ? data.Userid : null;
-					scope.suserid = data.Suserid ? data.Suserid : null;
 				});
 
 				// Set TURN and STUN data and refresh webrtc settings.
@@ -129,19 +89,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 						console.log("Ttl reached - sending refresh request.");
 						mediaStream.api.sendSelf();
 					}, data.Turn.ttl / 100 * 90 * 1000);
-				}
-
-				// Support resurrection shrine.
-				if (appData.flags.resurrect) {
-					var resurrection = appData.flags.resurrect;
-					appData.flags.resurrect = null;
-					$timeout(function () {
-						if (resurrection.id === $scope.id) {
-							console.log("Using resurrection shrine", resurrection);
-							// Valid resurrection.
-							$scope.setStatus(resurrection.status);
-						}
-					}, 0);
 				}
 
 				// Propagate authentication event.
@@ -217,44 +164,29 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 							}
 							appData.flags.reconnecting = false;
 						}, delay);
-						$scope.setStatus("reconnecting");
 					} else {
 						console.warn("Already reconnecting ...");
 					}
-				} else {
-					$scope.setStatus("closed");
 				}
 			};
 
 			mediaStream.connector.e.on("open error close", function (event) {
 				$timeout.cancel(ttlTimeout);
-				$scope.userid = $scope.suserid = null;
 				switch (event.type) {
 					case "open":
 						appData.flags.connected = true;
 						appData.flags.autoreconnectDelay = 0;
 						$scope.updateStatus(true);
-						$scope.setStatus("waiting");
 						break;
 					case "error":
 						if (appData.flags.connected) {
 							reconnect();
-						} else {
-							$scope.setStatus(event.type);
 						}
 						break;
 					case "close":
 						reconnect();
 						break;
 				}
-			});
-
-			mediaStream.webrtc.e.on("waitforusermedia connecting", function (event, currentcall) {
-				var t = event.type;
-				safeApply($scope, function (scope) {
-					scope.dialing = currentcall ? currentcall.id : null;
-					scope.setStatus(t);
-				});
 			});
 
 			mediaStream.webrtc.e.on("statechange", function (event, state, currentcall) {
@@ -266,7 +198,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 						}
 					case "completed":
 					case "connected":
-						$scope.setConnectedStatus();
 						break;
 					case "failed":
 						var wasConnected = !currentcall.closed;
@@ -284,13 +215,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			}, 1000);
 
 			$scope.$on("active", function (event, currentcall) {
-
 				console.info("Video state active (assuming connected)", currentcall.id);
-				$scope.setConnectedStatus();
-			});
-
-			$scope.$on("room.updated", function (event, room) {
-				$scope.roomType = room ? room.Type : null;
 			});
 
 			// Apply all layout stuff as classes to our element.
@@ -322,11 +247,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				}
 			}()), true);
 
-			mediaStream.webrtc.e.on("done stop", function () {
-				safeApply($scope, function (scope) {
-					scope.clearConnectedStatus();
-				});
-			});
 
 			mediaStream.webrtc.e.on("busy", function (event, from) {
 				console.log("Incoming call - sent busy.", from);
@@ -337,7 +257,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			});
 
 			mediaStream.webrtc.e.on("bye", function (event, reason, from) {
-				console.log("received bye", pickupTimeout, reason);
 				switch (reason) {
 					case "busy":
 						console.log("User is busy", reason, from);
@@ -373,28 +292,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				}
 			});
 
-			$scope.$on("status", function (event, status) {
-				if (status === "connecting" && dialerEnabled) {
-					dialer.start();
-					// Start accept timeout.
-					ringerTimeout = $timeout(function () {
-						console.log("Ringer timeout reached.");
-						mediaStream.webrtc.doHangup("ringertimeout");
-						$scope.$emit("notification", "pickuptimeout", {
-							reason: 'pickuptimeout',
-							from: $scope.dialing
-						});
-					}, 35000);
-				} else {
-					$timeout.cancel(ringerTimeout);
-					ringerTimeout = null;
-				}
-				safeApply($scope, function (scope) {
-					var old = $scope.status;
-					$scope.status = status;
-				});
-				appData.e.triggerHandler("mainStatus", [status]);
-			});
 
 			$scope.$on("notification", function (event, type, details) {
 				var message = null;

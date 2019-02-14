@@ -20,10 +20,6 @@ define([
 
 		// Apply configuration details.
 		webrtc.settings.renegotiation = context.Cfg.Renegotiation && true;
-		if (webrtc.settings.renegotiation && $window.webrtcDetectedBrowser !== "chrome") {
-			console.warn("Disable renegotiation in anything but Chrome for now.");
-			webrtc.settings.renegotiation = false;
-		}
 
 		// mediaStream service API.
 		var mediaStream = {
