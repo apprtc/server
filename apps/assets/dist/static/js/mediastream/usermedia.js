@@ -29,12 +29,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			mediaConstraints = currentcall.mediaConstraints;
 		}
 
-		return this.doGetUserMediaWithConstraints(mediaConstraints);
-
-	};
-
-	UserMedia.prototype.doGetUserMediaWithConstraints = function (mediaConstraints) {
-
 		if (!mediaConstraints) {
 			mediaConstraints = this.mediaConstraints;
 		} else {

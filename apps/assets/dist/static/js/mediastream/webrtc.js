@@ -138,7 +138,7 @@ define([
 				return;
 			}
 
-			var autoaccept = true;
+
 			if (this.conference.hasCalls() && !this.conference.isDisconnected(from)) {
 				// TODO(fancycode): support joining callers to currently active conference.
 				console.warn("Received Offer while already in a call -> busy.", from);
@@ -149,20 +149,15 @@ define([
 
 			call = this.createCall(from, this.api.id, from);
 			if (!this.conference.addIncoming(from, call)) {
-				console.warn("Already got a call, not processing Offer", from, autoaccept);
+				console.warn("Already got a call, not processing Offer", from);
 				return;
 			}
 
 			this.pushFrontMessage(from, [to, data, type, to2, from]);
-			if (autoaccept) {
-				if (!this.doAccept(call, true)) {
-					this.popFrontMessage(from);
-				}
-				return;
+			// autoaccept)
+			if (!this.doAccept(call, true)) {
+				this.popFrontMessage(from);
 			}
-
-			// Delegate next steps to UI.
-			this.e.triggerHandler("offer", [from, to2, to]);
 		};
 
 		WebRTC.prototype._processCandidate = function (to, data, type, to2, from) {
@@ -359,19 +354,7 @@ define([
 
 		WebRTC.prototype.doAccept = function (call, autoanswer) {
 			console.log("WebRTC.doAccept");
-			if (typeof call === "string") {
-				var id = call;
-				call = this.conference.getCall(id);
-				if (!call) {
-					console.warn("Trying to accept unknown call.", id);
-					return false;
-				}
-			}
-
 			this.conference.setCallActive(call.id);
-			if (autoanswer && this._doAutoStartCall(call)) {
-				return true;
-			}
 
 			return this._doCallUserMedia(call);
 		};

@@ -125,13 +125,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 				}
 			};
 
-
-			mediaStream.webrtc.e.on("usermedia", function (event, usermedia) {
-
-				if (!usermedia || !usermedia.started) {
-					return;
-				}
-			});
 			mediaStream.webrtc.e.on("done stop", function (event) {
 
 				safeApply($scope, function (scope) {

@@ -103,11 +103,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				}
 				// Refresh constraints.
 				constraints.refresh($scope.master.settings).then(function () {
-					var um = $scope.usermedia;
-					if (um && um.renegotiation && um.started) {
-						// Trigger renegotiation if supported and started.
-						um.doGetUserMediaWithConstraints(mediaStream.webrtc.settings.mediaConstraints);
-					}
 				});
 			};
 			$scope.refreshWebrtcSettings(); // Call once for bootstrap.
@@ -214,30 +209,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 					scope.peer = peercall ? peercall.id : null;
 					scope.setConnectedStatus();
 				});
-			});
-
-
-			mediaStream.webrtc.e.on("offer", function (event, from, to2, to) {
-				safeApply($scope, function (scope) {
-					scope.incoming = from;
-				});
-				if ($scope.updateAutoAccept(null, from)) {
-					console.log("accept support.");
-					// Auto accept support.
-					mediaStream.webrtc.doAccept(from);
-					return;
-				}
-
-				// Show incoming call notification.
-				$scope.$emit("status", "ringing");
-				// Start accept timeout.
-				pickupTimeout = $timeout(function () {
-					console.log("Pickup timeout reached.");
-					mediaStream.webrtc.doHangup("pickuptimeout", from);
-
-				}, 30000);
-
-				console.log("notification incoming from: ", from);
 			});
 
 			mediaStream.webrtc.e.on("error", function (event, message, msgid) {

@@ -43,14 +43,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 		};
 		$scope.master = angular.copy($scope.defaults);
 
-		$scope.update = function(user) {
-			$scope.master = angular.copy(user);
-			if (appData.flags.connected) {
-				$scope.updateStatus();
-			}
-			$scope.refreshWebrtcSettings();
-		};
-
 		$scope.reset = function() {
 			$scope.user = angular.copy($scope.master);
 		};
