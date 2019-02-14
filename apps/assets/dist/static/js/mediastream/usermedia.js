@@ -2,21 +2,6 @@
 
 "use strict";
 define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
-	var stopUserMediaStream = (function () {
-		return function (stream) {
-			if (stream && stream.getTracks) {
-				// Stop all tracks.
-				var tracks = stream.getTracks();
-				_.each(tracks, function (t) {
-					t.stop();
-				});
-			} else {
-				// MediaStream.stop is deprecated.
-				stream.stop();
-			}
-		}
-	})();
-
 	// UserMedia.
 	var UserMedia = function (options) {
 
@@ -35,25 +20,8 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			console.info("User media with renegotiation created ...");
 		}
 
-		this.audioMute = options.audioMute && true;
-		this.videoMute = options.videoMute && true;
 		this.mediaConstraints = null;
-
-
-		this.e.on("localstream", _.bind(function (event, stream, oldstream) {
-			// Update stream support.
-			if (oldstream) {
-				_.each(this.peerconnections, function (pc) {
-					pc.removeStream(oldstream);
-					pc.addStream(stream);
-					console.log("Updated usermedia stream at peer connection", pc, stream);
-				});
-			}
-		}, this));
 	};
-
-
-	UserMedia.stopUserMediaStream = stopUserMediaStream;
 
 	UserMedia.prototype.doGetUserMedia = function (currentcall, mediaConstraints) {
 
@@ -71,10 +39,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			mediaConstraints = this.mediaConstraints;
 		} else {
 			this.mediaConstraints = mediaConstraints;
-			if (this.localStream) {
-				// Release stream early if any to be able to apply new constraints.
-				this.replaceStream(null);
-			}
+			this.localStream = null;
 		}
 
 		var constraints = $.extend(true, {}, mediaConstraints);
@@ -95,13 +60,11 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 	UserMedia.prototype.onUserMediaSuccess = function (stream) {
 		console.log('User has granted access to local media.');
 
-		if (!this.started) {
-			stopUserMediaStream(stream);
-			return;
-		}
-
-		this.onLocalStream(stream);
-
+		this.localStream = stream;
+		// We are new.
+		setTimeout(_.bind(function () {
+			this.e.triggerHandler("mediasuccess", [this]);
+		}, this), 0);
 	};
 
 	UserMedia.prototype.onUserMediaError = function (error) {
@@ -116,94 +79,18 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 	};
 
-	UserMedia.prototype.replaceStream = function (stream) {
-
-		var oldStream = this.localStream;
-
-		if (oldStream && oldStream.active) {
-			// Let old stream silently end.
-			var onendedsilent = function (event) {
-				console.log("Silently ended replaced user media stream.");
-			};
-			if (oldStream.getTracks) {
-				_.each(stream.getTracks(), function (t) {
-					t.onended = onendedsilent;
-				});
-			} else {
-				// Legacy api.
-				oldStream.onended = onendedsilent;
-			}
-			stopUserMediaStream(oldStream);
-		}
-
-		if (stream) {
-			// Catch events when streams end.
-			var trackCount = 0;
-			var onended = _.bind(function (event) {
-				trackCount--;
-				if (this.started && trackCount <= 0) {
-					console.log("Stopping user media as a stream has ended.", event);
-					this.stop();
-				}
-			}, this);
-			if (stream.getTracks) {
-				_.each(stream.getTracks(), function (t) {
-					t.onended = onended;
-					trackCount++;
-				});
-			} else {
-				// Legacy api.
-				stream.onended = onended;
-				trackCount++;
-			}
-			// Set new stream.
-			this.localStream = stream;
-			this.e.triggerHandler("localstream", [stream, oldStream, this]);
-		}
-
-		return oldStream && stream;
-
-	};
-
-	UserMedia.prototype.onLocalStream = function (stream) {
-		if (this.replaceStream(stream)) {
-			// We replaced a stream.
-			setTimeout(_.bind(function () {
-				this.e.triggerHandler("mediachanged", [this]);
-			}, this), 0);
-		} else {
-			// We are new.
-			setTimeout(_.bind(function () {
-				this.e.triggerHandler("mediasuccess", [this]);
-			}, this), 0);
-		}
-
-		if (!this.renegotiation) {
-			// Apply mute states after we got streams.
-			this.applyAudioMute(this.audioMute);
-			this.applyVideoMute(this.videoMute);
-		}
-
-	};
-
 	UserMedia.prototype.stop = function () {
-
 		this.started = false;
 
-		if (this.audioSource) {
-			this.audioSource.disconnect();
-			this.audioSource = null;
-		}
-		if (this.localStream) {
-			stopUserMediaStream(this.localStream);
+		if (this.localStream && this.localStream.getTracks) {
+			// Stop all tracks.
+			var tracks = this.localStream.getTracks();
+			_.each(tracks, function (t) {
+				t.stop();
+			});
 			this.localStream = null;
 		}
-		if (this.audioProcessor) {
-			this.audioProcessor.disconnect()
-		}
-		this.audioLevel = 0;
-		this.audioMute = false;
-		this.videoMute = false;
+
 		this.mediaConstraints = null;
 		console.log("Stopped user media.");
 		this.e.triggerHandler("stopped", [this]);
