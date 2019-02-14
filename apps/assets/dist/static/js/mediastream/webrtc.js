@@ -22,12 +22,10 @@ define([
 			this.conference = new PeerConference(this);
 			this.msgQueues = {};
 			this.usermediaReady = false;
-			this.pendingMediaCalls = [];
+			this.currentCall = null;
 			this.pendingMessages = [];
 
 			this.usermedia = null;
-			this.audioMute = false;
-			this.videoMute = false;
 
 			// Settings.are cloned into peer call on call creation.
 			this.settings = {
@@ -263,18 +261,13 @@ define([
 			}
 
 			// Create default media (audio/video).
-			var usermedia = new UserMedia({
-				renegotiation: this.settings.renegotiation,
-				audioMute: this.audioMute,
-				videoMute: this.videoMute
-			});
+			var usermedia = new UserMedia();
 			usermedia.e.on("mediasuccess mediaerror", _.bind(function (event, um) {
 				this.e.triggerHandler("usermedia", [um]);
 				this.usermediaReady = true;
 				// Start always, no matter what.
-				while (this.pendingMediaCalls.length > 0) {
-					var c = this.pendingMediaCalls.shift();
-					this.maybeStart(um, c);
+				if (this.currentCall != null) {
+					this.maybeStart(um, this.currentCall);
 				}
 			}, this));
 			usermedia.e.on("stopped", _.bind(function (event, um) {
@@ -289,7 +282,7 @@ define([
 			});
 			this.usermedia = usermedia;
 			this.e.triggerHandler("usermedia", [usermedia]);
-			this.pendingMediaCalls.push(call);
+			this.currentCall = call;
 
 			return usermedia.doGetUserMedia(call);
 
@@ -299,7 +292,7 @@ define([
 			console.log("WebRTC._doCallUserMedia, this.usermediaReady=", this.usermediaReady);
 			if (this.usermedia) {
 				if (!this.usermediaReady) {
-					this.pendingMediaCalls.push(call);
+					this.currentCall = call;
 				} else {
 					this.maybeStart(this.usermedia, call);
 				}
@@ -311,11 +304,7 @@ define([
 				this.e.triggerHandler("waitforusermedia", [call]);
 				return true;
 			}
-
-			// this.e.triggerHandler("error", ["Failed to access camera/microphone.", "failed_getusermedia"]);
-			// if (call.id) {
-			// 	this.doHangup("usermedia", call.id);
-			// }
+			
 			return false;
 		};
 
@@ -327,7 +316,7 @@ define([
 
 			if (!this.usermediaReady) {
 				// getUserMedia is still pending, defer starting of call.
-				this.pendingMediaCalls.push(call);
+				this.currentCall = call;
 			} else {
 				this.maybeStart(this.usermedia, call, true);
 			}
@@ -408,14 +397,6 @@ define([
 				return;
 			}
 
-			if (!autocall) {
-				if (!call.isinternal) {
-					this.e.triggerHandler("connecting", [call]);
-				} else if (!this.conference.hasCalls()) {
-					// Signal UI that media access has been granted.
-					this.e.triggerHandler("done");
-				}
-			}
 			console.log('Creating PeerConnectionClient.', call);
 			call.createPeerConnection(_.bind(function (peerconnectionclient) {
 				// Success call.

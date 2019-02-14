@@ -3,22 +3,11 @@
 "use strict";
 define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 	// UserMedia.
-	var UserMedia = function (options) {
-
-		this.options = $.extend({}, options);
+	var UserMedia = function () {
 		this.e = $({}); // Events.
 
 		this.localStream = null;
 		this.started = false;
-
-		this.peerconnections = {};
-
-		// If true, mute/unmute of audio/video creates a new stream which
-		// will trigger renegotiation on the peer connection.
-		this.renegotiation = options.renegotiation && true;
-		if (this.renegotiation) {
-			console.info("User media with renegotiation created ...");
-		}
 
 		this.mediaConstraints = null;
 	};
@@ -64,10 +53,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 	UserMedia.prototype.onUserMediaError = function (error) {
 		console.error('Failed to get access to local media. Error was ' + error.name, error);
 
-		if (!this.started) {
-			return;
-		}
-
 		// Let webrtc handle the rest.
 		this.e.triggerHandler("mediaerror", [this, error]);
 
@@ -97,21 +82,8 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 		console.log("Add usermedia stream to peer connection", pc, this.localStream);
 		if (this.localStream) {
-
 			pc.addStream(this.localStream);
-
-			var id = pc.id;
-			if (!this.peerconnections.hasOwnProperty(id)) {
-				this.peerconnections[id] = pc;
-				pc.currentcall.e.one("closed", _.bind(function () {
-					delete this.peerconnections[id];
-				}, this));
-			}
-		} else {
-			// Make sure to trigger renegotiation even if we have no media.
-			_.defer(pc.negotiationNeeded);
 		}
-
 	};
 
 	UserMedia.prototype.removeFromPeerConnection = function (pc) {
@@ -119,9 +91,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 		console.log("Remove usermedia stream from peer connection", pc, this.localStream);
 		if (this.localStream) {
 			pc.removeStream(this.localStream);
-			if (this.peerconnections.hasOwnProperty(pc.id)) {
-				delete this.peerconnections[pc.id];
-			}
 		}
 
 	};
