@@ -7,6 +7,8 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 	var PeerConnectionClient = function (webrtc, currentcall) {
 
+		console.debug("new PeerConnectionClient");
+
 		this.webrtc = webrtc;
 		this.id = count++;
 		this.currentcall = null;
@@ -26,6 +28,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 	PeerConnectionClient.prototype.createPeerConnection = function (currentcall) {
 
 		// XXX(longsleep): This function is a mess.
+		console.debug("PeerConnectionClient.createPeerConnection", this.currentcall);
 
 		var pc;
 		if (currentcall) {

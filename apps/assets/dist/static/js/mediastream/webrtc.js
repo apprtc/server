@@ -282,10 +282,6 @@ define([
 					this.maybeStart(um, c);
 				}
 			}, this));
-			usermedia.e.on("mediachanged", _.bind(function (event, um) {
-				// Propagate media change events.
-				this.e.triggerHandler("usermedia", [um]);
-			}, this));
 			usermedia.e.on("stopped", _.bind(function (event, um) {
 				if (um === this.usermedia) {
 					this.e.triggerHandler("usermedia", [null]);
@@ -305,7 +301,7 @@ define([
 		};
 
 		WebRTC.prototype._doCallUserMedia = function (call) {
-			console.log("WebRTC._doCallUserMedia");
+			console.log("WebRTC._doCallUserMedia, this.usermediaReady=", this.usermediaReady);
 			if (this.usermedia) {
 				if (!this.usermediaReady) {
 					this.pendingMediaCalls.push(call);
@@ -329,7 +325,7 @@ define([
 		};
 
 		WebRTC.prototype._doAutoStartCall = function (call) {
-			console.log("WebRTC._doAutoStartCall");
+			console.log("WebRTC._doAutoStartCall, this.usermediaReady=", this.usermediaReady);
 			if (!this.usermedia) {
 				return false;
 			}

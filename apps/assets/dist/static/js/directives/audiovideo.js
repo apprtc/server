@@ -132,7 +132,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 					return;
 				}
 			});
-
 			mediaStream.webrtc.e.on("done stop", function (event) {
 
 				safeApply($scope, function (scope) {

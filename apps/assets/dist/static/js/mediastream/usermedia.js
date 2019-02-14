@@ -50,7 +50,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				});
 			}
 		}, this));
-
 	};
 
 
@@ -167,7 +166,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 	};
 
 	UserMedia.prototype.onLocalStream = function (stream) {
-
 		if (this.replaceStream(stream)) {
 			// We replaced a stream.
 			setTimeout(_.bind(function () {
@@ -213,101 +211,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 	};
 
-	UserMedia.prototype.applyAudioMute = function (mute) {
-
-		var m = !!mute;
-
-		if (!this.renegotiation) {
-
-			// Disable streams only - does not require renegotiation but keeps mic
-			// active and the stream will transmit silence.
-
-			if (this.localStream) {
-
-				var audioTracks = this.localStream.getAudioTracks();
-				if (audioTracks.length === 0) {
-					//console.log('No local audio available.');
-					return;
-				}
-
-				for (var i = 0; i < audioTracks.length; i++) {
-					audioTracks[i].enabled = !mute;
-				}
-
-				if (mute) {
-					console.log("Local audio muted by disabling audio tracks.");
-				} else {
-					console.log("Local audio unmuted by enabling audio tracks.");
-				}
-
-			}
-
-		} else {
-
-			// Remove audio stream, by creating a new stream and doing renegotiation. This
-			// is the way to go to disable the mic when audio is muted.
-
-			if (this.started) {
-				if (this.audioMute !== m) {
-					this.audioMute = m;
-					this.doGetUserMediaWithConstraints();
-				}
-			} else {
-				this.audioMute = m;
-			}
-
-		}
-
-		return m;
-
-	};
-
-	UserMedia.prototype.applyVideoMute = function (mute) {
-
-		var m = !!mute;
-
-		if (!this.renegotiation) {
-
-			// Disable streams only - does not require renegotiation but keeps camera
-			// active and the stream will transmit black.
-
-			if (this.localStream) {
-				var videoTracks = this.localStream.getVideoTracks();
-				if (videoTracks.length === 0) {
-					//console.log('No local video available.');
-					return;
-				}
-
-				for (var i = 0; i < videoTracks.length; i++) {
-					videoTracks[i].enabled = !mute;
-				}
-
-				if (mute) {
-					console.log("Local video muted by disabling video tracks.");
-				} else {
-					console.log("Local video unmuted by enabling video tracks.");
-				}
-
-			}
-		} else {
-
-			// Remove video stream, by creating a new stream and doing renegotiation. This
-			// is the way to go to disable the camera when video is muted.
-
-			if (this.started) {
-				if (this.videoMute !== m) {
-					this.videoMute = m;
-					this.doGetUserMediaWithConstraints();
-				}
-			} else {
-				this.videoMute = m;
-			}
-
-		}
-
-		return m;
-
-	};
 
 	UserMedia.prototype.addToPeerConnection = function (pc) {
 

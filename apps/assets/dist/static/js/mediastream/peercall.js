@@ -272,14 +272,14 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 
 	PeerCall.prototype.onNegotiationNeeded = function () {
 		console.log("PeerCall.onNegotiationNeeded.", this);
-		
+
 		if (!this.peerconnectionclient.readyForRenegotiation) {
 			console.log("PeerConnectionClient is not ready for renegotiation yet", this);
 			return;
 		}
 
 		if (!this.negotiationNeeded) {
-			this.negotiationNeeded = true;
+			this.negotiationNeeded = true; 
 			
 			this.e.triggerHandler("negotiationNeeded", [this]);
 		}

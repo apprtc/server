@@ -45,7 +45,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			$scope.suserid = null;
 			$scope.peer = null;
 			$scope.dialing = null;
-			$scope.conference = null;
 			$scope.conferenceObject = null;
 			$scope.conferencePeers = [];
 			$scope.incoming = null;
@@ -340,9 +339,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 						if ($scope.getStatus() === "closed" || $scope.getStatus() === "waiting") {
 							return;
 						}
-					// This changes back from "conference" to "connected" if a
-					// conference is downgraded to p2p call.
-					/* falls through */
 					case "completed":
 					case "connected":
 						$scope.setConnectedStatus();
