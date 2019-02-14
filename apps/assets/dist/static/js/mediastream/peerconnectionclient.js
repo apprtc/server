@@ -122,16 +122,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 	};
 
-	PeerConnectionClient.prototype.hasRemoteDescription = function () {
-
-		// NOTE(longsleep): Chrome seems to return empty sdp even if no remoteDescription was set.
-		if (!this.pc || !this.pc.remoteDescription || !this.pc.remoteDescription.sdp) {
-			return false
-		}
-		return true;
-
-	};
-
 	PeerConnectionClient.prototype.setRemoteDescription = function () {
 
 		return this.pc.setRemoteDescription.apply(this.pc, arguments);

@@ -23,7 +23,6 @@ define([
 			this.msgQueues = {};
 			this.usermediaReady = false;
 			this.currentCall = null;
-			this.pendingMessages = [];
 
 			this.usermedia = null;
 
@@ -74,11 +73,6 @@ define([
 			this.api.e.bind("received.offer received.candidate received.answer received.bye received.conference", _.bind(this.processReceived, this));
 		};
 
-		WebRTC.prototype.stopLocalVideo = function () {
-			if (this.usermedia) {
-				this.usermedia.stop();
-			}
-		};
 
 		WebRTC.prototype.processReceived = function (event, to, data, type, to2, from) {
 
@@ -118,14 +112,6 @@ define([
 			console.log("WebRTC._processOffer");
 			var call = this.conference.getCall(from);
 			if (call) {
-				// Remote peer is trying to renegotiate media.
-				if (!this.settings.renegotiation && call.peerconnectionclient && call.peerconnectionclient.hasRemoteDescription()) {
-					// Call replace support without renegotiation.
-					this.doHangup("unsupported", from);
-					console.error("Processing new offers is not implemented without renegotiation.");
-					return;
-				}
-
 				call.setRemoteDescription(new window.RTCSessionDescription(data), _.bind(function (sessionDescription, currentcall) {
 					this.e.triggerHandler("peercall", [currentcall]);
 					currentcall.createAnswer(_.bind(function (sessionDescription, currentcall) {
@@ -323,7 +309,7 @@ define([
 			return true;
 		};
 
-		WebRTC.prototype.doCall = function (id, autocall) {
+		WebRTC.prototype.doCall = function (id) {
 			console.log("WebRTC.doCall");
 			var call = this.createCall(id, null, id);
 			call.setInitiate(true);
@@ -332,9 +318,6 @@ define([
 				return;
 			}
 			this.e.triggerHandler("peercall", [call]);
-			if (!autocall) {
-				this.e.triggerHandler("connecting", [call]);
-			}
 
 			if (!this._doCallUserMedia(call)) {
 				return;
