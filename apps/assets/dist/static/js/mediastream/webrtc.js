@@ -113,7 +113,6 @@ define([
 			var call = this.conference.getCall(from);
 			if (call) {
 				call.setRemoteDescription(new window.RTCSessionDescription(data), _.bind(function (sessionDescription, currentcall) {
-					this.e.triggerHandler("peercall", [currentcall]);
 					currentcall.createAnswer(_.bind(function (sessionDescription, currentcall) {
 						console.log("Sending answer", sessionDescription, currentcall.id);
 						this.api.sendAnswer(currentcall.id, sessionDescription);
@@ -317,7 +316,6 @@ define([
 				console.log("Already has a call with", id);
 				return;
 			}
-			this.e.triggerHandler("peercall", [call]);
 
 			if (!this._doCallUserMedia(call)) {
 				return;
@@ -334,7 +332,6 @@ define([
 		WebRTC.prototype.stop = function () {
 			console.log("WebRTC.stop");
 			this.conference.close();
-			this.e.triggerHandler("peercall", [null]);
 			this.e.triggerHandler("stop");
 			this.msgQueues = {};
 
@@ -363,7 +360,6 @@ define([
 			}
 
 			// Last peer disconnected, perform cleanup.
-			this.e.triggerHandler("peercall", [null]);
 			_.defer(_.bind(function () {
 				this.e.triggerHandler("done", [reason]);
 			}, this));

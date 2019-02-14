@@ -107,35 +107,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			};
 			$scope.refreshWebrtcSettings(); // Call once for bootstrap.
 
-			var pickupTimeout = null;
-			var autoAcceptTimeout = null;
-			var ringerTimeout = null;
-			$scope.updateAutoAccept = function (id, from) {
-
-				if (id) {
-					console.log("Auto accept requested", id);
-					$scope.autoAccept = id;
-					$timeout.cancel(autoAcceptTimeout);
-					autoAcceptTimeout = $timeout(function () {
-						$scope.autoAccept = null;
-						console.warn("Auto accept expired!")
-						safeApply($scope);
-					}, 2000);
-				} else {
-					if ($scope.autoAccept && $scope.autoAccept === from) {
-						$scope.autoAccept = null;
-						$timeout.cancel(autoAcceptTimeout);
-						console.log("Auto accept success", from)
-						return from;
-					}
-					return null;
-				}
-
-			};
-
-
-			var dialerEnabled = false;
-			var notification;
 			var ttlTimeout;
 
 			mediaStream.api.e.on("received.self", function (event, data) {
@@ -192,23 +163,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 					}
 				}
 				$scope.$apply();
-			});
-
-			mediaStream.webrtc.e.on("peercall", function (event, peercall) {
-
-				// Kill timeout.
-				$timeout.cancel(pickupTimeout);
-				pickupTimeout = null;
-
-				// Close notifications.
-				if (notification) {
-					notification.close();
-				}
-				// Apply peer call to scope.
-				safeApply($scope, function (scope) {
-					scope.peer = peercall ? peercall.id : null;
-					scope.setConnectedStatus();
-				});
 			});
 
 			mediaStream.webrtc.e.on("error", function (event, message, msgid) {
