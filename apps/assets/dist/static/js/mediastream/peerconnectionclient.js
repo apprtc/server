@@ -13,7 +13,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 		this.id = count++;
 		this.currentcall = null;
 		this.pc = null;
-		this.readyForRenegotiation = true;
 
 		if (currentcall) {
 			this.createPeerConnection(currentcall);
@@ -21,9 +20,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 	};
 
-	PeerConnectionClient.prototype.setReadyForRenegotiation = function (ready) {
-		this.readyForRenegotiation = !!ready;
-	};
 
 	PeerConnectionClient.prototype.createPeerConnection = function (currentcall) {
 

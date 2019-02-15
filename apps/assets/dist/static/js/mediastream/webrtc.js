@@ -109,18 +109,6 @@ define([
 
 		WebRTC.prototype._processOffer = function (to, data, type, to2, from) {
 			console.log("WebRTC._processOffer");
-			var call = this.conference.getCall(from);
-			if (call) {
-				call.setRemoteDescription(new window.RTCSessionDescription(data), _.bind(function (sessionDescription, currentcall) {
-					currentcall.createAnswer(_.bind(function (sessionDescription, currentcall) {
-						console.log("Sending answer", sessionDescription, currentcall.id);
-						this.api.sendAnswer(currentcall.id, sessionDescription);
-					}, this));
-				}, this));
-				return;
-			}
-
-
 			if (this.conference.hasCalls() && !this.conference.isDisconnected(from)) {
 				// TODO(fancycode): support joining callers to currently active conference.
 				console.warn("Received Offer while already in a call -> busy.", from);
@@ -129,17 +117,9 @@ define([
 				return;
 			}
 
-			call = this.createCall(from, this.api.id, from);
-			if (!this.conference.addIncoming(from, call)) {
-				console.warn("Already got a call, not processing Offer", from);
-				return;
-			}
-
-			this.pushFrontMessage(from, [to, data, type, to2, from]);
 			// autoaccept)
-			if (!this.doAccept(call, true)) {
-				this.popFrontMessage(from);
-			}
+			this.doAccept(from, data);
+
 		};
 
 		WebRTC.prototype._processCandidate = function (to, data, type, to2, from) {
@@ -168,8 +148,7 @@ define([
 			}
 
 			this.conference.setCallActive(call.id);
-			// TODO(longsleep): In case of negotiation this could switch offer and answer
-			// and result in a offer sdp sent as answer data. We need to handle this.
+
 			call.setRemoteDescription(new window.RTCSessionDescription(data), function () {
 				// Received remote description as answer.
 				console.log("Received answer after we sent offer", data);
@@ -236,7 +215,7 @@ define([
 			return call;
 		};
 
-		WebRTC.prototype.doUserMedia = function (call) {
+		WebRTC.prototype.doUserMedia = function (call, needStream) {
 			console.log("WebRTC.doUserMedia");
 			if (this.usermedia) {
 				// We should not create a new UserMedia object while the current one
@@ -246,13 +225,6 @@ define([
 
 			// Create default media (audio/video).
 			var usermedia = new UserMedia();
-			usermedia.e.on("mediasuccess mediaerror", _.bind(function (event, um) {
-				this.e.triggerHandler("usermedia", [um]);
-				// Start always, no matter what.
-				if (this.currentCall != null) {
-					this.maybeStart(um, this.currentCall);
-				}
-			}, this));
 			usermedia.e.on("stopped", _.bind(function (event, um) {
 				if (um === this.usermedia) {
 					this.e.triggerHandler("usermedia", [null]);
@@ -266,7 +238,7 @@ define([
 			this.e.triggerHandler("usermedia", [usermedia]);
 			this.currentCall = call;
 
-			return usermedia.doGetUserMedia(call);
+			return usermedia.doGetUserMedia(call, needStream);
 
 		};
 
@@ -279,16 +251,44 @@ define([
 				return;
 			}
 
-			if (!this.doUserMedia(call)) {
-				return;
-			}
+			this.doUserMedia(call, true)
+				.then(function () {
+					this.CreatePcClient(this.usermedia, call);
+
+					call.createOffer(_.bind(function (sessionDescription, call) {
+						this.api.sendOffer(call.id, sessionDescription);
+					}, this));
+
+				}.bind(this)).catch(function (error) {
+					console.error('Failed to caling: ' + error.message);
+				}.bind(this));
 		};
 
-		WebRTC.prototype.doAccept = function (call, autoanswer) {
+		WebRTC.prototype.doAccept = function (from, data) {
 			console.log("WebRTC.doAccept");
+
+			var call = this.createCall(from, this.api.id, from);
+			if (!this.conference.addIncoming(from, call)) {
+				console.warn("Already got a call, not processing Offer", from);
+				return;
+			}
+
 			this.conference.setCallActive(call.id);
 
-			return this.doUserMedia(call);
+
+			this.doUserMedia(call, true)
+				.then(function () {
+					this.CreatePcClient(this.usermedia, call);
+					call.setRemoteDescription(new window.RTCSessionDescription(data), _.bind(function (sessionDescription, call) {
+						call.createAnswer(_.bind(function (sessionDescription, call) {
+							console.log("Sending answer", sessionDescription, call.id);
+							this.api.sendAnswer(call.id, sessionDescription);
+						}, this));
+					}, this));
+
+				}.bind(this)).catch(function (error) {
+					console.error('Failed to accept: ' + error.message);
+				}.bind(this));
 		};
 
 		WebRTC.prototype.stop = function () {
@@ -330,9 +330,9 @@ define([
 			return true;
 		}
 
-		WebRTC.prototype.maybeStart = function (usermedia, call) {
+		WebRTC.prototype.CreatePcClient = function (usermedia, call) {
 
-			console.log("WebRTC.maybeStart");
+			console.log("WebRTC.CreatePcClient");
 			if (call.peerconnectionclient) {
 				console.log("Already started", call);
 				return;
@@ -342,12 +342,6 @@ define([
 			call.createPeerConnection(_.bind(function (peerconnectionclient) {
 				// Success call.
 				usermedia.addToPeerConnection(peerconnectionclient);
-				if (!call.initiate) {
-					this.processPendingMessages(call.id);
-				}
-				call.e.on("negotiationNeeded", _.bind(function (event, call) {
-					this.sendOfferWhenNegotiationNeeded(call);
-				}, this));
 			}, this), _.bind(function () {
 				// Error call.
 				this.e.triggerHandler("error", ["Failed to create peer connection. See log for details."]);
@@ -368,16 +362,16 @@ define([
 			} while (true);
 		};
 
-		WebRTC.prototype.sendOfferWhenNegotiationNeeded = function (currentcall, to) {
-			console.log("WebRTC.sendOfferWhenNegotiationNeeded");
+		// WebRTC.prototype.sendOfferWhenNegotiationNeeded = function (currentcall, to) {
+		// 	console.log("WebRTC.sendOfferWhenNegotiationNeeded");
 
-			if (!to) {
-				to = currentcall.id;
-			}
-			currentcall.createOffer(_.bind(function (sessionDescription, currentcall) {
-				this.api.sendOffer(to, sessionDescription);
-			}, this));
-		};
+		// 	if (!to) {
+		// 		to = currentcall.id;
+		// 	}
+		// 	currentcall.createOffer(_.bind(function (sessionDescription, currentcall) {
+		// 		this.api.sendOffer(to, sessionDescription);
+		// 	}, this));
+		// };
 
 		WebRTC.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
 			console.log("WebRTC.onConnectionStateChange");
