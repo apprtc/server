@@ -21,7 +21,6 @@ define([
 
 			this.conference = new PeerConference(this);
 			this.msgQueues = {};
-			this.usermediaReady = false;
 			this.currentCall = null;
 
 			this.usermedia = null;
@@ -249,7 +248,6 @@ define([
 			var usermedia = new UserMedia();
 			usermedia.e.on("mediasuccess mediaerror", _.bind(function (event, um) {
 				this.e.triggerHandler("usermedia", [um]);
-				this.usermediaReady = true;
 				// Start always, no matter what.
 				if (this.currentCall != null) {
 					this.maybeStart(um, this.currentCall);
@@ -258,7 +256,6 @@ define([
 			usermedia.e.on("stopped", _.bind(function (event, um) {
 				if (um === this.usermedia) {
 					this.e.triggerHandler("usermedia", [null]);
-					this.usermediaReady = false;
 					this.usermedia = null;
 				}
 			}, this));
@@ -273,41 +270,6 @@ define([
 
 		};
 
-		WebRTC.prototype._doCallUserMedia = function (call) {
-			console.log("WebRTC._doCallUserMedia, this.usermediaReady=", this.usermediaReady);
-			if (this.usermedia) {
-				if (!this.usermediaReady) {
-					this.currentCall = call;
-				} else {
-					this.maybeStart(this.usermedia, call);
-				}
-				return true;
-			}
-
-			var ok = this.doUserMedia(call);
-			if (ok) {
-				this.e.triggerHandler("waitforusermedia", [call]);
-				return true;
-			}
-			
-			return false;
-		};
-
-		WebRTC.prototype._doAutoStartCall = function (call) {
-			console.log("WebRTC._doAutoStartCall, this.usermediaReady=", this.usermediaReady);
-			if (!this.usermedia) {
-				return false;
-			}
-
-			if (!this.usermediaReady) {
-				// getUserMedia is still pending, defer starting of call.
-				this.currentCall = call;
-			} else {
-				this.maybeStart(this.usermedia, call, true);
-			}
-			return true;
-		};
-
 		WebRTC.prototype.doCall = function (id) {
 			console.log("WebRTC.doCall");
 			var call = this.createCall(id, null, id);
@@ -317,7 +279,7 @@ define([
 				return;
 			}
 
-			if (!this._doCallUserMedia(call)) {
+			if (!this.doUserMedia(call)) {
 				return;
 			}
 		};
@@ -326,7 +288,7 @@ define([
 			console.log("WebRTC.doAccept");
 			this.conference.setCallActive(call.id);
 
-			return this._doCallUserMedia(call);
+			return this.doUserMedia(call);
 		};
 
 		WebRTC.prototype.stop = function () {
@@ -368,7 +330,7 @@ define([
 			return true;
 		}
 
-		WebRTC.prototype.maybeStart = function (usermedia, call, autocall) {
+		WebRTC.prototype.maybeStart = function (usermedia, call) {
 
 			console.log("WebRTC.maybeStart");
 			if (call.peerconnectionclient) {
