@@ -65,8 +65,7 @@ define([
 					offerToReceiveAudio: 1,
 					offerToReceiveVideo: 1,
 					voiceActivityDetection: false
-				},
-				renegotiation: true
+				}
 			};
 
 			this.api.e.bind("received.offer received.candidate received.answer received.bye received.conference", _.bind(this.processReceived, this));
@@ -362,16 +361,6 @@ define([
 			} while (true);
 		};
 
-		// WebRTC.prototype.sendOfferWhenNegotiationNeeded = function (currentcall, to) {
-		// 	console.log("WebRTC.sendOfferWhenNegotiationNeeded");
-
-		// 	if (!to) {
-		// 		to = currentcall.id;
-		// 	}
-		// 	currentcall.createOffer(_.bind(function (sessionDescription, currentcall) {
-		// 		this.api.sendOffer(to, sessionDescription);
-		// 	}, this));
-		// };
 
 		WebRTC.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
 			console.log("WebRTC.onConnectionStateChange");

@@ -51,18 +51,11 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			pc.onremovestream = _.bind(this.onRemoteStreamRemoved, this);
 			pc.onsignalingstatechange = _.bind(this.onSignalingStateChange, this);
 			pc.oniceconnectionstatechange = _.bind(this.onIceConnectionStateChange, this)
-
-			pc.onnegotiationneeded = _.bind(this.onNegotiationNeeded, this);
 		}
 
 		return pc;
 
 	};
-
-	PeerConnectionClient.prototype.negotiationNeeded = function () {
-		// Per default this does nothing as the browser is expected to handle this.
-	};
-
 
 	PeerConnectionClient.prototype.onSignalingStateChange = function (event) {
 
@@ -99,15 +92,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 	};
 
-	PeerConnectionClient.prototype.onNegotiationNeeded = function (event) {
-
-		var peerconnectionclient = event.target;
-		if (peerconnectionclient === this.pc) {
-			this.currentcall.onNegotiationNeeded();
-		}
-
-	};
-
 	PeerConnectionClient.prototype.close = function () {
 
 		if (this.pc) {
@@ -137,17 +121,12 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 	};
 
 	PeerConnectionClient.prototype.addStream = function () {
-
-		_.defer(this.negotiationNeeded);
 		return this.pc.addStream.apply(this.pc, arguments);
 
 	};
 
 	PeerConnectionClient.prototype.removeStream = function () {
-
-		_.defer(this.negotiationNeeded);
 		return this.pc.removeStream.apply(this.pc, arguments);
-
 	};
 
 	PeerConnectionClient.prototype.createAnswer = function () {

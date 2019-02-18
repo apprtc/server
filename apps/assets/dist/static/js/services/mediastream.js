@@ -18,9 +18,6 @@ define([
 
 		var connectMarker = null;
 
-		// Apply configuration details.
-		webrtc.settings.renegotiation = context.Cfg.Renegotiation && true;
-
 		// mediaStream service API.
 		var mediaStream = {
 			version: version,

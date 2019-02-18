@@ -23,7 +23,6 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 
 		this.remoteStream = null;
 
-		this.negotiationNeeded = false;
 		this.initiate = false;
 		this.closed = false;
 
@@ -61,14 +60,14 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 
 		var options = this.offerOptions;
 		console.log('Creating offer with options: \n' +
-			'  \'' + JSON.stringify(options, null, '\t') + '\'.', this.negotiationNeeded);
+			'  \'' + JSON.stringify(options, null, '\t') + '\'.');
 		this.peerconnectionclient.createOffer(_.bind(this.onCreateAnswerOffer, this, cb), _.bind(this.onErrorAnswerOffer, this), options);
 
 	};
 
 	PeerCall.prototype.createAnswer = function (cb) {
 
-		console.log("Creating answer.", this.negotiationNeeded);
+		console.log("Creating answer.");
 		this.peerconnectionclient.createAnswer(_.bind(this.onCreateAnswerOffer, this, cb), _.bind(this.onErrorAnswerOffer, this));
 
 	};
@@ -98,12 +97,6 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 			this.close();
 			this.e.triggerHandler("error", "failed_peerconnection_setup");
 		}, this));
-
-		if (this.negotiationNeeded) {
-			this.negotiationNeeded = false;
-			console.log("Negotiation complete.", this);
-		}
-
 	};
 
 	PeerCall.prototype.onErrorAnswerOffer = function (event) {
@@ -210,21 +203,6 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 		}
 	};
 
-	PeerCall.prototype.onNegotiationNeeded = function () {
-		console.log("PeerCall.onNegotiationNeeded.", this);
-
-		if (!this.peerconnectionclient.readyForRenegotiation) {
-			console.log("PeerConnectionClient is not ready for renegotiation yet", this);
-			return;
-		}
-
-		if (!this.negotiationNeeded) {
-			this.negotiationNeeded = true;
-
-			this.e.triggerHandler("negotiationNeeded", [this]);
-		}
-
-	};
 
 	PeerCall.prototype.addIceCandidate = function (candidate) {
 
