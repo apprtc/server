@@ -234,7 +234,7 @@ define([
 			this.e.triggerHandler("usermedia", [usermedia]);
 			this.currentCall = call;
 
-			return usermedia.doGetUserMedia(call, needStream);
+			return usermedia.doGetUserMedia(this.settings.mediaConstraints, needStream);
 
 		};
 
@@ -272,7 +272,7 @@ define([
 			this.conference.setCallActive(call.id);
 
 
-			this.doUserMedia(call, false)
+			this.doUserMedia(call, true)
 				.then(function () {
 					this.CreatePcClient(this.usermedia, call);
 					call.setRemoteDescription(new window.RTCSessionDescription(data), _.bind(function (sessionDescription, call) {

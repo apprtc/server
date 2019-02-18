@@ -11,7 +11,6 @@ define(["jquery"], function($) {
 	//
 	// Other appData properties:
 	//
-	// - language (string) : ISO language code of active language.
 	// - id (string)       : Random string generated on app startup.
 	// - flags (map)       : Flag table.
 

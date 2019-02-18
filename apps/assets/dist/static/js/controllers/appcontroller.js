@@ -16,30 +16,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 		// User related scope data.
 		$scope.defaults = {
 			message: null,
-			settings: {
-				videoQuality: "high",
-				sendStereo: false,
-				maxFrameRate: 20,
-				defaultRoom: "",
-				language: "",
-				audioRenderToAssociatedSkin: true,
-				videoCpuOveruseDetection: true,
-				experimental: {
-					enabled: false,
-					audioEchoCancellation2: true,
-					audioAutoGainControl2: true,
-					audioNoiseSuppression2: true,
-					audioTypingNoiseDetection: true,
-					videoLeakyBucket: true,
-					videoNoiseReduction: false,
-					preferVideoSendCodecVP9: false
-				},
-				sound: {
-					incomingMessages: true,
-					incomingCall: true,
-					roomJoinLeave: false
-				}
-			}
 		};
 		$scope.master = angular.copy($scope.defaults);
 

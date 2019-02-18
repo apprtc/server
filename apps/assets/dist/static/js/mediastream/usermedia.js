@@ -7,21 +7,10 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 		this.e = $({}); // Events.
 
 		this.localStream = null;
-		this.started = false;
-
-		this.mediaConstraints = null;
 	};
 
 	// Asynchronously request user media if needed.
-	UserMedia.prototype.doGetUserMedia = function (currentcall, needStream) {
-		var mediaConstraints = currentcall.mediaConstraints;
-		if (!mediaConstraints) {
-			mediaConstraints = this.mediaConstraints;
-		} else {
-			this.mediaConstraints = mediaConstraints;
-			this.localStream = null;
-		}
-
+	UserMedia.prototype.doGetUserMedia = function (mediaConstraints, needStream) {
 		var mediaPromise = null;
 		if (needStream) {
 
@@ -44,8 +33,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 	};
 
 	UserMedia.prototype.stop = function () {
-		this.started = false;
-
 		if (this.localStream && this.localStream.getTracks) {
 			// Stop all tracks.
 			var tracks = this.localStream.getTracks();
@@ -55,7 +42,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			this.localStream = null;
 		}
 
-		this.mediaConstraints = null;
 		console.log("Stopped user media.");
 		this.e.triggerHandler("stopped", [this]);
 		this.e.off();

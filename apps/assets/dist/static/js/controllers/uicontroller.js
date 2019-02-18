@@ -37,7 +37,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			$scope.layout = {
 				main: null,
 			};
-			$scope.usermedia = null;
 
 			$scope.getStatus = function () {
 				return $scope.status;
@@ -54,15 +53,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			};
 
 			$scope.refreshWebrtcSettings = function () {
-				var settings = $scope.master.settings;
-				// Refresh SDP params.
-				if (settings.experimental.enabled && settings.experimental.preferVideoSendCodecVP9) {
-					// Prefer VP9.
-					mediaStream.webrtc.settings.sdpParams.videoSendCodec = "VP9/90000";
-				} else {
-					// Else prefer VP8.
-					mediaStream.webrtc.settings.sdpParams.videoSendCodec = "VP8/90000";
-				}
 				// Refresh constraints.
 				constraints.refresh($scope.master.settings).then(function () {
 				});
@@ -132,11 +122,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				console.error("webrtc error: ", msgid, message);
 			});
 
-			mediaStream.webrtc.e.on("usermedia", function (event, usermedia) {
-				safeApply($scope, function (scope) {
-					scope.usermedia = usermedia;
-				});
-			});
 
 			appData.flags.autoreconnect = true;
 			appData.flags.autoreconnectDelay = 0;
