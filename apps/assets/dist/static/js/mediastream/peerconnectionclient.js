@@ -46,11 +46,11 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 		if (pc) {
 			// Bind peer connection events.
-			pc.onicecandidate = _.bind(currentcall.onIceCandidate, currentcall);
-			pc.ontrack = _.bind(this.onRemoteStreamAdded, this);
-			pc.onremovestream = _.bind(this.onRemoteStreamRemoved, this);
-			pc.onsignalingstatechange = _.bind(this.onSignalingStateChange, this);
-			pc.oniceconnectionstatechange = _.bind(this.onIceConnectionStateChange, this)
+			pc.onicecandidate = currentcall.onIceCandidate.bind(currentcall);
+			pc.ontrack = this.onRemoteStreamAdded.bind(this);
+			pc.onremovestream = this.onRemoteStreamRemoved.bind(this);
+			pc.onsignalingstatechange = this.onSignalingStateChange.bind(this);
+			pc.oniceconnectionstatechange = this.onIceConnectionStateChange.bind(this);
 		}
 
 		return pc;

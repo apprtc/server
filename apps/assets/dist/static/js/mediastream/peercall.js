@@ -191,13 +191,11 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 		console.log("PeerCall.onRemoteStreamAdded stream");
 
 		this.remoteStream = stream;
-		this.e.triggerHandler("remoteStreamAdded", [stream, this]);
+		this.webrtc.onRemoteStreamAdded(stream, this);
 	};
 
 	PeerCall.prototype.onRemoteStreamRemoved = function (stream) {
-
-		this.stopRecording();
-		this.e.triggerHandler("remoteStreamRemoved", [this.remoteStream, this]);
+		this.webrtc.onRemoteStreamRemoved(this.remoteStream, this);
 		if (this.remoteStream) {
 			this.remoteStream = null;
 		}
