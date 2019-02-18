@@ -34,7 +34,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 
 	PeerCall.prototype.setInitiate = function (initiate) {
 		this.initiate = !!initiate;
-		console.log("Set initiate", this.initiate, this);
+		console.log("Set initiate", this.initiate);
 	};
 
 
@@ -88,7 +88,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 		this.e.triggerHandler("sessiondescription", [sessionDescriptionObj, this]);
 		// Always set local description.
 		this.peerconnectionclient.setLocalDescription(sessionDescription, _.bind(function () {
-			console.log("Set local session description.", sessionDescription, this);
+			console.log("Set local session description.", sessionDescription);
 			if (cb) {
 				cb(sessionDescriptionObj, this);
 			}
@@ -114,7 +114,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 		this.setRemoteSdp(sessionDescription);
 
 		peerconnectionclient.setRemoteDescription(sessionDescription, _.bind(function () {
-			console.log("Set remote session description.", sessionDescription, this);
+			console.log("Set remote session description.", sessionDescription);
 			if (cb) {
 				cb(sessionDescription, this);
 			}
@@ -156,6 +156,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 	};
 
 	PeerCall.prototype.onIceCandidate = function (event) {
+		console.info("PeerCall.onIceCandidate:", event.candidate);
 		if (event.candidate) {
 			//console.log("ice candidate", event.candidate);
 			var payload = {
@@ -175,32 +176,46 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 		}
 	};
 
-	PeerCall.prototype.onSignalingStateChange = function (signalingState) {
+
+	PeerCall.prototype.onSignalingStateChange = function (event) {
+		var signalingState = event.target.signalingState;
+		console.info("PeerCall.onSignalingStateChange signalingState=", signalingState);
 
 		this.e.triggerHandler("signalingStateChange", [signalingState, this]);
-
 	};
 
-	PeerCall.prototype.onIceConnectionStateChange = function (iceConnectionState) {
+	PeerCall.prototype.onIceConnectionStateChange = function (event) {
+		var iceConnectionState = event.target.iceConnectionState;
+		console.info("PeerCall.onIceConnectionStateChange iceConnectionState=", iceConnectionState);
 
 		this.e.triggerHandler("connectionStateChange", [iceConnectionState, this]);
 
 	};
 
-	PeerCall.prototype.onRemoteStreamAdded = function (stream) {
-		console.log("PeerCall.onRemoteStreamAdded stream");
+	PeerCall.prototype.onRemoteStreamAdded = function (event) {
+		console.info('PeerCall.onRemoteStreamAdded');
+		// var stream = event.stream;
+		var stream = event.streams[0];
 
-		this.remoteStream = stream;
-		this.webrtc.onRemoteStreamAdded(stream, this);
-	};
+		if (stream != null) {
+			this.remoteStream = stream;
 
-	PeerCall.prototype.onRemoteStreamRemoved = function (stream) {
-		this.webrtc.onRemoteStreamRemoved(this.remoteStream, this);
-		if (this.remoteStream) {
-			this.remoteStream = null;
+			this.webrtc.onRemoteStreamAdded(stream, this);
 		}
 	};
 
+	PeerCall.prototype.onRemoteStreamRemoved = function (event) {
+
+		console.info('PeerCall.onRemoteStreamRemoved.');
+		var stream = event.stream;
+
+		this.webrtc.onRemoteStreamRemoved(this.remoteStream, this);
+
+		if (this.remoteStream) {
+			this.remoteStream = null;
+		}
+
+	};
 
 	PeerCall.prototype.addIceCandidate = function (candidate) {
 

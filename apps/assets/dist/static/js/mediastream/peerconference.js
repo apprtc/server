@@ -80,7 +80,6 @@ define(['jquery', 'underscore'], function ($, _) {
 	PeerConference.prototype._setCallState = function (id, state) {
 		if (this.callStates.hasOwnProperty(id)) {
 			this.callStates[id] = state;
-			console.log("Call state changed", id, state);
 		}
 	};
 
@@ -149,7 +148,7 @@ define(['jquery', 'underscore'], function ($, _) {
 
 	PeerConference.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
 
-		console.log("PeerConference.onConnectionStateChange", iceConnectionState, currentcall);
+		console.log("PeerConference.onConnectionStateChange iceConnectionState=", iceConnectionState);
 		switch (iceConnectionState) {
 			case "completed":
 			case "connected":

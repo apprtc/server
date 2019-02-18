@@ -12,7 +12,11 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 			$scope.isActive = false;
 
 			$scope.attachStream = function (stream, currentcall) {
-				console.log("audivideo.attachStream and start recording.stream videotracks:", stream.getVideoTracks().length, "\ncaller:\n", currentcall);
+				console.log("audivideo.attachStream and start recording.stream videotracks:");
+
+				stream.getTracks().forEach(function (track) {
+					console.log("track.id=", track.id);
+				});
 
 				const video = document.querySelector('video');
 				video.srcObject = stream;

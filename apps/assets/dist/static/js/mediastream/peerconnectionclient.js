@@ -47,50 +47,16 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 		if (pc) {
 			// Bind peer connection events.
 			pc.onicecandidate = currentcall.onIceCandidate.bind(currentcall);
-			pc.ontrack = this.onRemoteStreamAdded.bind(this);
-			pc.onremovestream = this.onRemoteStreamRemoved.bind(this);
-			pc.onsignalingstatechange = this.onSignalingStateChange.bind(this);
-			pc.oniceconnectionstatechange = this.onIceConnectionStateChange.bind(this);
+			pc.ontrack = currentcall.onRemoteStreamAdded.bind(currentcall);
+			pc.onremovestream = currentcall.onRemoteStreamRemoved.bind(currentcall);
+			pc.onsignalingstatechange = currentcall.onSignalingStateChange.bind(currentcall);
+			pc.oniceconnectionstatechange = currentcall.onIceConnectionStateChange.bind(currentcall);
 		}
 
 		return pc;
 
 	};
 
-	PeerConnectionClient.prototype.onSignalingStateChange = function (event) {
-
-		var signalingState = event.target.signalingState;
-		console.debug("Connection signaling state change", signalingState, this.currentcall.id);
-		this.currentcall.onSignalingStateChange(signalingState);
-
-	};
-
-	PeerConnectionClient.prototype.onIceConnectionStateChange = function (event) {
-
-		var iceConnectionState = event.target.iceConnectionState;
-		console.debug("ICE connection state change", iceConnectionState, this.currentcall.id);
-		this.currentcall.onIceConnectionStateChange(iceConnectionState);
-
-	};
-
-	PeerConnectionClient.prototype.onRemoteStreamAdded = function (event) {
-
-		// var stream = event.stream;
-		var stream = event.streams[0];
-
-		if (stream != null) {
-			console.info('PeerConnectionClient.onRemoteStreamAdded');
-			this.currentcall.onRemoteStreamAdded(stream);
-		}
-	};
-
-	PeerConnectionClient.prototype.onRemoteStreamRemoved = function (event) {
-
-		var stream = event.stream;
-		console.info('PeerConnectionClient onRemoteStreamRemoved.');
-		this.currentcall.onRemoteStreamRemoved(stream);
-
-	};
 
 	PeerConnectionClient.prototype.close = function () {
 

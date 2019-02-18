@@ -175,7 +175,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			});
 
 			mediaStream.webrtc.e.on("statechange", function (event, state, currentcall) {
-				console.info("P2P state changed", state, currentcall.id);
+				console.info("P2P state changed", state);
 				switch (state) {
 					case "closed":
 						if ($scope.getStatus() === "closed" || $scope.getStatus() === "waiting") {
@@ -198,10 +198,6 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			$window.setInterval(function () {
 				mediaStream.api.heartbeat(5000, 11500)
 			}, 1000);
-
-			$scope.$on("active", function (event, currentcall) {
-				console.info("Video state active (assuming connected)", currentcall.id);
-			});
 
 			// Apply all layout stuff as classes to our element.
 			$scope.$watch("layout", (function () {

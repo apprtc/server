@@ -138,7 +138,6 @@ define([
 				candidate: data.candidate
 			});
 			call.addIceCandidate(candidate);
-			console.log("Got candidate [sdpMid=]", data.sdpMid, "[sdpMLineIndex=]", data.sdpMLineIndex, "[candidate=]", data.candidate);
 		};
 
 		WebRTC.prototype._processAnswer = function (to, data, type, to2, from) {
@@ -334,7 +333,6 @@ define([
 				return;
 			}
 
-			console.log('Creating PeerConnectionClient.', call);
 			call.createPeerConnection(_.bind(function (peerconnectionclient) {
 				// Success call.
 				usermedia.addToPeerConnection(peerconnectionclient);
@@ -360,11 +358,7 @@ define([
 
 
 		WebRTC.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
-			console.log("WebRTC.onConnectionStateChange");
-			// Defer this to allow native event handlers to complete before running more stuff.
-			_.defer(_.bind(function () {
-				this.e.triggerHandler('statechange', [iceConnectionState, currentcall]);
-			}, this));
+			this.e.triggerHandler('statechange', [iceConnectionState, currentcall]);
 		};
 
 		return WebRTC;
