@@ -113,7 +113,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 
 		this.setRemoteSdp(sessionDescription);
 
-		peerconnectionclient.setRemoteDescription(sessionDescription, _.bind(function () {
+		peerconnectionclient.setRemoteDescription(new RTCSessionDescription(sessionDescription), _.bind(function () {
 			console.log("Set remote session description.", sessionDescription);
 			if (cb) {
 				cb(sessionDescription, this);
@@ -155,22 +155,44 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 
 	};
 
+
+	// Return false if the candidate should be dropped, true if not.
+	PeerCall.prototype.filterIceCandidate_ = function (candidateObj) {
+		var candidateStr = candidateObj.candidate;
+
+		// Always eat TCP candidates. Not needed in this context.
+		if (candidateStr.indexOf('tcp') !== -1) {
+			return false;
+		}
+
+		// If we're trying to eat non-relay candidates, do that.
+		if (iceCandidateType(candidateStr) === 'relay') {
+			return false;
+		}
+
+		return true;
+	};
+
 	PeerCall.prototype.onIceCandidate = function (event) {
 		console.info("PeerCall.onIceCandidate:", event.candidate);
+
+		// Eat undesired candidates.
 		if (event.candidate) {
-			//console.log("ice candidate", event.candidate);
-			var payload = {
-				type: 'candidate',
-				sdpMLineIndex: event.candidate.sdpMLineIndex,
-				sdpMid: event.candidate.sdpMid,
-				candidate: event.candidate.candidate
-			};
-			// Allow external payload modifications.
-			this.e.triggerHandler("icecandidate", [payload, this]);
-			// Send it.
-			// XXX(longsleep): This seems to be breaking conferences when this.to and not this.id.
-			this.webrtc.api.sendCandidate(this.to, payload);
-			//console.log("Sent candidate", event.candidate.sdpMid, event.candidate.sdpMLineIndex, event.candidate.candidate);
+			if (this.filterIceCandidate_(event.candidate)) {
+				//console.log("ice candidate", event.candidate);
+				var payload = {
+					type: 'candidate',
+					sdpMLineIndex: event.candidate.sdpMLineIndex,
+					sdpMid: event.candidate.sdpMid,
+					candidate: event.candidate.candidate
+				};
+				// Allow external payload modifications.
+				this.e.triggerHandler("icecandidate", [payload, this]);
+				// Send it.
+				// XXX(longsleep): This seems to be breaking conferences when this.to and not this.id.
+				this.webrtc.api.sendCandidate(this.to, payload);
+				//console.log("Sent candidate", event.candidate.sdpMid, event.candidate.sdpMLineIndex, event.candidate.candidate);
+			}
 		} else {
 			console.log('End of candidates.');
 		}

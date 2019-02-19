@@ -38,7 +38,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 			console.log('Creating RTCPeerConnnection with:\n' +
 				'  config: \'' + JSON.stringify(currentcall.pcConfig) + '\';\n' +
 				'  constraints: \'' + JSON.stringify(currentcall.pcConstraints) + '\'.');
-			pc = this.pc = new window.RTCPeerConnection(currentcall.pcConfig, currentcall.pcConstraints);
+			pc = this.pc = new RTCPeerConnection(currentcall.pcConfig, currentcall.pcConstraints);
 		} catch (e) {
 			console.error('Failed to create PeerConnectionClient, exception: ' + e.message);
 			pc = this.pc = null;
@@ -58,6 +58,13 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 	};
 
 
+	PeerConnectionClient.prototype.onRemoteStreamRemoved = function (event) {
+
+		var stream = event.stream;
+		console.info('PeerConnectionClient onRemoteStreamRemoved.');
+		this.currentcall.onRemoteStreamRemoved(stream);
+
+	};
 	PeerConnectionClient.prototype.close = function () {
 
 		if (this.pc) {

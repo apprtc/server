@@ -132,7 +132,7 @@ define([
 				return;
 			}
 
-			var candidate = new window.RTCIceCandidate({
+			var candidate = new RTCIceCandidate({
 				sdpMLineIndex: data.sdpMLineIndex,
 				sdpMid: data.sdpMid,
 				candidate: data.candidate
@@ -150,7 +150,7 @@ define([
 
 			this.conference.setCallActive(call.id);
 
-			call.setRemoteDescription(new window.RTCSessionDescription(data), function () {
+			call.setRemoteDescription(data, function () {
 				// Received remote description as answer.
 				console.log("Received answer after we sent offer", data);
 			});
@@ -274,7 +274,7 @@ define([
 			this.doUserMedia(call, true)
 				.then(function () {
 					this.CreatePcClient(this.usermedia, call);
-					call.setRemoteDescription(new window.RTCSessionDescription(data), _.bind(function (sessionDescription, call) {
+					call.setRemoteDescription(data, _.bind(function (sessionDescription, call) {
 						call.createAnswer(_.bind(function (sessionDescription, call) {
 							console.log("Sending answer", sessionDescription, call.id);
 							this.api.sendAnswer(call.id, sessionDescription);

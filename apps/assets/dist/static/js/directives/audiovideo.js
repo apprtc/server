@@ -129,23 +129,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 				}
 			};
 
-			mediaStream.webrtc.e.on("done stop", function (event) {
-
-				safeApply($scope, function (scope) {
-					if (!scope.isActive) {
-						return;
-					}
-					scope.isActive = false;
-
-					if (event.type === "stop") {
-						removeVideos();
-					} else {
-						$timeout(removeVideos, 1500);
-					}
-				});
-
-			});
-
 
 			mediaStream.webrtc.onRemoteStreamAdded = $scope.attachStream.bind($scope);
 			mediaStream.webrtc.onRemoteStreamRemoved = $scope.removeRemoteStream.bind($scope);
