@@ -199,45 +199,45 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 	};
 
 
-	PeerCall.prototype.onSignalingStateChange = function (event) {
-		var signalingState = event.target.signalingState;
+	PeerCall.prototype.onSignalingStateChange = function (signalingState) {
 		console.info("PeerCall.onSignalingStateChange signalingState=", signalingState);
 
 		this.e.triggerHandler("signalingStateChange", [signalingState, this]);
 	};
 
-	PeerCall.prototype.onIceConnectionStateChange = function (event) {
-		var iceConnectionState = event.target.iceConnectionState;
+	PeerCall.prototype.onIceConnectionStateChange = function (iceConnectionState) {
 		console.info("PeerCall.onIceConnectionStateChange iceConnectionState=", iceConnectionState);
 
 		this.e.triggerHandler("connectionStateChange", [iceConnectionState, this]);
 
 	};
 
-	PeerCall.prototype.onRemoteStreamAdded = function (event) {
-		console.info('PeerCall.onRemoteStreamAdded');
-		// var stream = event.stream;
-		var stream = event.streams[0];
+	PeerCall.prototype.onRemoteStreamAdded = function (stream) {
+		console.log("PeerCall.onRemoteStreamAdded stream");
 
 		if (stream != null) {
 			this.remoteStream = stream;
 
 			this.webrtc.onRemoteStreamAdded(stream, this);
 		}
+
+		// this.remoteStream = stream;
+		// this.e.triggerHandler("remoteStreamAdded", [stream, this]);
 	};
 
-	PeerCall.prototype.onRemoteStreamRemoved = function (event) {
-
-		console.info('PeerCall.onRemoteStreamRemoved.');
-		var stream = event.stream;
-
+	PeerCall.prototype.onRemoteStreamRemoved = function (stream) {
+		this.e.triggerHandler("remoteStreamRemoved", [this.remoteStream, this]);
 		this.webrtc.onRemoteStreamRemoved(this.remoteStream, this);
 
 		if (this.remoteStream) {
 			this.remoteStream = null;
 		}
 
+		// if (this.remoteStream) {
+		// 	this.remoteStream = null;
+		// }
 	};
+
 
 	PeerCall.prototype.addIceCandidate = function (candidate) {
 

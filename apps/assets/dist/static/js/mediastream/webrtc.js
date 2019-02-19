@@ -24,10 +24,8 @@ define([
 			this.currentCall = null;
 
 			this.usermedia = null;
-
 			this.onRemoteStreamAdded = null;
 			this.onRemoteStreamRemoved = null;
-
 			// Settings.are cloned into peer call on call creation.
 			this.settings = {
 				mediaConstraints: {
@@ -188,6 +186,12 @@ define([
 			var call = new PeerCall(this, id, from, to);
 			call.e.on("connectionStateChange", _.bind(function (event, iceConnectionState, currentcall) {
 				this.onConnectionStateChange(iceConnectionState, currentcall);
+			}, this));
+			call.e.on("remoteStreamAdded", _.bind(function (event, stream, currentcall) {
+				this.onRemoteStreamAdded(stream, currentcall);
+			}, this));
+			call.e.on("remoteStreamRemoved", _.bind(function (event, stream, currentcall) {
+				this.onRemoteStreamRemoved(stream, currentcall);
 			}, this));
 			call.e.on("error", _.bind(function (event, error_id, message) {
 				if (!error_id) {
@@ -358,8 +362,22 @@ define([
 
 
 		WebRTC.prototype.onConnectionStateChange = function (iceConnectionState, currentcall) {
-			this.e.triggerHandler('statechange', [iceConnectionState, currentcall]);
+			console.log("WebRTC.onConnectionStateChange");
+			// Defer this to allow native event handlers to complete before running more stuff.
+			_.defer(_.bind(function () {
+				this.e.triggerHandler('statechange', [iceConnectionState, currentcall]);
+			}, this));
 		};
+
+		// WebRTC.prototype.onRemoteStreamAdded = function (stream, currentcall) {
+		// 	console.log("WebRTC.onRemoteStreamAdded");
+		// 	this.e.triggerHandler("streamadded", [stream, currentcall]);
+		// };
+
+		// WebRTC.prototype.onRemoteStreamRemoved = function (stream, currentcall) {
+		// 	console.log("WebRTC.onRemoteStreamRemoved");
+		// 	this.e.triggerHandler("streamremoved", [stream, currentcall]);
+		// };
 
 		return WebRTC;
 

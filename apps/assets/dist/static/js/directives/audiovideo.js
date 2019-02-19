@@ -129,9 +129,24 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter
 				}
 			};
 
-
 			mediaStream.webrtc.onRemoteStreamAdded = $scope.attachStream.bind($scope);
 			mediaStream.webrtc.onRemoteStreamRemoved = $scope.removeRemoteStream.bind($scope);
+
+
+			// mediaStream.webrtc.e.on("streamadded", function (event, stream, currentcall) {
+
+			// 	console.log("audivideo > on [webrtc.streamadded].");
+
+			// 	$scope.attachStream(stream, currentcall);
+
+			// });
+
+			// mediaStream.webrtc.e.on("streamremoved", function (event, stream, currentcall) {
+
+			// 	console.log("audivideo > on [webrtc.streamremoved].");
+			// 	$scope.removeRemoteStream(stream, currentcall);
+
+			// });
 
 			mediaStream.webrtc.e.on("statechange", function (event, iceConnectionState, currentcall) {
 
