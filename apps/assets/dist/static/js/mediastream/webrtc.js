@@ -117,25 +117,9 @@ define([
 				return;
 			}
 
-			// autoaccept)
+			// autoaccept
 			this.doAccept(from, data);
 
-		};
-
-		WebRTC.prototype._processCandidate = function (to, data, type, to2, from) {
-			console.log("WebRTC._processCandidate");
-			var call = this.conference.getCall(from);
-			if (!call) {
-				console.warn("Received Candidate for unknown id -> ignore.", from);
-				return;
-			}
-
-			var candidate = new RTCIceCandidate({
-				sdpMLineIndex: data.sdpMLineIndex,
-				sdpMid: data.sdpMid,
-				candidate: data.candidate
-			});
-			call.addIceCandidate(candidate);
 		};
 
 		WebRTC.prototype._processAnswer = function (to, data, type, to2, from) {
@@ -152,6 +136,23 @@ define([
 				// Received remote description as answer.
 				console.log("Received answer after we sent offer", data);
 			});
+		};
+
+
+		WebRTC.prototype._processCandidate = function (to, data, type, to2, from) {
+			console.log("WebRTC._processCandidate");
+			var call = this.conference.getCall(from);
+			if (!call) {
+				console.warn("Received Candidate for unknown id -> ignore.", from);
+				return;
+			}
+
+			var candidate = new RTCIceCandidate({
+				sdpMLineIndex: data.sdpMLineIndex,
+				sdpMid: data.sdpMid,
+				candidate: data.candidate
+			});
+			call.addIceCandidate(candidate);
 		};
 
 		WebRTC.prototype._processBye = function (to, data, type, to2, from) {
@@ -234,7 +235,6 @@ define([
 				usermedia.stop();
 			});
 			this.usermedia = usermedia;
-			this.e.triggerHandler("usermedia", [usermedia]);
 			this.currentCall = call;
 
 			return usermedia.doGetUserMedia(this.settings.mediaConstraints, needStream);
@@ -265,7 +265,6 @@ define([
 
 		WebRTC.prototype.doAccept = function (from, data) {
 			console.log("WebRTC.doAccept");
-
 			var call = this.createCall(from, this.api.id, from);
 			if (!this.conference.addIncoming(from, call)) {
 				console.warn("Already got a call, not processing Offer", from);
@@ -275,15 +274,16 @@ define([
 			this.conference.setCallActive(call.id);
 
 
-			this.doUserMedia(call, true)
+			this.doUserMedia(call, false)
 				.then(function () {
 					this.CreatePcClient(this.usermedia, call);
-					call.setRemoteDescription(data, _.bind(function (sessionDescription, call) {
-						call.createAnswer(_.bind(function (sessionDescription, call) {
-							console.log("Sending answer", sessionDescription, call.id);
-							this.api.sendAnswer(call.id, sessionDescription);
-						}, this));
+					call.setRemoteDescription(data);
+
+					call.createAnswer(_.bind(function (sessionDescription, call) {
+						console.log("Sending answer", sessionDescription, call.id);
+						this.api.sendAnswer(call.id, sessionDescription);
 					}, this));
+
 
 				}.bind(this)).catch(function (error) {
 					console.error('Failed to accept: ' + error.message);

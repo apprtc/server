@@ -26,6 +26,12 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 		this.initiate = false;
 		this.closed = false;
 
+		this.started_ = false;
+		this.hasRemoteSdp_ = false;
+
+
+		this.onremotesdpset = null;
+
 	};
 
 	PeerCall.prototype.isOutgoing = function () {
@@ -48,13 +54,22 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 			// TODO(longsleep): Check if this can happen?
 			error_cb(peerconnectionclient);
 		}
+
+		this.drainMessageQueues();
+		return peerconnectionclient;
+
+	};
+
+	PeerCall.prototype.drainMessageQueues = function () {
+		console.log("PeerCall.drainMessageQueues.");
+		if (!this.peerconnectionclient || !this.hasRemoteSdp_) {
+			return;
+		}
 		while (this.pendingCandidates.length > 0) {
 			var candidate = this.pendingCandidates.shift();
 			this.addIceCandidate(candidate);
 		}
-		return peerconnectionclient;
-
-	};
+	}
 
 	PeerCall.prototype.createOffer = function (cb) {
 
@@ -77,20 +92,11 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 
 		this.setLocalSdp(sessionDescription);
 
-		// Convert to object to allow custom property injection.
-		var sessionDescriptionObj = sessionDescription;
-		if (sessionDescriptionObj.toJSON) {
-			sessionDescriptionObj = JSON.parse(JSON.stringify(sessionDescriptionObj));
-		}
-		// console.log("Created offer/answer", JSON.stringify(sessionDescriptionObj, null, "\t"));
-
-		// Allow external session description modifications.
-		this.e.triggerHandler("sessiondescription", [sessionDescriptionObj, this]);
 		// Always set local description.
 		this.peerconnectionclient.setLocalDescription(sessionDescription, _.bind(function () {
 			console.log("Set local session description.", sessionDescription);
 			if (cb) {
-				cb(sessionDescriptionObj, this);
+				cb(sessionDescription, this);
 			}
 		}, this), _.bind(function (err) {
 			console.error("Set local session description failed", err);
@@ -111,28 +117,38 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 			return;
 		}
 
-		this.setRemoteSdp(sessionDescription);
+		sessionDescription.sdp = maybeSetOpusOptions(sessionDescription.sdp, this.sdpParams);
+		sessionDescription.sdp = maybePreferAudioSendCodec(sessionDescription.sdp, this.sdpParams);
+		sessionDescription.sdp = maybePreferVideoSendCodec(sessionDescription.sdp, this.sdpParams);
+		sessionDescription.sdp = maybeSetAudioSendBitRate(sessionDescription.sdp, this.sdpParams);
+		sessionDescription.sdp = maybeSetVideoSendBitRate(sessionDescription.sdp, this.sdpParams);
+		sessionDescription.sdp = maybeSetVideoSendInitialBitRate(sessionDescription.sdp, this.sdpParams);
+		sessionDescription.sdp = maybeRemoveVideoFec(sessionDescription.sdp, this.sdpParams);
 
-		peerconnectionclient.setRemoteDescription(new RTCSessionDescription(sessionDescription), _.bind(function () {
-			console.log("Set remote session description.", sessionDescription);
-			if (cb) {
-				cb(sessionDescription, this);
-			}
+		peerconnectionclient.setRemoteDescription(new RTCSessionDescription(sessionDescription))
+			.then(this.onSetRemoteDescriptionSuccess_.bind(this))
+			.catch(function (err) {
+				console.error("Set remote session description failed", err);
+				this.close();
+				this.e.triggerHandler("error", "failed_peerconnection_setup");
+			});
 
-			// _.defer(_.bind(function () {
-			// 	console.log("Adding stream after remote SDP success.");
-			// 	if (this.remoteStream) {
-			// 		this.onRemoteStreamAdded(this.remoteStream);
-			// 	}
-			// }, this));
+	};
 
 
-		}, this), _.bind(function (err) {
-			console.error("Set remote session description failed", err);
-			this.close();
-			this.e.triggerHandler("error", "failed_peerconnection_setup");
-		}, this));
+	PeerCall.prototype.onSetRemoteDescriptionSuccess_ = function () {
+		trace('Set remote session description success.');
+		this.hasRemoteSdp_ = true;
+		// By now all onaddstream events for the setRemoteDescription have fired,
+		// so we can know if the peer has any remote video streams that we need
+		// to wait for. Otherwise, transition immediately to the active state.
+		var remoteStreams = this.peerconnectionclient.pc.getRemoteStreams();
+		if (this.onremotesdpset) {
+			this.onremotesdpset(remoteStreams.length > 0 &&
+				remoteStreams[0].getVideoTracks().length > 0);
+		}
 
+		this.drainMessageQueues();
 	};
 
 	PeerCall.prototype.setLocalSdp = function (sessionDescription) {
@@ -141,18 +157,6 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 		sessionDescription.sdp = maybeSetAudioReceiveBitRate(sessionDescription.sdp, this.sdpParams);
 		sessionDescription.sdp = maybeSetVideoReceiveBitRate(sessionDescription.sdp, this.sdpParams);
 		sessionDescription.sdp = maybeRemoveVideoFec(sessionDescription.sdp, this.sdpParams);
-	};
-
-	PeerCall.prototype.setRemoteSdp = function (message) {
-
-		message.sdp = maybeSetOpusOptions(message.sdp, this.sdpParams);
-		message.sdp = maybePreferAudioSendCodec(message.sdp, this.sdpParams);
-		message.sdp = maybePreferVideoSendCodec(message.sdp, this.sdpParams);
-		message.sdp = maybeSetAudioSendBitRate(message.sdp, this.sdpParams);
-		message.sdp = maybeSetVideoSendBitRate(message.sdp, this.sdpParams);
-		message.sdp = maybeSetVideoSendInitialBitRate(message.sdp, this.sdpParams);
-		message.sdp = maybeRemoveVideoFec(message.sdp, this.sdpParams);
-
 	};
 
 
@@ -245,7 +249,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 			// Avoid errors when still receiving candidates but closed.
 			return;
 		}
-		if (!this.peerconnectionclient) {
+		if (!this.peerconnectionclient || !this.hasRemoteSdp_) {
 			this.pendingCandidates.push(candidate);
 			return;
 		}

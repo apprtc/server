@@ -201,29 +201,7 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 
 			// Apply all layout stuff as classes to our element.
 			$scope.$watch("layout", (function () {
-				var makeName = function (prefix, n) {
-					return prefix + n.charAt(0).toUpperCase() + n.slice(1);
-				};
 				return function (layout, old) {
-					_.each(layout, function (v, k) {
-						if (k === "main") {
-							return;
-						}
-						var n = makeName("with", k);
-						if (v) {
-							$element.addClass(n);
-						} else {
-							$element.removeClass(n);
-						}
-					});
-					if (old.main !== layout.main) {
-						if (old.main) {
-							$element.removeClass(makeName("main", old.main));
-						}
-						if (layout.main) {
-							$element.addClass(makeName("main", layout.main));
-						}
-					}
 					$scope.$broadcast("mainresize", layout.main);
 				}
 			}()), true);
