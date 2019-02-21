@@ -10,8 +10,12 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html'], function ($, _
 			var remoteVideo_ = document.querySelector('video');
 			remoteVideo_.srcObject = null;
 
+			remoteVideo_.focus();
+
 			$scope.attachStream = function (stream, currentcall) {
 				console.log("audivideo.attachStream.stream videotracks:");
+
+				remoteVideo_.focus();
 
 				stream.getTracks().forEach(function (track) {
 					console.log("track.id=", track.id);

@@ -4,22 +4,21 @@
 define([
 	'underscore',
 
-	'controllers/uicontroller',
-	'controllers/appcontroller'], function(_, UiController, AppController) {
+	'controllers/uicontroller'], function (_, UiController) {
 
-	var controllers = {
-		UiController: UiController,
-		AppController: AppController
-	};
+		var controllers = {
+			UiController: UiController,
 
-	var initialize = function(angModule) {
-		_.each(controllers, function(controller, name) {
-			angModule.controller(name, controller);
-		})
-	}
+		};
 
-	return {
-		initialize: initialize
-	};
+		var initialize = function (angModule) {
+			_.each(controllers, function (controller, name) {
+				angModule.controller(name, controller);
+			})
+		}
 
-});
+		return {
+			initialize: initialize
+		};
+
+	});

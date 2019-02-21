@@ -40,10 +40,7 @@ var tmplMain = `
 	<script src="../static/js/libs/EBML.js"></script>
 </head>
 
-<body webrtc-app style="background-color:#000; overflow-x: hidden; overflow-y: hidden;">
-    <div id="loader">
-        <div class="loader-message"></div>
-    </div>
+<body style="background-color:#000; overflow-x: hidden; overflow-y: hidden;">
     <ui></ui>
     <script data-main="<%.Cfg.S%>/js/<%.App%>" data-plugin="<%.Cfg.Plugin%>" src="<%.Cfg.S%>/js/libs/require/require.js"></script>
 </body>

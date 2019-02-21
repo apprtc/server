@@ -6,6 +6,32 @@ define(['jquery', 'underscore'], function ($, _) {
 	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "mediaStream", "appData", "rooms", "constraints",
 		function ($scope, $rootScope, $element, $window, $timeout, mediaStream, appData, rooms, constraints) {
 
+			appData.set($scope);
+
+			// User related scope data.
+			$scope.defaults = {
+				message: null,
+			};
+			$scope.master = angular.copy($scope.defaults);
+	
+			$scope.reset = function() {
+				$scope.user = angular.copy($scope.master);
+			};
+	
+			$scope.manualReloadApp = function(url) {
+				appData.flags.manualUnload = true;
+				if (url) {
+					$window.location.href = url;
+					$timeout(function() {
+						appData.flags.manualUnload = false;
+					}, 0);
+				} else {
+					$window.location.reload(true);
+				}
+			};
+	
+			$scope.reset(); // Call once for bootstrap.
+
 			// Avoid accidential reloads or exits when in a call.
 			$($window).on("beforeunload", function (event) {
 				if (appData.flags.manualUnload || !$scope.peer) {
@@ -280,7 +306,7 @@ define(['jquery', 'underscore'], function ($, _) {
 						break;
 				}
 				if (message) {
-					console.log("notification", type, message);
+					trace("notification", type, message);
 				}
 
 			});
