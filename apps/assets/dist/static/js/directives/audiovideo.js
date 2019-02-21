@@ -1,137 +1,96 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter', 'RecordRTC'], function ($, _, template) {
+define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter'], function ($, _, template) {
 
 	return ["$window", "mediaStream", "safeApply", "$timeout", function ($window, mediaStream, safeApply, $timeout) {
 
 
 		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-			var recorder = null;
+
 
 			$scope.isActive = false;
 
+
+			var remoteVideo_ = document.querySelector('video');
+			remoteVideo_.srcObject = null;
+
 			$scope.attachStream = function (stream, currentcall) {
-				console.log("audivideo.attachStream and start recording.stream videotracks:");
+				console.log("audivideo.attachStream.stream videotracks:");
 
 				stream.getTracks().forEach(function (track) {
 					console.log("track.id=", track.id);
 				});
 
-				const video = document.querySelector('video');
-				video.srcObject = stream;
-
-				recorder = RecordRTC(stream, {
-					// audio, video, canvas, gif
-					type: 'video',
-
-					// audio/webm
-					// video/webm;codecs=vp9
-					// video/webm;codecs=vp8
-					// video/webm;codecs=h264
-					// video/x-matroska;codecs=avc1
-					// video/mpeg -- NOT supported by any browser, yet
-					// video/mp4  -- NOT supported by any browser, yet
-					// audio/wav
-					// audio/ogg  -- ONLY Firefox
-					// demo: simple-demos/isTypeSupported.html
-					mimeType: 'video/webm',
-
-					// MediaStreamRecorder, StereoAudioRecorder, WebAssemblyRecorder
-					// CanvasRecorder, GifRecorder, WhammyRecorder
-					recorderType: MediaStreamRecorder,
-
-					// disable logs
-					disableLogs: true,
-
-					// get intervals based blobs
-					// value in milliseconds
-					timeSlice: 1000,
-
-					// requires timeSlice above
-					// returns blob via callback function
-					ondataavailable: function (blob) { },
-
-					// auto stop recording if camera stops
-					checkForInactiveTracks: false,
-
-					// requires timeSlice above
-					onTimeStamp: function (timestamp) { },
-
-					// both for audio and video tracks
-					bitsPerSecond: 128000,
-
-					// only for audio track
-					audioBitsPerSecond: 128000,
-
-					// only for video track
-					videoBitsPerSecond: 128000,
-
-					// used by CanvasRecorder and WhammyRecorder
-					// it is kind of a "frameRate"
-					frameInterval: 90,
-
-					// if you are recording multiple streams into single file
-					// this helps you see what is being recorded
-					previewStream: function (stream) { },
-
-					// used by CanvasRecorder and WhammyRecorder
-					// you can pass {width:640, height: 480} as well
-					video: HTMLVideoElement,
-
-					// used by CanvasRecorder and WhammyRecorder
-					canvas: {
-						width: 640,
-						height: 480
-					},
-
-					// used by StereoAudioRecorder
-					// the range 22050 to 96000.
-					sampleRate: 96000,
-
-					// used by StereoAudioRecorder
-					// the range 22050 to 96000.
-					// let us force 16khz recording:
-					desiredSampRate: 16000,
-
-					// used by StereoAudioRecorder
-					// Legal values are (256, 512, 1024, 2048, 4096, 8192, 16384).
-					bufferSize: 16384,
-
-					// used by StereoAudioRecorder
-					// 1 or 2
-					numberOfAudioChannels: 2,
-
-					// used by WebAssemblyRecorder
-					frameRate: 30,
-
-					// used by WebAssemblyRecorder
-					bitrate: 128000
-				});
-				recorder.startRecording();
+				remoteVideo_.srcObject = stream;
 			};
 
 			$scope.removeRemoteStream = function (stream, currentcall) {
-				console.log("audivideo.removeRemoteStream and save record file.");
+				console.log("audivideo.removeRemoteStream");
+				remoteVideo_.srcObject = stream;
 
-				const video = document.querySelector('video');
-				video.srcObject = stream;
+				$scope.transitionToWaiting_();
+			};
 
 
-				if (recorder !== null) {
-					recorder.stopRecording(function () {
-						let blob = recorder.getBlob();
 
-						getSeekableBlob(blob, function (seekableBlob) {
-							invokeSaveAsDialog(seekableBlob, "record-rtc-media.webm");
-						})
-					});
+
+			$scope.onRemoteSdpSet_ = function (hasRemoteVideo) {
+				if (hasRemoteVideo) {
+					trace('Waiting for remote video.');
+					$scope.waitForRemoteVideo_();
+				} else {
+					trace('No remote video stream; not waiting for media to arrive.');
+					// TODO(juberti): Make this wait for ICE connection before transitioning.
+					$scope.transitionToActive_();
 				}
 			};
 
+			$scope.waitForRemoteVideo_ = function () {
+				// Wait for the actual video to start arriving before moving to the active
+				// call state.
+				if (remoteVideo_.readyState >= 2) { // i.e. can play
+					trace('Remote video started; currentTime: ' +
+						remoteVideo_.currentTime);
+					$scope.transitionToActive_();
+				} else {
+					remoteVideo_.oncanplay = $scope.waitForRemoteVideo_.bind($scope);
+				}
+			};
+
+
+			$scope.transitionToActive_ = function () {
+				// Stop waiting for remote video.
+				remoteVideo_.oncanplay = undefined;
+
+				// Transition opacity from 0 to 1 for the remote videos.
+				$scope.activate_(remoteVideo_);
+
+			};
+
+
+			$scope.transitionToWaiting_ = function () {
+				// Stop waiting for remote video.
+				remoteVideo_.oncanplay = undefined;
+
+				// Transition opacity from 1 to 0 for the remote videos.
+				$scope.deactivate_(remoteVideo_);
+
+			};
+
+
+			$scope.activate_ = function (element) {
+				element.classList.add('active');
+			};
+
+			$scope.deactivate_ = function (element) {
+				element.classList.remove('active');
+			};
+
+
 			mediaStream.webrtc.onRemoteStreamAdded = $scope.attachStream.bind($scope);
 			mediaStream.webrtc.onRemoteStreamRemoved = $scope.removeRemoteStream.bind($scope);
-
+			mediaStream.webrtc.onremotesdpset = $scope.onRemoteSdpSet_.bind($scope);
 
 			// mediaStream.webrtc.e.on("streamadded", function (event, stream, currentcall) {
 

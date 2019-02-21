@@ -26,6 +26,7 @@ define([
 			this.usermedia = null;
 			this.onRemoteStreamAdded = null;
 			this.onRemoteStreamRemoved = null;
+			this.onremotesdpset = null;
 			// Settings.are cloned into peer call on call creation.
 			this.settings = {
 				mediaConstraints: {
@@ -215,7 +216,7 @@ define([
 			return call;
 		};
 
-		WebRTC.prototype.doUserMedia = function (call, needStream) {
+		WebRTC.prototype.doUserMedia = function (needStream) {
 			console.log("WebRTC.doUserMedia");
 			if (this.usermedia) {
 				// We should not create a new UserMedia object while the current one
@@ -235,10 +236,8 @@ define([
 				usermedia.stop();
 			});
 			this.usermedia = usermedia;
-			this.currentCall = call;
 
 			return usermedia.doGetUserMedia(this.settings.mediaConstraints, needStream);
-
 		};
 
 		WebRTC.prototype.doCall = function (id) {
@@ -249,8 +248,10 @@ define([
 				console.log("Already has a call with", id);
 				return;
 			}
+			this.currentCall = call;
+			this.currentCall.onremotesdpset = this.onremotesdpset;
 
-			this.doUserMedia(call, true)
+			this.doUserMedia(true)
 				.then(function () {
 					this.CreatePcClient(this.usermedia, call);
 
@@ -266,15 +267,19 @@ define([
 		WebRTC.prototype.doAccept = function (from, data) {
 			console.log("WebRTC.doAccept");
 			var call = this.createCall(from, this.api.id, from);
+
+			
+
 			if (!this.conference.addIncoming(from, call)) {
 				console.warn("Already got a call, not processing Offer", from);
 				return;
 			}
 
 			this.conference.setCallActive(call.id);
+			this.currentCall = call;
+			this.currentCall.onremotesdpset = this.onremotesdpset;
 
-
-			this.doUserMedia(call, false)
+			this.doUserMedia(false)
 				.then(function () {
 					this.CreatePcClient(this.usermedia, call);
 					call.setRemoteDescription(data);
@@ -288,6 +293,7 @@ define([
 				}.bind(this)).catch(function (error) {
 					console.error('Failed to accept: ' + error.message);
 				}.bind(this));
+
 		};
 
 		WebRTC.prototype.stop = function () {

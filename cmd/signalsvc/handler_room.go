@@ -34,7 +34,7 @@ var tmplMain = `
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="referrer" content="no-referrer">
 	<base href="<%.Cfg.B%>">
-	<!-- <link rel="stylesheet" type="text/css" href="<%.Cfg.S%>/css/main.min.css"> -->
+	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
 
 	<script id="globalcontext" type="application/json"><%$%></script>
 	<script src="../static/js/libs/EBML.js"></script>

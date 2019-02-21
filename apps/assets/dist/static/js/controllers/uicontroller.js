@@ -90,15 +90,21 @@ define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
 				console.log('received.users:', data);
 				var selfId = $scope.id;
 
+				var isInitiator_ = false;
 				for (let index = 0; index < data.length; index++) {
 					const p = data[index];
 
 					if (p.Id !== selfId) {
+						isInitiator_ = true;
 						// 对聊天室内的第一个好友进行自动呼叫
 						mediaStream.webrtc.doCall(p.Id);
 						break;
 					}
 				}
+
+				// if (!isInitiator_) {
+				// 	mediaStream.webrtc.doUserMedia(false);
+				// }
 				$scope.$apply();
 			});
 
