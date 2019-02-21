@@ -2,10 +2,8 @@
 
 "use strict";
 define([
-	'angular',
-	'jquery',
 	'underscore'
-], function (angular, $, _) {
+], function (_) {
 
 	return ["$window", "$route", "$rootScope", "connector", "api", "appData",
 

@@ -7,11 +7,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html'], function ($, _
 
 
 		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {
-
-
-			$scope.isActive = false;
-
-
 			var remoteVideo_ = document.querySelector('video');
 			remoteVideo_.srcObject = null;
 
@@ -91,21 +86,6 @@ define(['jquery', 'underscore', 'text!partials/audiovideo.html'], function ($, _
 			mediaStream.webrtc.onRemoteStreamAdded = $scope.attachStream.bind($scope);
 			mediaStream.webrtc.onRemoteStreamRemoved = $scope.removeRemoteStream.bind($scope);
 			mediaStream.webrtc.onremotesdpset = $scope.onRemoteSdpSet_.bind($scope);
-
-			// mediaStream.webrtc.e.on("streamadded", function (event, stream, currentcall) {
-
-			// 	console.log("audivideo > on [webrtc.streamadded].");
-
-			// 	$scope.attachStream(stream, currentcall);
-
-			// });
-
-			// mediaStream.webrtc.e.on("streamremoved", function (event, stream, currentcall) {
-
-			// 	console.log("audivideo > on [webrtc.streamremoved].");
-			// 	$scope.removeRemoteStream(stream, currentcall);
-
-			// });
 
 			mediaStream.webrtc.e.on("statechange", function (event, iceConnectionState, currentcall) {
 

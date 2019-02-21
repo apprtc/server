@@ -6,11 +6,6 @@ define(["jquery", "angular", "underscore"], function($, angular, _) {
 	// AppController
 	return ["$scope", "$window", "appData", "$timeout", function($scope, $window, appData, $timeout) {
 
-		// Disable drag and drop.
-		$($window).on("dragover dragenter drop", function(event) {
-			event.preventDefault();
-		});
-
 		appData.set($scope);
 
 		// User related scope data.

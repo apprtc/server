@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore'], function ($, _) {
+define(['underscore'], function (_) {
 
 	var count = 0;
 

@@ -1,15 +1,15 @@
 
 
 "use strict";
- define(["jquery", "underscore"], function($, _) {
+define(["jquery", "underscore"], function ($, _) {
 
 	// constraints
-	return ["webrtc", "$window", "$q", function(webrtc, $window, $q) {
+	return ["webrtc", "$q", function (webrtc, $q) {
 
 		var service = this;
 
 		// Constraints implementation holder. Created new all the time.
-		var Constraints = function(settings) {
+		var Constraints = function (settings) {
 			this.settings = _.clone(settings, true);
 			this.pc = [];
 			this.audio = [];
@@ -22,20 +22,20 @@
 		};
 
 		// Helpers to wait on stuff.
-		Constraints.prototype.defer = function() {
+		Constraints.prototype.defer = function () {
 			var deferred = $q.defer();
 			this.promises.push(deferred.promise);
 			return deferred;
 		};
-		Constraints.prototype.wait = function(promise) {
+		Constraints.prototype.wait = function (promise) {
 			this.promises.push(promise);
 			return promise;
 		};
 
 		// Add constraints.
-		Constraints.prototype.add = function(t, k, v, mandatory) {
+		Constraints.prototype.add = function (t, k, v, mandatory) {
 			if (_.isArray(t)) {
-				_.forEach(t, function(x) {
+				_.forEach(t, function (x) {
 					this.add(x, k, v, mandatory);
 				}, this);
 				return;
@@ -61,7 +61,7 @@
 		};
 
 		// Set constraints, overwriting existing.
-		Constraints.prototype.set = function(t, data, mandatory) {
+		Constraints.prototype.set = function (t, data, mandatory) {
 			if (mandatory) {
 				t = t + "Mandatory";
 			}
@@ -73,7 +73,7 @@
 		};
 
 		// Set disable flag for video/audio.
-		Constraints.prototype.disable = function(name) {
+		Constraints.prototype.disable = function (name) {
 			this.disabled[name] = true;
 		};
 
@@ -83,7 +83,7 @@
 		service.turn = {};
 
 		// Create as WebRTC data structure.
-		service.mediaConstraints = function(constraints) {
+		service.mediaConstraints = function (constraints) {
 			if (constraints.disabled.audio) {
 				webrtc.settings.mediaConstraints.audio = false
 			} else {
@@ -102,12 +102,12 @@
 		};
 
 		// Create as WebRTC data structure.
-		service.pcConstraints = function(constraints) {
+		service.pcConstraints = function (constraints) {
 			webrtc.settings.pcConstraints.optional = constraints.pc;
 		};
 
-		service.iceServers = function(constraints) {
-			var createIceServers = function(urls, username, password) {
+		service.iceServers = function (constraints) {
+			var createIceServers = function (urls, username, password) {
 				var s = {
 					urls: urls
 				}
@@ -131,23 +131,23 @@
 		// Public API.
 		return {
 			e: service.e,
-			refresh: function(settings) {
+			refresh: function (settings) {
 				var constraints = new Constraints(settings);
-				return $q.all(constraints.promises).then(function() {
+				return $q.all(constraints.promises).then(function () {
 					service.mediaConstraints(constraints);
 					service.pcConstraints(constraints);
 					service.iceServers(constraints);
 				});
 			},
 			// Setters for TURN and STUN data.
-			turn: function(turnData) {
+			turn: function (turnData) {
 				service.turn = turnData;
 			},
-			stun: function(stunData) {
+			stun: function (stunData) {
 				service.stun = stunData;
 			}
 		};
 
 	}];
 
- });
+});

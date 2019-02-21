@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(["jquery"], function($) {
+define(["jquery"], function ($) {
 
 	// appData.e events:
 	// Subscribe these events with appData.e.on(eventname, function() {}).
@@ -15,7 +15,7 @@ define(["jquery"], function($) {
 	// - flags (map)       : Flag table.
 
 	// appData
-	return ["$window", function($window) {
+	return [function () {
 
 		var service = this;
 
@@ -26,10 +26,10 @@ define(["jquery"], function($) {
 		};
 
 
-		service.get = function() {
+		service.get = function () {
 			return service.data;
 		};
-		service.set = function(d) {
+		service.set = function (d) {
 			service.data = d;
 			return d;
 		};
