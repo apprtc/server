@@ -3,8 +3,7 @@
 "use strict";
 define([
 	'jquery',
-	'underscore',
-	'webrtc.adapter'
+	'underscore'
 
 ], function ($, _) {
 

@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
+define(['jquery', 'underscore'], function ($, _) {
 	// UserMedia.
 	var UserMedia = function () {
 		this.e = $({}); // Events.

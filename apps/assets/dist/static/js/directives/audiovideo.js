@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'text!partials/audiovideo.html', 'webrtc.adapter'], function ($, _, template) {
+define(['jquery', 'underscore', 'text!partials/audiovideo.html'], function ($, _, template) {
 
 	return ["$window", "mediaStream", "safeApply", "$timeout", function ($window, mediaStream, safeApply, $timeout) {
 

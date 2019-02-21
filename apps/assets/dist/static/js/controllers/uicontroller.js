@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'webrtc.adapter'], function ($, _) {
+define(['jquery', 'underscore'], function ($, _) {
 
 	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "rooms", "constraints",
 		function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, rooms, constraints) {

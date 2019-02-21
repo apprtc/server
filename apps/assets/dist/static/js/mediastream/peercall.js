@@ -1,7 +1,7 @@
 
 
 "use strict";
-define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream/util', 'mediastream/sdputils', 'RecordRTC'], function ($, _, PeerConnectionClient) {
+define(['jquery', 'underscore', 'mediastream/peerconnectionclient'], function ($, _, PeerConnectionClient) {
 
 	var PeerCall = function (webrtc, id, from, to) {
 
@@ -317,7 +317,7 @@ define(['jquery', 'underscore', 'mediastream/peerconnectionclient', 'mediastream
 	}
 
 
-	PeerCall.prototype.stopRecord = function() {
+	PeerCall.prototype.stopRecord = function () {
 		trace("PeerCall.stopRecord");
 
 		if (this.recorder !== null) {

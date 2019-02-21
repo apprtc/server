@@ -1,7 +1,7 @@
 
 
 "use strict";
- define(["jquery", "underscore", "webrtc.adapter"], function($, _) {
+ define(["jquery", "underscore"], function($, _) {
 
 	// constraints
 	return ["webrtc", "$window", "$q", function(webrtc, $window, $q) {
