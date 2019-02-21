@@ -3,8 +3,8 @@
 "use strict";
 define(['jquery', 'underscore'], function ($, _) {
 
-	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "safeApply", "mediaStream", "appData", "rooms", "constraints",
-		function ($scope, $rootScope, $element, $window, $timeout, safeApply, mediaStream, appData, rooms, constraints) {
+	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "mediaStream", "appData", "rooms", "constraints",
+		function ($scope, $rootScope, $element, $window, $timeout, mediaStream, appData, rooms, constraints) {
 
 			// Avoid accidential reloads or exits when in a call.
 			$($window).on("beforeunload", function (event) {
@@ -64,9 +64,9 @@ define(['jquery', 'underscore'], function ($, _) {
 			mediaStream.api.e.on("received.self", function (event, data) {
 
 				$timeout.cancel(ttlTimeout);
-				safeApply($scope, function (scope) {
-					scope.id = scope.myid = data.Id;
-				});
+
+				$scope.id = $scope.myid = data.Id;
+
 
 				// Set TURN and STUN data and refresh webrtc settings.
 				constraints.turn(data.Turn);

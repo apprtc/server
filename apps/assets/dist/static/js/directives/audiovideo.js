@@ -3,7 +3,7 @@
 "use strict";
 define(['jquery', 'underscore', 'text!partials/audiovideo.html'], function ($, _, template) {
 
-	return ["$window", "mediaStream", "safeApply", "$timeout", function ($window, mediaStream, safeApply, $timeout) {
+	return ["$window", "mediaStream", "$timeout", function ($window, mediaStream, $timeout) {
 
 
 		var controller = ['$scope', '$element', '$attrs', function ($scope, $element, $attrs) {

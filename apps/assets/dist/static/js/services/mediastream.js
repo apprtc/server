@@ -7,7 +7,7 @@ define([
 
 ], function ($, _) {
 
-	return ["globalContext", "connector", "api", "webrtc", "appData", "$window", "$http", "safeApply", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $window, $http, safeApply, $timeout, $sce, continueConnector) {
+	return ["globalContext", "connector", "api", "webrtc", "appData", "$window", "$http", "$timeout", "$sce", "continueConnector", function (context, connector, api, webrtc, appData, $window, $http, $timeout, $sce, continueConnector) {
 
 		var url = (context.Ssl ? "wss" : "ws") + "://" + context.Host + (context.Cfg.B || "/") + "ws";
 		var version = context.Cfg.Version;
@@ -58,9 +58,7 @@ define([
 						// Inject connector function into scope, so that controllers can pick it up.
 						console.log("Ready to connect ...");
 						mediaStream.connect();
-						safeApply($rootScope, function (scope) {
-							scope.connect = true;
-						});
+						$rootScope.connect = true;
 					}
 				};
 

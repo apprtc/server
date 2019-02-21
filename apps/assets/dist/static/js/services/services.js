@@ -3,7 +3,6 @@
 "use strict";
 define([
 	'underscore',
-	'services/safeapply',
 	'services/connector',
 	'services/api',
 	'services/webrtc',
@@ -13,7 +12,6 @@ define([
 	'services/rooms',
 	'services/constraints'
 ], function (_,
-	safeApply,
 	connector,
 	api,
 	webrtc,
@@ -25,7 +23,6 @@ define([
 ) {
 
 		var services = {
-			safeApply: safeApply,
 			connector: connector,
 			api: api,
 			webrtc: webrtc,
