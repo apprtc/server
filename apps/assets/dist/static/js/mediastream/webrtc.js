@@ -26,23 +26,28 @@ define([
 			this.onRemoteStreamRemoved = null;
 			this.onremotesdpset = null;
 			// Settings.are cloned into peer call on call creation.
+
+
+			this.resolutions = ["1920x1080", "1280x720", "640x480", "3840x2160"];
+			this.defaultResolution = this.resolutions[1].split('x');
+
+
+			this.defaultWidth = parseInt(this.defaultResolution[0]);
+			this.defaultHeight = parseInt(this.defaultResolution[1]);
+
 			this.settings = {
 				mediaConstraints: {
 					audio: true,
 					video: {
-						width: 1280,
-						height: 720,
 						optional: [],
 						mandatory: {
-							maxWidth: 1280,
-							maxHeight: 720
+							minWidth: this.defaultWidth,
+							minHeight: this.defaultHeight
 						}
 					}
 				},
 				pcConfig: {
-					iceServers: [{
-						// url: 'stun:' + 'stun.l.google.com:19302'
-					}]
+					iceServers: []
 				},
 				pcConstraints: {
 					mandatory: {},

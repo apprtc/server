@@ -16,7 +16,7 @@ define(['jquery', 'underscore'], function ($, _) {
 
 			mediaPromise = navigator.mediaDevices.getUserMedia(mediaConstraints)
 				.catch(function (error) {
-					this.onUserMediaError(error);
+					console.error('getUserMedia Error was ' + error.name, error);
 				})
 				.then(function (stream) {
 					console.log('Got access to local media with mediaConstraints:\n' +

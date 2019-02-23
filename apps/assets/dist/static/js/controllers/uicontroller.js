@@ -5,9 +5,8 @@ define(['jquery', 'underscore'], function ($, _) {
 
 	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "mediaStream", "appData", "rooms", "constraints",
 		function ($scope, $rootScope, $element, $window, $timeout, mediaStream, appData, rooms, constraints) {
-
 			appData.set($scope);
-
+	
 			// User related scope data.
 			$scope.defaults = {
 				message: null,
@@ -16,8 +15,7 @@ define(['jquery', 'underscore'], function ($, _) {
 	
 			$scope.reset = function() {
 				$scope.user = angular.copy($scope.master);
-			};
-	
+			};			
 			$scope.manualReloadApp = function(url) {
 				appData.flags.manualUnload = true;
 				if (url) {
@@ -29,9 +27,7 @@ define(['jquery', 'underscore'], function ($, _) {
 					$window.location.reload(true);
 				}
 			};
-	
 			$scope.reset(); // Call once for bootstrap.
-
 			// Avoid accidential reloads or exits when in a call.
 			$($window).on("beforeunload", function (event) {
 				if (appData.flags.manualUnload || !$scope.peer) {
@@ -47,13 +43,11 @@ define(['jquery', 'underscore'], function ($, _) {
 				}
 			});
 
-
 			// Init STUN from server config.
 			(function () {
 				var stun = mediaStream.config.StunURIs || [];
 				constraints.stun(stun);
 			})();
-
 
 			// Default scope data.
 			$scope.status = "initializing";
@@ -71,8 +65,7 @@ define(['jquery', 'underscore'], function ($, _) {
 			$scope.updateStatus = function (clear) {
 				// This is the user status.
 				var status = {
-					displayName: $scope.master.displayName || null,
-					message: $scope.master.message || null
+					displayName: "",
 				}
 				console.log("Status update commit", status);
 				mediaStream.api.updateStatus(status);
@@ -80,11 +73,10 @@ define(['jquery', 'underscore'], function ($, _) {
 
 			$scope.refreshWebrtcSettings = function () {
 				// Refresh constraints.
-				constraints.refresh($scope.master.settings).then(function () {
-				});
+				// constraints.refresh($scope.master.settings).then(function () {
+				// });
 			};
 			$scope.refreshWebrtcSettings(); // Call once for bootstrap.
-
 			var ttlTimeout;
 
 			mediaStream.api.e.on("received.self", function (event, data) {
@@ -93,13 +85,10 @@ define(['jquery', 'underscore'], function ($, _) {
 
 				$scope.id = $scope.myid = data.Id;
 
-
 				// Set TURN and STUN data and refresh webrtc settings.
 				constraints.turn(data.Turn);
 				constraints.stun(data.Stun);
-				$scope.refreshWebrtcSettings();
-
-				// Support to upgrade stuff when ttl was reached.
+				$scope.refreshWebrtcSettings();				// Support to upgrade stuff when ttl was reached.
 				if (data.Turn.ttl) {
 					ttlTimeout = $timeout(function () {
 						console.log("Ttl reached - sending refresh request.");
