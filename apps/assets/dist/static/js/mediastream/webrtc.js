@@ -30,10 +30,12 @@ define([
 				mediaConstraints: {
 					audio: true,
 					video: {
+						width: 1280,
+						height: 720,
 						optional: [],
 						mandatory: {
-							maxWidth: 640,
-							maxHeight: 480
+							maxWidth: 1280,
+							maxHeight: 720
 						}
 					}
 				},
@@ -49,14 +51,14 @@ define([
 				// sdpParams values need to be strings.
 				sdpParams: {
 					//audioSendBitrate: ,
-					audioSendCodec: "opus/48000",
+					// audioSendCodec: "opus/48000",
 					//audioRecvBitrate: ,
 					//audioRecvCodec: ,
 					//opusMaxPbr: ,
 					opusStereo: "true",
 					//videoSendBitrate: ,
 					//videoSendInitialBitrate: ,
-					videoSendCodec: "VP8/90000"
+					// videoSendCodec: "VP8/90000"
 					//videoRecvBitrate: ,
 					//videoRecvCodec
 				},
@@ -266,7 +268,7 @@ define([
 			console.log("WebRTC.doAccept");
 			var call = this.createCall(from, this.api.id, from);
 
-			
+
 
 			if (!this.conference.addIncoming(from, call)) {
 				console.warn("Already got a call, not processing Offer", from);
