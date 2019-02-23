@@ -9,8 +9,7 @@ define([
 	'services/mediastream',
 	'services/appdata',
 	'services/continueconnector',
-	'services/rooms',
-	'services/constraints'
+	'services/rooms'
 ], function (_,
 	connector,
 	api,
@@ -18,8 +17,7 @@ define([
 	mediaStream,
 	appData,
 	continueConnector,
-	rooms,
-	constraints
+	rooms
 ) {
 
 		var services = {
@@ -29,8 +27,7 @@ define([
 			mediaStream: mediaStream,
 			appData: appData,
 			continueConnector: continueConnector,
-			rooms: rooms,
-			constraints: constraints
+			rooms: rooms
 		};
 
 		var initialize = function (angModule) {
