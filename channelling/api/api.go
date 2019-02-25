@@ -110,14 +110,6 @@ func (api *channellingAPI) OnIncoming(sender channelling.Sender, session *channe
 		}
 
 		session.Unicast(msg.Answer.To, msg.Answer, pipeline)
-	case "Users":
-		return api.HandleUsers(session)
-	case "Authentication":
-		if msg.Authentication == nil || msg.Authentication.Authentication == nil {
-			return nil, channelling.NewDataError("bad_request", "message did not contain Authentication")
-		}
-
-		return api.HandleAuthentication(session, msg.Authentication.Authentication)
 	case "Bye":
 		if msg.Bye == nil {
 			log.Println("Received invalid bye message.", msg)
@@ -139,21 +131,8 @@ func (api *channellingAPI) OnIncoming(sender channelling.Sender, session *channe
 		//log.Println("Status", msg.Status)
 		session.Update(&channelling.SessionUpdate{Types: []string{"Status"}, Status: msg.Status.Status})
 		session.BroadcastStatus()
-	case "Conference":
-		if msg.Conference == nil {
-			log.Println("Received invalid conference message.", msg)
-			break
-		}
-
-		api.HandleConference(session, msg.Conference)
 	case "Alive":
 		return msg.Alive, nil
-	case "Sessions":
-		if msg.Sessions == nil || msg.Sessions.Sessions == nil {
-			return nil, channelling.NewDataError("bad_request", "message did not contain Sessions")
-		}
-
-		return api.HandleSessions(session, msg.Sessions.Sessions)
 	case "Room":
 		if msg.Room == nil {
 			return nil, channelling.NewDataError("bad_request", "message did not contain Room")
@@ -176,7 +155,5 @@ func (api *channellingAPI) OnIncomingProcessed(sender channelling.Sender, sessio
 	switch msg.Type {
 	case "Hello":
 		api.HelloProcessed(sender, session, msg, reply, err)
-	case "Room":
-		api.RoomProcessed(sender, session, msg, reply, err)
 	}
 }

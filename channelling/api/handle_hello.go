@@ -27,7 +27,5 @@ func (api *channellingAPI) HandleHello(session *channelling.Session, hello *chan
 }
 
 func (api *channellingAPI) HelloProcessed(sender channelling.Sender, session *channelling.Session, msg *channelling.DataIncoming, reply interface{}, err error) {
-	if err == nil {
-		api.SendConferenceRoomUpdate(session)
-	}
+
 }

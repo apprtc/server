@@ -12,3 +12,4 @@
 *.out
 go.sum
 apps/focusteachrtcd/debug
+apps/rtcd/debug
