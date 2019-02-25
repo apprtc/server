@@ -3,18 +3,6 @@ package channelling
 import (
 	"fmt"
 	"time"
-
-	"github.com/nats-io/nats"
-)
-
-const (
-	BusManagerStartup    = "startup"
-	BusManagerOffer      = "offer"
-	BusManagerAnswer     = "answer"
-	BusManagerBye        = "bye"
-	BusManagerConnect    = "connect"
-	BusManagerDisconnect = "disconnect"
-	BusManagerSession    = "session"
 )
 
 // A BusManager provides the API to interact with a bus.
@@ -24,7 +12,7 @@ type BusManager interface {
 	Publish(subject string, v interface{}) error
 	Request(subject string, v interface{}, vPtr interface{}, timeout time.Duration) error
 	Trigger(name, from, payload string, data interface{}, pipeline *Pipeline) error
-	Subscribe(subject string, cb nats.Handler) error
+	Subscribe(subject string) error
 	BindRecvChan(subject string, channel interface{}) error
 	BindSendChan(subject string, channel interface{}) error
 	PrefixSubject(string) string
@@ -91,7 +79,7 @@ func (bus *noopBus) BindSendChan(subject string, channel interface{}) error {
 	return nil
 }
 
-func (bus *noopBus) Subscribe(subject string, cb nats.Handler) error {
+func (bus *noopBus) Subscribe(subject string) error {
 	return nil
 }
 

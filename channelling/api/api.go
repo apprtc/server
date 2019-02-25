@@ -48,15 +48,13 @@ func New(config *channelling.Config,
 func (api *channellingAPI) OnConnect(client *channelling.Client, session *channelling.Session) (interface{}, error) {
 	api.Unicaster.OnConnect(client, session)
 	self, err := api.HandleSelf(session)
-	if err == nil {
-		api.BusManager.Trigger(channelling.BusManagerConnect, session.Id, "", nil, nil)
-	}
+
 	return self, err
 }
 
 func (api *channellingAPI) OnDisconnect(client *channelling.Client, session *channelling.Session) {
 	api.Unicaster.OnDisconnect(client, session)
-	api.BusManager.Trigger(channelling.BusManagerDisconnect, session.Id, "", nil, nil)
+
 }
 
 func (api *channellingAPI) OnIncoming(sender channelling.Sender, session *channelling.Session, msg *channelling.DataIncoming) (interface{}, error) {
@@ -75,12 +73,6 @@ func (api *channellingAPI) OnIncoming(sender channelling.Sender, session *channe
 			log.Println("Received invalid offer message.", msg)
 			break
 		}
-		if _, ok := msg.Offer.Offer["_token"]; !ok {
-			pipeline = api.PipelineManager.GetPipeline(channelling.PipelineNamespaceCall, sender, session, msg.Offer.To)
-			// Trigger offer event when offer has no token, so this is
-			// not triggered for peerxfer and peerscreenshare offers.
-			api.BusManager.Trigger(channelling.BusManagerOffer, session.Id, msg.Offer.To, nil, pipeline)
-		}
 
 		session.Unicast(msg.Offer.To, msg.Offer, pipeline)
 	case "Candidate":
@@ -96,12 +88,6 @@ func (api *channellingAPI) OnIncoming(sender channelling.Sender, session *channe
 			log.Println("Received invalid answer message.", msg)
 			break
 		}
-		if _, ok := msg.Answer.Answer["_token"]; !ok {
-			pipeline = api.PipelineManager.GetPipeline(channelling.PipelineNamespaceCall, sender, session, msg.Answer.To)
-			// Trigger answer event when answer has no token. so this is
-			// not triggered for peerxfer and peerscreenshare answers.
-			api.BusManager.Trigger(channelling.BusManagerAnswer, session.Id, msg.Answer.To, nil, pipeline)
-		}
 
 		session.Unicast(msg.Answer.To, msg.Answer, pipeline)
 	case "Bye":
@@ -110,7 +96,6 @@ func (api *channellingAPI) OnIncoming(sender channelling.Sender, session *channe
 			break
 		}
 		pipeline = api.PipelineManager.GetPipeline(channelling.PipelineNamespaceCall, sender, session, msg.Bye.To)
-		api.BusManager.Trigger(channelling.BusManagerBye, session.Id, msg.Bye.To, nil, pipeline)
 
 		session.Unicast(msg.Bye.To, msg.Bye, pipeline)
 		if pipeline != nil {

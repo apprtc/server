@@ -56,9 +56,6 @@ func (plm *pipelineManager) Start() {
 	plm.enabled = true
 
 	plm.start()
-
-	plm.Subscribe("channelling.session.create", plm.sessionCreate)
-	plm.Subscribe("channelling.session.close", plm.sessionClose)
 }
 
 func (plm *pipelineManager) cleanup() {

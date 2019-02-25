@@ -24,7 +24,6 @@ func (api *channellingAPI) HandleSelf(session *channelling.Session) (*channellin
 		Version:    api.config.Version,
 		ApiVersion: apiVersion,
 	}
-	api.BusManager.Trigger(channelling.BusManagerSession, session.Id, session.Userid(), nil, nil)
 
 	return self, nil
 }
