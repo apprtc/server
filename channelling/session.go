@@ -1,10 +1,7 @@
-
-
 package channelling
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 	"time"
 
@@ -18,7 +15,6 @@ type Session struct {
 	Unicaster         Unicaster
 	Broadcaster       Broadcaster
 	RoomStatusManager RoomStatusManager
-	buddyImages       ImageCache
 	Id                string
 	Sid               string
 	Ua                string
@@ -44,7 +40,6 @@ func NewSession(manager SessionManager,
 	unicaster Unicaster,
 	broadcaster Broadcaster,
 	rooms RoomStatusManager,
-	buddyImages ImageCache,
 	attestations *securecookie.SecureCookie,
 	id,
 	sid string) *Session {
@@ -53,7 +48,6 @@ func NewSession(manager SessionManager,
 		Unicaster:         unicaster,
 		Broadcaster:       broadcaster,
 		RoomStatusManager: rooms,
-		buddyImages:       buddyImages,
 		Id:                id,
 		Sid:               sid,
 		Prio:              100,
@@ -242,8 +236,6 @@ func (s *Session) Close() {
 		}
 
 		s.SessionManager.DestroySession(s.Id, s.userid)
-		s.buddyImages.Delete(s.Id)
-
 	}
 
 	s.subscriptions = make(map[string]*Session)
@@ -275,19 +267,6 @@ func (s *Session) Replace(oldSession *Session) {
 func (s *Session) Update(update *SessionUpdate) uint64 {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-
-	if update.Status != nil {
-		status, ok := update.Status.(map[string]interface{})
-		if ok && status["buddyPicture"] != nil {
-			pic := status["buddyPicture"].(string)
-			if strings.HasPrefix(pic, "data:") {
-				imageId := s.buddyImages.Update(s.Id, pic[5:])
-				if imageId != "" {
-					status["buddyPicture"] = "img:" + imageId
-				}
-			}
-		}
-	}
 
 	for _, key := range update.Types {
 

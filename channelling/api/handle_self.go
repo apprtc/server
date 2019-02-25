@@ -23,8 +23,6 @@ func (api *channellingAPI) HandleSelf(session *channelling.Session) (*channellin
 		Token:      token,
 		Version:    api.config.Version,
 		ApiVersion: apiVersion,
-		Turn:       api.TurnDataCreator.CreateTurnData(session),
-		Stun:       api.config.StunURIs,
 	}
 	api.BusManager.Trigger(channelling.BusManagerSession, session.Id, session.Userid(), nil, nil)
 

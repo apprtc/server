@@ -1,5 +1,3 @@
-
-
 package channelling
 
 import (
@@ -31,7 +29,6 @@ type sessionManager struct {
 	Unicaster
 	Broadcaster
 	RoomStatusManager
-	buddyImages          ImageCache
 	config               *Config
 	userTable            map[string]*User
 	sessionTable         map[string]*Session
@@ -40,14 +37,13 @@ type sessionManager struct {
 	attestations         *securecookie.SecureCookie
 }
 
-func NewSessionManager(config *Config, tickets Tickets, unicaster Unicaster, broadcaster Broadcaster, rooms RoomStatusManager, buddyImages ImageCache, sessionSecret []byte) SessionManager {
+func NewSessionManager(config *Config, tickets Tickets, unicaster Unicaster, broadcaster Broadcaster, rooms RoomStatusManager, sessionSecret []byte) SessionManager {
 	sessionManager := &sessionManager{
 		sync.RWMutex{},
 		tickets,
 		unicaster,
 		broadcaster,
 		rooms,
-		buddyImages,
 		config,
 		make(map[string]*User),
 		make(map[string]*Session),
@@ -99,7 +95,7 @@ func (sessionManager *sessionManager) CreateSession(st *SessionToken, userid str
 	if st == nil {
 		st = sessionManager.DecodeSessionToken("")
 	}
-	session := NewSession(sessionManager, sessionManager.Unicaster, sessionManager.Broadcaster, sessionManager.RoomStatusManager, sessionManager.buddyImages, sessionManager.attestations, st.Id, st.Sid)
+	session := NewSession(sessionManager, sessionManager.Unicaster, sessionManager.Broadcaster, sessionManager.RoomStatusManager, sessionManager.attestations, st.Id, st.Sid)
 
 	if userid != "" {
 		// Errors are ignored here, session is returned without userID when auth failed.
@@ -160,7 +156,7 @@ func (sessionManager *sessionManager) GetUserSessions(session *Session, userid s
 		session, ok := sessionManager.sessionByUserIDTable[userid]
 		if !ok {
 			st := sessionManager.FakeSessionToken(userid)
-			session = NewSession(sessionManager, sessionManager.Unicaster, sessionManager.Broadcaster, sessionManager.RoomStatusManager, sessionManager.buddyImages, sessionManager.attestations, st.Id, st.Sid)
+			session = NewSession(sessionManager, sessionManager.Unicaster, sessionManager.Broadcaster, sessionManager.RoomStatusManager, sessionManager.attestations, st.Id, st.Sid)
 			session.SetUseridFake(st.Userid)
 			sessionManager.sessionByUserIDTable[userid] = session
 			sessionManager.sessionTable[session.Id] = session

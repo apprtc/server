@@ -6,21 +6,21 @@ define(['jquery', 'underscore'], function ($, _) {
 	return ["$scope", "$rootScope", "$element", "$window", "$timeout", "mediaStream", "appData", "rooms",
 		function ($scope, $rootScope, $element, $window, $timeout, mediaStream, appData, rooms) {
 			appData.set($scope);
-	
+
 			// User related scope data.
 			$scope.defaults = {
 				message: null,
 			};
 			$scope.master = angular.copy($scope.defaults);
-	
-			$scope.reset = function() {
+
+			$scope.reset = function () {
 				$scope.user = angular.copy($scope.master);
-			};			
-			$scope.manualReloadApp = function(url) {
+			};
+			$scope.manualReloadApp = function (url) {
 				appData.flags.manualUnload = true;
 				if (url) {
 					$window.location.href = url;
-					$timeout(function() {
+					$timeout(function () {
 						appData.flags.manualUnload = false;
 					}, 0);
 				} else {
@@ -72,13 +72,6 @@ define(['jquery', 'underscore'], function ($, _) {
 				$timeout.cancel(ttlTimeout);
 
 				$scope.id = $scope.myid = data.Id;
-
-				if (data.Turn.ttl) {
-					ttlTimeout = $timeout(function () {
-						console.log("Ttl reached - sending refresh request.");
-						mediaStream.api.sendSelf();
-					}, data.Turn.ttl / 100 * 90 * 1000);
-				}
 
 				// Propagate authentication event.
 				appData.e.triggerHandler("selfReceived", [data]);
