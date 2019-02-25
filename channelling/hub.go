@@ -1,14 +1,9 @@
 package channelling
 
 import (
-	"crypto/aes"
-	"crypto/sha256"
-	"errors"
 	"fmt"
 	"log"
 	"sync"
-
-	"github.com/gorilla/securecookie"
 )
 
 const (
@@ -18,7 +13,6 @@ const (
 type Hub interface {
 	ClientStats
 	Unicaster
-	ContactManager
 }
 
 type hub struct {
@@ -27,7 +21,6 @@ type hub struct {
 	config     *Config
 	turnSecret []byte
 	mutex      sync.RWMutex
-	contacts   *securecookie.SecureCookie
 }
 
 func NewHub(config *Config, sessionSecret, encryptionSecret, turnSecret []byte, encoder OutgoingEncoder) Hub {
@@ -37,11 +30,6 @@ func NewHub(config *Config, sessionSecret, encryptionSecret, turnSecret []byte, 
 		config:          config,
 		turnSecret:      turnSecret,
 	}
-
-	h.contacts = securecookie.New(sessionSecret, encryptionSecret)
-	h.contacts.MaxAge(0) // Forever
-	h.contacts.HashFunc(sha256.New)
-	h.contacts.BlockFunc(aes.NewCipher)
 
 	return h
 }
@@ -124,87 +112,4 @@ func (h *hub) Unicast(to string, outgoing *DataOutgoing, pipeline *Pipeline) {
 		client.Send(message)
 		message.Decref()
 	}
-}
-
-func (h *hub) GetContactID(session *Session, token string) (userid string, err error) {
-	contact := &Contact{}
-	err = h.contacts.Decode("contact", token, contact)
-	if err != nil {
-		err = fmt.Errorf("Failed to decode incoming contact token", err, token)
-		return
-	}
-	// Use the userid which is not ours from the contact data.
-	suserid := session.Userid()
-	if contact.A == suserid {
-		userid = contact.B
-	} else if contact.B == suserid {
-		userid = contact.A
-	}
-	if userid == "" {
-		err = fmt.Errorf("Ignoring foreign contact token", contact.A, contact.B)
-	}
-
-	return
-}
-
-func (h *hub) ContactrequestHandler(session *Session, to string, cr *DataContactRequest) error {
-	var err error
-
-	if cr.Success {
-		// Client replied with success.
-		// Decode Token and make sure c.Session.Userid and the to Session.Userid are a match.
-		contact := &Contact{}
-		err = h.contacts.Decode("contact", cr.Token, contact)
-		if err != nil {
-			return err
-		}
-		suserid := session.Userid()
-		if suserid == "" {
-			return errors.New("no userid")
-		}
-		session, ok := h.GetSession(to)
-		if !ok {
-			return errors.New("unknown to session for confirm")
-		}
-		userid := session.Userid()
-		if userid == "" {
-			return errors.New("to has no userid for confirm")
-		}
-		if suserid != contact.A {
-			return errors.New("contact mismatch in a")
-		}
-		if userid != contact.B {
-			return errors.New("contact mismatch in b")
-		}
-	} else {
-		if cr.Token != "" {
-			// Client replied with no success.
-			// Remove token.
-			cr.Token = ""
-		} else {
-			// New request.
-			// Create Token with flag and c.Session.Userid and the to Session.Userid.
-			suserid := session.Userid()
-			if suserid == "" {
-				return errors.New("no userid")
-			}
-			session, ok := h.GetSession(to)
-			if !ok {
-				return errors.New("unknown to session")
-			}
-			userid := session.Userid()
-			if userid == "" {
-				return errors.New("to has no userid")
-			}
-			if userid == suserid {
-				return errors.New("to userid cannot be the same as own userid")
-			}
-			// Create object.
-			contact := &Contact{userid, suserid}
-			// Serialize.
-			cr.Token, err = h.contacts.Encode("contact", contact)
-		}
-	}
-
-	return err
 }

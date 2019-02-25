@@ -16,7 +16,6 @@ type channellingAPI struct {
 	SessionEncoder    channelling.SessionEncoder
 	SessionManager    channelling.SessionManager
 	StatsCounter      channelling.StatsCounter
-	ContactManager    channelling.ContactManager
 	Unicaster         channelling.Unicaster
 	BusManager        channelling.BusManager
 	PipelineManager   channelling.PipelineManager
@@ -31,7 +30,6 @@ func New(config *channelling.Config,
 	sessionEncoder channelling.SessionEncoder,
 	sessionManager channelling.SessionManager,
 	statsCounter channelling.StatsCounter,
-	contactManager channelling.ContactManager,
 	unicaster channelling.Unicaster,
 	busManager channelling.BusManager,
 	pipelineManager channelling.PipelineManager) channelling.ChannellingAPI {
@@ -40,7 +38,6 @@ func New(config *channelling.Config,
 		sessionEncoder,
 		sessionManager,
 		statsCounter,
-		contactManager,
 		unicaster,
 		busManager,
 		pipelineManager,

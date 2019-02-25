@@ -141,7 +141,7 @@ func runner(runtime phoenix.Runtime) error {
 	}
 
 	// Create API.
-	channellingAPI := api.New(config, roomManager, tickets, sessionManager, statsManager, hub, hub, busManager, pipelineManager)
+	channellingAPI := api.New(config, roomManager, tickets, sessionManager, statsManager, hub, busManager, pipelineManager)
 	apiConsumer.SetChannellingAPI(channellingAPI)
 
 	// Start bus.

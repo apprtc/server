@@ -56,23 +56,6 @@ func NewConfig(container phoenix.Container, tokens bool) (*channelling.Config, e
 	turnURIs := strings.Split(turnURIsString, " ")
 	trimAndRemoveDuplicates(&turnURIs)
 
-	// Get enabled modules.
-	modulesTable := map[string]bool{
-		"screensharing": true,
-		"youtube":       true,
-		"presentation":  true,
-		"contacts":      true,
-	}
-	modules := []string{}
-	for module := range modulesTable {
-		if container.GetBoolDefault("modules", module, true) {
-			modules = append(modules, module)
-		} else {
-			modulesTable[module] = false
-		}
-	}
-	log.Println("Enabled modules:", modules)
-
 	roomTypes := make(map[*regexp.Regexp]string)
 	if options, _ := container.GetOptions("roomtypes"); len(options) > 0 {
 		for _, option := range options {
@@ -108,15 +91,8 @@ func NewConfig(container phoenix.Container, tokens bool) (*channelling.Config, e
 		TurnURIs:                        turnURIs,
 		Tokens:                          tokens,
 		Version:                         version,
-		UsersEnabled:                    container.GetBoolDefault("users", "enabled", false),
-		UsersAllowRegistration:          container.GetBoolDefault("users", "allowRegistration", false),
-		UsersMode:                       container.GetStringDefault("users", "mode", ""),
 		DefaultRoomEnabled:              container.GetBoolDefault("app", "defaultRoomEnabled", true),
 		Plugin:                          container.GetStringDefault("app", "plugin", ""),
-		AuthorizeRoomCreation:           container.GetBoolDefault("app", "authorizeRoomCreation", false),
-		AuthorizeRoomJoin:               container.GetBoolDefault("app", "authorizeRoomJoin", false),
-		Modules:                         modules,
-		ModulesTable:                    modulesTable,
 		GlobalRoomID:                    container.GetStringDefault("app", "globalRoom", ""),
 		ContentSecurityPolicy:           container.GetStringDefault("app", "contentSecurityPolicy", ""),
 		ContentSecurityPolicyReportOnly: container.GetStringDefault("app", "contentSecurityPolicyReportOnly", ""),

@@ -1,5 +1,3 @@
-
-
 package channelling
 
 type DataError struct {
@@ -108,74 +106,23 @@ type DataStatus struct {
 	Status interface{}
 }
 
-type DataChat struct {
-	To   string
-	Type string
-	Chat *DataChatMessage
-}
-
-type DataChatMessage struct {
-	Message string
-	Time    string
-	NoEcho  bool   `json:",omitempty"`
-	Mid     string `json:",omitempty"`
-	Status  *DataChatStatus
-}
-
-type DataChatStatus struct {
-	Typing         string              `json:",omitempty"`
-	State          string              `json:",omitempty"`
-	Mid            string              `json:",omitempty"`
-	SeenMids       []string            `json:",omitempty"`
-	FileInfo       *DataFileInfo       `json:",omitempty"`
-	Geolocation    *DataGeolocation    `json:",omitempty"`
-	ContactRequest *DataContactRequest `json:",omitempty"`
-	AutoCall       *DataAutoCall       `json:",omitempty"`
-}
-
-type DataFileInfo struct {
-	Id     string `json:"id"`
-	Chunks uint64 `json:"chunks"`
-	Name   string `json:"name"`
-	Size   uint64 `json:"size"`
-	Type   string `json:"type"`
-}
-
-type DataGeolocation struct {
-	Accuracy         float64 `json:"accuracy,omitempty"`
-	Latitude         float64 `json:"latitude,omitempty"`
-	Longitude        float64 `json:"longitude,omitempty"`
-	Altitude         float64 `json:"altitude,omitempty"`
-	AltitudeAccuracy float64 `json:"altitudeAccuracy,omitempty"`
-}
-
-type DataContactRequest struct {
-	Id      string
-	Success bool
-	Userid  string `json:",omitempty"`
-	Token   string `json:",omitempty"`
-}
-
 type DataAutoCall struct {
 	Id   string
 	Type string
 }
 
 type DataIncoming struct {
-	Type           string
-	Hello          *DataHello          `json:",omitempty"`
-	Offer          *DataOffer          `json:",omitempty"`
-	Candidate      *DataCandidate      `json:",omitempty"`
-	Answer         *DataAnswer         `json:",omitempty"`
-	Bye            *DataBye            `json:",omitempty"`
-	Status         *DataStatus         `json:",omitempty"`
-	Chat           *DataChat           `json:",omitempty"`
-	Conference     *DataConference     `json:",omitempty"`
-	Alive          *DataAlive          `json:",omitempty"`
-	Authentication *DataAuthentication `json:",omitempty"`
-	Sessions       *DataSessions       `json:",omitempty"`
-	Room           *DataRoom           `json:",omitempty"`
-	Iid            string              `json:",omitempty"`
+	Type      string
+	Hello     *DataHello     `json:",omitempty"`
+	Offer     *DataOffer     `json:",omitempty"`
+	Candidate *DataCandidate `json:",omitempty"`
+	Answer    *DataAnswer    `json:",omitempty"`
+	Bye       *DataBye       `json:",omitempty"`
+	Status    *DataStatus    `json:",omitempty"`
+	Alive     *DataAlive     `json:",omitempty"`
+	Sessions  *DataSessions  `json:",omitempty"`
+	Room      *DataRoom      `json:",omitempty"`
+	Iid       string         `json:",omitempty"`
 }
 
 type DataOutgoing struct {
@@ -197,18 +144,7 @@ type DataSessionsRequest struct {
 	Type  string
 }
 
-type DataConference struct {
-	Id         string
-	Type       string
-	Conference []string
-}
-
 type DataAlive struct {
 	Type  string
 	Alive uint64
-}
-
-type DataAuthentication struct {
-	Type           string
-	Authentication *SessionToken
 }
