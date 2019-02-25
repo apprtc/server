@@ -6,10 +6,6 @@ import (
 	"sync"
 )
 
-const (
-	turnTTL = 3600 // XXX(longsleep): Add to config file.
-)
-
 type Hub interface {
 	ClientStats
 	Unicaster

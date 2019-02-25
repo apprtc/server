@@ -66,15 +66,6 @@ type DataSelf struct {
 	Token      string
 	Version    string  // Server version.
 	ApiVersion float64 // Server channelling API version.
-	Turn       *DataTurn
-	Stun       []string
-}
-
-type DataTurn struct {
-	Username string   `json:"username"`
-	Password string   `json:"password"`
-	Ttl      int      `json:"ttl"`
-	Urls     []string `json:"urls"`
 }
 
 type DataSession struct {
@@ -104,11 +95,6 @@ type DataBye struct {
 type DataStatus struct {
 	Type   string
 	Status interface{}
-}
-
-type DataAutoCall struct {
-	Id   string
-	Type string
 }
 
 type DataIncoming struct {
