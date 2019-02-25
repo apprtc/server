@@ -5,19 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-
-	"github.com/apprtc/server/acceptlanguageparser"
 )
-
-// Helper to retrieve languages from request.
-func getRequestLanguages(r *http.Request, supportedLanguages []string) []string {
-	acceptLanguageHeader, ok := r.Header["Accept-Language"]
-	var langs []string
-	if ok {
-		langs = acceptlanguageparser.ParseAcceptLanguage(acceptLanguageHeader[0], supportedLanguages)
-	}
-	return langs
-}
 
 func rewriteExtraDUrl(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -89,12 +89,6 @@ func handleRoomView(room string, w http.ResponseWriter, r *http.Request) {
 		scheme = "https"
 	}
 
-	// Get languages from request.
-	langs := getRequestLanguages(r, []string{})
-	if len(langs) == 0 {
-		langs = append(langs, "en")
-	}
-
 	// Prepare context to deliver to HTML..
 	context := &channelling.Context{
 		Cfg:       config,
@@ -103,7 +97,7 @@ func handleRoomView(room string, w http.ResponseWriter, r *http.Request) {
 		Scheme:    scheme,
 		Ssl:       ssl,
 		Csp:       csp,
-		Languages: langs,
+		Languages: []string{"en"},
 		Room:      room,
 		S:         config.S,
 	}
