@@ -1,13 +1,9 @@
-
-
 package channelling
 
 import (
 	"fmt"
 	"log"
 	"sync"
-
-	"github.com/nats-io/nats"
 )
 
 type RoomStatusManager interface {
@@ -39,11 +35,10 @@ type roomManager struct {
 	*Config
 	OutgoingEncoder
 	BusManager
-	roomTypeSubscription *nats.Subscription
-	roomTable            map[string]RoomWorker
-	roomTypes            map[string]string
-	globalRoomID         string
-	defaultRoomID        string
+	roomTable     map[string]RoomWorker
+	roomTypes     map[string]string
+	globalRoomID  string
+	defaultRoomID string
 }
 
 type roomTypeMessage struct {
@@ -67,18 +62,8 @@ func NewRoomManager(config *Config, encoder OutgoingEncoder) RoomManager {
 }
 
 func (rooms *roomManager) SetBusManager(BusManager BusManager) error {
-	if rooms.roomTypeSubscription != nil {
-		rooms.roomTypeSubscription.Unsubscribe()
-		rooms.roomTypeSubscription = nil
-	}
 	rooms.BusManager = BusManager
-	if rooms.BusManager != nil {
-		sub, err := rooms.Subscribe("channelling.config.roomtype", rooms.setNatsRoomType)
-		if err != nil {
-			return err
-		}
-		rooms.roomTypeSubscription = sub
-	}
+
 	return nil
 }
 
