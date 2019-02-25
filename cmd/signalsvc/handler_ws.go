@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/apprtc/server/channelling"
-	"github.com/apprtc/server/channelling/server"
 
 	"github.com/gorilla/websocket"
 )
@@ -32,7 +31,7 @@ var (
 	}
 )
 
-func makeWSHandler(connectionCounter channelling.ConnectionCounter, sessionManager channelling.SessionManager, codec channelling.Codec, channellingAPI channelling.ChannellingAPI, users *server.Users) http.HandlerFunc {
+func makeWSHandler(connectionCounter channelling.ConnectionCounter, sessionManager channelling.SessionManager, codec channelling.Codec, channellingAPI channelling.ChannellingAPI) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Validate incoming request.
 		if r.Method != "GET" {
@@ -54,12 +53,6 @@ func makeWSHandler(connectionCounter channelling.ConnectionCounter, sessionManag
 		st := sessionManager.DecodeSessionToken(token)
 
 		var userid string
-		if users != nil {
-			userid, _ = users.GetUserID(r)
-			if userid == "" {
-				userid = st.Userid
-			}
-		}
 
 		// Create a new connection instance.
 		session := sessionManager.CreateSession(st, userid)

@@ -158,7 +158,7 @@ func runner(runtime phoenix.Runtime) error {
 	r.Handle("/static/{path:.*}", http.StripPrefix(config.B, httputils.FileStaticServer(statikFS)))
 
 	// Finally add websocket handler.
-	r.Handle("/ws", makeWSHandler(statsManager, sessionManager, codec, channellingAPI, nil))
+	r.Handle("/ws", makeWSHandler(statsManager, sessionManager, codec, channellingAPI))
 
 	// Simple room handler.
 	r.HandleFunc("/{room}", httputils.MakeGzipHandler(roomHandler))
