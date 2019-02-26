@@ -2,13 +2,11 @@ package signalsvc
 
 import (
 	"crypto/rand"
-	"encoding/hex"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"path"
 
 	"github.com/apprtc/server/channelling"
 	"github.com/apprtc/server/channelling/api"
@@ -30,70 +28,16 @@ var config *channelling.Config
 
 func runner(runtime phoenix.Runtime) error {
 	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	var err error
 
-	var sessionSecret []byte
-	sessionSecretString, err := runtime.GetString("app", "sessionSecret")
-	if err != nil {
-		return fmt.Errorf("No sessionSecret in config file.")
-	}
-	sessionSecret, err = hex.DecodeString(sessionSecretString)
-	if err != nil {
-		log.Println("Warning: sessionSecret value is not a hex encoded", err)
-		sessionSecret = []byte(sessionSecretString)
-	}
-	if len(sessionSecret) < 32 {
-		return fmt.Errorf("Length of sessionSecret must be at least 32 bytes.")
-	}
-
-	if len(sessionSecret) < 32 {
-		log.Printf("Weak sessionSecret (only %d bytes). It is recommended to use a key with 32 or 64 bytes.\n", len(sessionSecret))
-	}
-
-	var encryptionSecret []byte
-	encryptionSecretString, err := runtime.GetString("app", "encryptionSecret")
-	if err != nil {
-		return fmt.Errorf("No encryptionSecret in config file.")
-	}
-	encryptionSecret, err = hex.DecodeString(encryptionSecretString)
-	if err != nil {
-		log.Println("Warning: encryptionSecret value is not a hex encoded", err)
-		encryptionSecret = []byte(encryptionSecretString)
-	}
-	switch l := len(encryptionSecret); {
-	case l == 16:
-	case l == 24:
-	case l == 32:
-	default:
-		return fmt.Errorf("Length of encryptionSecret must be exactly 16, 24 or 32 bytes to select AES-128, AES-192 or AES-256.")
-	}
+	sessionSecret := []byte("the-default-secret-do-not-keep-me")
+	encryptionSecret := []byte("tne-default-encryption-block-key")
 
 	var turnSecret []byte
-	turnSecretString, err := runtime.GetString("app", "turnSecret")
-	if err == nil {
-		turnSecret = []byte(turnSecretString)
-	}
-
-	serverRealm, err := runtime.GetString("app", "serverRealm")
-	if err != nil {
-		serverRealm = "local"
-	}
-
-	// Create token provider.
-	tokenFile, err := runtime.GetString("app", "tokenFile")
-	if err == nil {
-		if !httputils.HasFilePath(path.Clean(tokenFile)) {
-			return fmt.Errorf("Unable to find token file at %s", tokenFile)
-		}
-	}
-
-	var tokenProvider channelling.TokenProvider
-	if tokenFile != "" {
-		log.Printf("Using token authorization from %s\n", tokenFile)
-		tokenProvider = channelling.TokenFileProvider(tokenFile)
-	}
+	serverRealm := "local"
 
 	// Load remaining configuration items.
-	config, err = server.NewConfig(runtime, tokenProvider != nil)
+	config, err = server.NewConfig(runtime, false)
 	if err != nil {
 		return err
 	}
@@ -170,31 +114,12 @@ func runner(runtime phoenix.Runtime) error {
 }
 
 func boot() error {
-	defaultConfigPath := flag.String("dc", "", "Default configuration file.")
 	configPath := flag.String("c", defaultConfig, "Configuration file.")
-	overrideConfigPath := flag.String("oc", "", "Override configuration file.")
 	logPath := flag.String("l", "", "Log file, defaults to stderr.")
-	showVersion := flag.Bool("v", false, "Display version number and exit.")
-	memprofile := flag.String("memprofile", "", "Write memory profile to this file.")
-	cpuprofile := flag.String("cpuprofile", "", "Write cpu profile to file.")
-	showHelp := flag.Bool("h", false, "Show this usage information and exit.")
-	flag.Parse()
-
-	if *showHelp {
-		flag.Usage()
-		return nil
-	} else if *showVersion {
-		fmt.Printf("Version %s\n", version)
-		return nil
-	}
 
 	return phoenix.NewServer("server", version).
-		DefaultConfig(defaultConfigPath).
 		Config(configPath).
-		OverrideConfig(overrideConfigPath).
 		Log(logPath).
-		CpuProfile(cpuprofile).
-		MemProfile(memprofile).
 		Run(runner)
 }
 

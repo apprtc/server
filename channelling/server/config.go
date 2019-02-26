@@ -87,17 +87,12 @@ func NewConfig(container phoenix.Container, tokens bool) (*channelling.Config, e
 		B:                               basePath,
 		Token:                           serverToken,
 		Renegotiation:                   container.GetBoolDefault("app", "renegotiation", false),
-		StunURIs:                        stunURIs,
-		TurnURIs:                        turnURIs,
 		Tokens:                          tokens,
 		Version:                         version,
 		DefaultRoomEnabled:              container.GetBoolDefault("app", "defaultRoomEnabled", true),
-		Plugin:                          container.GetStringDefault("app", "plugin", ""),
 		GlobalRoomID:                    container.GetStringDefault("app", "globalRoom", ""),
 		ContentSecurityPolicy:           container.GetStringDefault("app", "contentSecurityPolicy", ""),
 		ContentSecurityPolicyReportOnly: container.GetStringDefault("app", "contentSecurityPolicyReportOnly", ""),
-		RoomTypeDefault:                 defaultRoomType,
-		RoomTypes:                       roomTypes,
 	}, nil
 }
 

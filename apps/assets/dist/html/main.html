@@ -1,7 +1,6 @@
 <%define "mainPage"%>
 <!doctype html>
-<html class="no-js wf-loading" <%if.Csp%> ng-csp
-<%end%>>
+<html class="no-js wf-loading" >
 
 <head>
     <%template "head" .%>
@@ -9,7 +8,7 @@
 
 <body style="background-color:#000; overflow-x: hidden; overflow-y: hidden;">
     <ui></ui>
-    <script data-main="<%.Cfg.S%>/js/<%.App%>" data-plugin="<%.Cfg.Plugin%>" src="<%.Cfg.S%>/js/libs/require/require.js"></script>
+    <script data-main="<%.Cfg.S%>/js/<%.App%>" src="<%.Cfg.S%>/js/libs/require/require.js"></script>
 </body>
 
 </html>

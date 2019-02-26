@@ -20,12 +20,11 @@ var mainPage *template.Template
 var tmplMain = `
 <%define "mainPage"%>
 <!doctype html>
-<html class="no-js wf-loading" <%if.Csp%> ng-csp
-<%end%>>
+<html class="no-js wf-loading">
 
 <head>
 	<title>
-		<%.Cfg.Title%>
+	video projector
 	</title>
 	<meta name="fragment" content="!">
 	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -42,7 +41,7 @@ var tmplMain = `
 
 <body style="background-color:#000; overflow-x: hidden; overflow-y: hidden;">
     <ui></ui>
-    <script data-main="<%.Cfg.S%>/js/<%.App%>" data-plugin="<%.Cfg.Plugin%>" src="<%.Cfg.S%>/js/libs/require/require.js"></script>
+    <script data-main="<%.Cfg.S%>/js/<%.App%>" src="<%.Cfg.S%>/js/libs/require/require.js"></script>
 </body>
 
 </html>
@@ -68,17 +67,6 @@ func handleRoomView(room string, w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Expires", "-1")
 	w.Header().Set("Cache-Control", "private, max-age=0")
 
-	csp := false
-
-	if config.ContentSecurityPolicy != "" {
-		w.Header().Set("Content-Security-Policy", config.ContentSecurityPolicy)
-		csp = true
-	}
-	if config.ContentSecurityPolicyReportOnly != "" {
-		w.Header().Set("Content-Security-Policy-Report-Only", config.ContentSecurityPolicyReportOnly)
-		csp = true
-	}
-
 	scheme := "http"
 
 	// Detect if the request was made with SSL.
@@ -91,15 +79,13 @@ func handleRoomView(room string, w http.ResponseWriter, r *http.Request) {
 
 	// Prepare context to deliver to HTML..
 	context := &channelling.Context{
-		Cfg:       config,
-		App:       "main",
-		Host:      r.Host,
-		Scheme:    scheme,
-		Ssl:       ssl,
-		Csp:       csp,
-		Languages: []string{"en"},
-		Room:      room,
-		S:         config.S,
+		Cfg:    config,
+		App:    "main",
+		Host:   r.Host,
+		Scheme: scheme,
+		Ssl:    ssl,
+		Room:   room,
+		S:      config.S,
 	}
 
 	// Get URL parameters.
